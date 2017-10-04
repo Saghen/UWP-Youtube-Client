@@ -1,1 +1,1 @@
-![Youtube and Twitch Player](https://raw.githubusercontent.com/Saghen/UWP-Youtube-Twitch-Viewer/master/Logo.png)
+#![Youtube and Twitch Player](https://raw.githubusercontent.com/Saghen/UWP-Youtube-Twitch-Viewer/master/Logo.png)
