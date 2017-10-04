@@ -1,1 +1,1 @@
-<div style="text-align:center"><img align="center" alt="Youtube and Twitch Player" src="https://raw.githubusercontent.com/Saghen/UWP-Youtube-Twitch-Viewer/master/Logo.png" /></div>
+<div style="align:center"><img src="https://raw.githubusercontent.com/Saghen/UWP-Youtube-Twitch-Viewer/master/Logo.png" /></div>
