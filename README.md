@@ -1,2 +1,1 @@
-# Youtube and Twitch Media Player
-## By Saghen
+![Youtube and Twitch Player](https://raw.githubusercontent.com/Saghen/UWP-Youtube-Twitch-Viewer/master/Logo.png)
