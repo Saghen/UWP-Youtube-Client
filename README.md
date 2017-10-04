@@ -1,1 +1,2 @@
-# UWP-Youtube-Twitch-Viewer
+# Youtube and Twitch Media Player
+## By Saghen
