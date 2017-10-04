@@ -1,5 +1,6 @@
 <p align="center"><img style="max-width:100%;" src="https://raw.githubusercontent.com/Saghen/UWP-Youtube-Twitch-Viewer/master/Logo.png"/></p>
-A pre-release of a to be fully featured Twitch and Youtube player.
+#Pre-release 
+To be fully featured Twitch and Youtube player
 
 Features:
  - Windows Styling Integration
