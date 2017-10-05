@@ -13,7 +13,7 @@ using Google.Apis.Auth.OAuth2.Flows;
 using Windows.UI.Core;
 using Newtonsoft.Json;
 
-namespace App4
+namespace YTApp
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.

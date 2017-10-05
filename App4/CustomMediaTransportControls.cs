@@ -7,7 +7,7 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace App4
+namespace YTApp
 {
     class CustomMediaTransportControls : MediaTransportControls
     {

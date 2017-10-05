@@ -7,7 +7,7 @@
     <ProjectGuid>{F7D4F8C5-68AD-41C4-9AF8-DA32273C5BCB}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>App4</RootNamespace>
+    <RootNamespace>YTApp</RootNamespace>
     <AssemblyName>Youtube App</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -101,7 +101,6 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CustomMediaTransportControls.cs" />
-    <Compile Include="FooFrame.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
