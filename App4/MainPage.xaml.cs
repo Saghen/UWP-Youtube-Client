@@ -12,6 +12,8 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Flows;
 using Windows.UI.Core;
 using Newtonsoft.Json;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace YTApp
 {
@@ -21,11 +23,21 @@ namespace YTApp
     public sealed partial class MainPage : Page
     {
         public string YoutubeLink = "";
+        public string YoutubeID = "";
 
         public MainPage()
         {
             this.InitializeComponent();
         }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window.Current.CoreWindow.KeyDown += Event_KeyDown;
+        }
+
+        #region Search
+
+        #region Events
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -55,6 +67,9 @@ namespace YTApp
                 else { try { await Run(); } catch { } }
             }
         }
+
+        #endregion
+        #region API
 
         private async Task Run()
         {
@@ -116,19 +131,32 @@ namespace YTApp
             var nice = subscriptions.Execute();
         }
 
+        #endregion
+
+        #endregion
+
+        #region Media Viewer
+
+        #region Methods
+
         public void StartVideo(string URL)
         {
             viewer.Visibility = Visibility.Visible;
             ScrollView.Visibility = Visibility.Collapsed;
             viewer.Source = new Uri(URL);
+            var _displayRequest = new Windows.System.Display.DisplayRequest();
+            _displayRequest.RequestActive();
         }
 
         public void StopVideo()
         {
             viewer.Visibility = Visibility.Collapsed;
             ScrollView.Visibility = Visibility.Visible;
-            viewer.Source = new Uri("about:Blank");
+            viewer.Source = new Uri("about:blank");
         }
+
+        #endregion
+        #region Events
 
         protected void YoutubeButtonClick(object sender, YoutubeEventArgs e)
         {
@@ -137,6 +165,9 @@ namespace YTApp
                 var youTube = YouTube.Default;
                 var video = youTube.GetVideo(e.URL);
                 StartVideo(video.Uri);
+
+                YoutubeLink = e.URL;
+                YoutubeID = e.ID;
             }
             catch { }
         }
@@ -154,6 +185,74 @@ namespace YTApp
         private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
         {
             StopVideo();
+        }
+
+        private void viewer_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing)
+            {
+                viewer.Pause();
+            }
+            else
+            {
+                viewer.Play();
+            }
+        }
+
+        private void viewer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            viewer.IsFullWindow = !viewer.IsFullWindow;
+            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing)
+            {
+                viewer.Pause();
+            }
+            else
+            {
+                viewer.Play();
+            }
+        }
+
+        private void Event_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (viewer.IsFullWindow && e.VirtualKey == Windows.System.VirtualKey.Escape) { viewer.IsFullWindow = false; }
+        }
+
+        private void viewer_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing)
+            {
+                viewer.Pause();
+            }
+            else
+            {
+                viewer.Play();
+            }
+        }
+
+        private void viewer_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            var tappedItem = (UIElement)e.OriginalSource;
+            var attachedFlyout = (MenuFlyout)FlyoutBase.GetAttachedFlyout(viewer.TransportControls);
+
+            attachedFlyout.ShowAt(tappedItem, e.GetPosition(tappedItem));
+        }
+
+        #endregion
+
+        #endregion
+
+        private void Flyout_CopyLink(object sender, RoutedEventArgs e)
+        {
+            var dataPackage = new DataPackage();
+            dataPackage.SetText("https://youtu.be/" + YoutubeID);
+            Clipboard.SetContent(dataPackage);
+        }
+
+        private void Flyout_CopyLinkAtTime(object sender, RoutedEventArgs e)
+        {
+            var dataPackage = new DataPackage();
+            dataPackage.SetText("https://youtu.be/" + YoutubeID + "?t=" + Convert.ToInt32(viewer.Position.TotalSeconds) + "s");
+            Clipboard.SetContent(dataPackage);
         }
     }
 }

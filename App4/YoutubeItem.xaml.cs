@@ -25,6 +25,7 @@ namespace YTApp
     public sealed partial class YoutubeItem : UserControl
     {
         string YLink = "";
+        string YId = "";
 
         public YoutubeItem(string ImageLink, string Title, string Channel, string Link)
         {
@@ -33,6 +34,7 @@ namespace YTApp
             TitleControl.Text = Title;
             AuthorControl.Text = Channel;
             YLink = "https://www.youtube.com/watch?v=" + Link;
+            YId = Link;
         }
 
         public event EventHandler<YoutubeEventArgs> ButtonClick;
@@ -40,7 +42,7 @@ namespace YTApp
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (this.ButtonClick != null)
-                this.ButtonClick(this, new YoutubeEventArgs(YLink));
+                this.ButtonClick(this, new YoutubeEventArgs(YLink, YId));
         }
     }
 }

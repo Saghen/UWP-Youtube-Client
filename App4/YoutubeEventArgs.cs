@@ -10,9 +10,11 @@ namespace YTApp
     public class YoutubeEventArgs : RoutedEventArgs
     {
         public string URL { get; set; }
-        public YoutubeEventArgs(string Url)
+        public string ID { get; set; }
+        public YoutubeEventArgs(string Url, string Id)
         {
             URL = Url;
+            ID = Id;
         }
     }
 }

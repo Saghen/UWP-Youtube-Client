@@ -5,7 +5,7 @@
     xmlns:local="using:YTApp"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited">
+    mc:Ignorable="d" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" Loaded="Page_Loaded">
 
 	<Grid>
 		<ScrollViewer x:Name="ScrollView">
@@ -20,11 +20,21 @@
 				</StackPanel>
 			</Grid>
 		</ScrollViewer>
-		<MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed">
-			<MediaElement.TransportControls>
-				<local:CustomMediaTransportControls Background="#AA000000"/>
-			</MediaElement.TransportControls>
-		</MediaElement>
+		<MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" >
+            <MediaElement.TransportControls>
+                <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" Tapped="viewer_Tapped" RightTapped="viewer_RightTapped">
+                    <FlyoutBase.AttachedFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink"/>
+                            <MenuFlyoutItem Text="Copy link at current time" Click="Flyout_CopyLinkAtTime"/>
+                            <MenuFlyoutItem Text="Loop"/>
+                            <MenuFlyoutItem Text="Close video"/>
+                        </MenuFlyout>
+                    </FlyoutBase.AttachedFlyout>
+                </local:CustomMediaTransportControls>
+            </MediaElement.TransportControls>
+        </MediaElement>
 		<Button x:Name='CloseMediaElement' Visibility="Collapsed" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="CloseMediaElement_Click"/>
-	</Grid>
+
+    </Grid>
 </Page>
