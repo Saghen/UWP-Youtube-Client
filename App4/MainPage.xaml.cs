@@ -14,6 +14,7 @@ using Windows.UI.Core;
 using Newtonsoft.Json;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace YTApp
 {
@@ -22,8 +23,9 @@ namespace YTApp
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        public string YoutubeLink = "";
-        public string YoutubeID = "";
+        private string YoutubeLink = "";
+        private string YoutubeID = "";
+        private bool FullSizedMediaElement = true;
 
         public MainPage()
         {
@@ -142,7 +144,22 @@ namespace YTApp
         public void StartVideo(string URL)
         {
             viewer.Visibility = Visibility.Visible;
-            ScrollView.Visibility = Visibility.Collapsed;
+            //ScrollView.Visibility = Visibility.Collapsed;
+            /*if (FullSizedMediaElement == true) { }
+            else
+            {
+                var animation = new DoubleAnimation();
+                animation.From = viewer.ActualWidth;
+                animation.To = 640;
+                animation.Duration = new Duration(new TimeSpan(0, 0, 0, 2, 0));
+                var storyboard = new Storyboard();
+                Storyboard.SetTargetProperty(animation, "Width");
+                Storyboard.SetTarget(animation, viewer);
+
+                storyboard.Children.Add(animation);
+                storyboard.Begin();
+
+            }*/
             viewer.Source = new Uri(URL);
             var _displayRequest = new Windows.System.Display.DisplayRequest();
             _displayRequest.RequestActive();
@@ -150,9 +167,67 @@ namespace YTApp
 
         public void StopVideo()
         {
-            viewer.Visibility = Visibility.Collapsed;
+            if (FullSizedMediaElement == true)
+            {
+                var animationWidth = new DoubleAnimation();
+                animationWidth.From = viewer.ActualWidth;
+                animationWidth.To = 640;
+                animationWidth.EnableDependentAnimation = true;
+                animationWidth.Duration = TimeSpan.FromSeconds(0.5);
+                var storyboard = new Storyboard();
+                Storyboard.SetTargetProperty(animationWidth, "Width");
+                Storyboard.SetTarget(animationWidth, viewer);
+
+                var animationHeight = new DoubleAnimation();
+                animationHeight.From = viewer.ActualHeight;
+                animationHeight.To = 360;
+                animationHeight.EnableDependentAnimation = true;
+                animationHeight.Duration = TimeSpan.FromSeconds(0.5);
+                Storyboard.SetTargetProperty(animationHeight, "Height");
+                Storyboard.SetTarget(animationHeight, viewer);
+
+                storyboard.Children.Add(animationWidth);
+                storyboard.Children.Add(animationHeight);
+                storyboard.Begin();
+
+                FullSizedMediaElement = false;
+            }
+            else
+            {
+                var animationWidth = new DoubleAnimation();
+                animationWidth.From = viewer.ActualWidth;
+                animationWidth.To = ActualWidth;
+                animationWidth.EnableDependentAnimation = true;
+                animationWidth.Duration = TimeSpan.FromSeconds(0.5);
+                var storyboard = new Storyboard();
+                Storyboard.SetTargetProperty(animationWidth, "Width");
+                Storyboard.SetTarget(animationWidth, viewer);
+
+                var animationHeight = new DoubleAnimation();
+                animationHeight.From = viewer.ActualHeight;
+                animationHeight.To = ActualHeight;
+                animationHeight.EnableDependentAnimation = true;
+                animationHeight.Duration = TimeSpan.FromSeconds(0.5);
+                Storyboard.SetTargetProperty(animationHeight, "Height");
+                Storyboard.SetTarget(animationHeight, viewer);
+
+                storyboard.Children.Add(animationWidth);
+                storyboard.Children.Add(animationHeight);
+                storyboard.Completed += Storyboard_Completed;
+                storyboard.Begin();
+
+                FullSizedMediaElement = true;
+            }
+            
+
             ScrollView.Visibility = Visibility.Visible;
-            viewer.Source = new Uri("about:blank");
+            //viewer.Source = new Uri("about:blank");
+        }
+
+        private void Storyboard_Completed(object sender, object e)
+        {
+            viewer.Height = Double.NaN;
+            viewer.Width = Double.NaN;
         }
 
         #endregion
@@ -187,18 +262,6 @@ namespace YTApp
             StopVideo();
         }
 
-        private void viewer_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing)
-            {
-                viewer.Pause();
-            }
-            else
-            {
-                viewer.Play();
-            }
-        }
-
         private void viewer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             viewer.IsFullWindow = !viewer.IsFullWindow;
@@ -215,6 +278,14 @@ namespace YTApp
         private void Event_KeyDown(object sender, KeyEventArgs e)
         {
             if (viewer.IsFullWindow && e.VirtualKey == Windows.System.VirtualKey.Escape) { viewer.IsFullWindow = false; }
+            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing && e.VirtualKey == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
+            {
+                viewer.Pause();
+            }
+            else if (e.VirtualKey == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
+            {
+                viewer.Play();
+            }
         }
 
         private void viewer_Tapped(object sender, TappedRoutedEventArgs e)

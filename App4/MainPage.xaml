@@ -7,7 +7,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" Loaded="Page_Loaded">
 
-	<Grid>
+    <Page.Resources>
+        <Storyboard x:Name="AnimateMediaElement">
+            <DoubleAnimation Storyboard.TargetProperty="Width" From="259.0" To="149.0" Duration="0:0:5"/>
+        </Storyboard>
+    </Page.Resources>
+    <Grid>
 		<ScrollViewer x:Name="ScrollView">
 			<Grid x:Name="MainGrid" Background="#222">
 				<StackPanel Margin="10">
@@ -20,7 +25,7 @@
 				</StackPanel>
 			</Grid>
 		</ScrollViewer>
-		<MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" >
+		<MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Right">
             <MediaElement.TransportControls>
                 <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" Tapped="viewer_Tapped" RightTapped="viewer_RightTapped">
                     <FlyoutBase.AttachedFlyout>
