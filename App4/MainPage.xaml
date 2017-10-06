@@ -5,41 +5,96 @@
     xmlns:local="using:YTApp"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" Loaded="Page_Loaded">
+    mc:Ignorable="d" Loaded="Page_Loaded" x:Name="MainWindowPage">
 
     <Page.Resources>
-        <Storyboard x:Name="AnimateMediaElement">
-            <DoubleAnimation Storyboard.TargetProperty="Width" From="259.0" To="149.0" Duration="0:0:5"/>
+        <Storyboard x:Name="FadeOut">
+            <DoubleAnimation Storyboard.TargetName="CloseMediaElement" EnableDependentAnimation="True"  Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.2"/>
         </Storyboard>
-    </Page.Resources>
-    <Grid>
-		<ScrollViewer x:Name="ScrollView">
-			<Grid x:Name="MainGrid" Background="#222">
-				<StackPanel Margin="10">
-					<StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
-						<TextBox x:Name="SearchBox" Background="#555" Foreground="#fff" PlaceholderText="Search" FocusVisualSecondaryBrush="Transparent" Width="500px" KeyDown="SearchBox_KeyDown"/>
-						<Button Background="#aaa" FontFamily="Segoe MDL2 Assets" Content="&#xE094;" Height="30px" Click="Button_Click"/>
-					</StackPanel>
-					<VariableSizedWrapGrid x:Name="Putallthethingshere" Orientation="Horizontal">
-					</VariableSizedWrapGrid>
-				</StackPanel>
-			</Grid>
-		</ScrollViewer>
-		<MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-            <MediaElement.TransportControls>
-                <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" Tapped="viewer_Tapped" RightTapped="viewer_RightTapped">
-                    <FlyoutBase.AttachedFlyout>
-                        <MenuFlyout>
-                            <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink"/>
-                            <MenuFlyoutItem Text="Copy link at current time" Click="Flyout_CopyLinkAtTime"/>
-                            <MenuFlyoutItem Text="Loop"/>
-                            <MenuFlyoutItem Text="Close video"/>
-                        </MenuFlyout>
-                    </FlyoutBase.AttachedFlyout>
-                </local:CustomMediaTransportControls>
-            </MediaElement.TransportControls>
-        </MediaElement>
-		<Button x:Name='CloseMediaElement' Visibility="Collapsed" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="CloseMediaElement_Click"/>
+        <Storyboard x:Name="FadeIn">
+            <DoubleAnimation Storyboard.TargetName="CloseMediaElement" EnableDependentAnimation="True" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2"/>
+        </Storyboard>
 
+        <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
+        <Style x:Key="MyButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                   Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#ccc"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <PointerUpThemeAnimation Storyboard.TargetName="RootGrid" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter"
+                                                   Storyboard.TargetProperty="Foreground">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="#999" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <PointerDownThemeAnimation Storyboard.TargetName="RootGrid" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter x:Name="ContentPresenter"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}"
+                          Content="{TemplateBinding Content}"
+                          ContentTransitions="{TemplateBinding ContentTransitions}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                          Padding="{TemplateBinding Padding}"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                          AutomationProperties.AccessibilityView="Raw"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <ScrollViewer x:Name="ScrollView">
+            <Grid x:Name="MainGrid" Background="#222">
+                <StackPanel Margin="10">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
+                        <TextBox x:Name="SearchBox" Background="#555" Foreground="#fff" PlaceholderText="Search" FocusVisualSecondaryBrush="Transparent" Width="500px" KeyDown="SearchBox_KeyDown"/>
+                        <Button Background="#aaa" FontFamily="Segoe MDL2 Assets" Content="&#xE094;" Height="30px" Click="Button_Click" Style="{StaticResource ButtonRevealStyle}"/>
+                    </StackPanel>
+                    <VariableSizedWrapGrid x:Name="Putallthethingshere" Orientation="Horizontal">
+                    </VariableSizedWrapGrid>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+        <Grid x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed">
+                <MediaElement.TransportControls>
+                    <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" RightTapped="viewer_RightTapped">
+                        <FlyoutBase.AttachedFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink"/>
+                                <MenuFlyoutItem Text="Copy link at current time" Click="Flyout_CopyLinkAtTime"/>
+                                <MenuFlyoutItem Text="Loop"/>
+                                <MenuFlyoutItem Text="Close video"/>
+                            </MenuFlyout>
+                        </FlyoutBase.AttachedFlyout>
+                    </local:CustomMediaTransportControls>
+                </MediaElement.TransportControls>
+            </MediaElement>
+            <Button x:Name='CloseMediaElement' Style="{StaticResource MyButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="CloseMediaElement_Click">
+            </Button>
+        </Grid>
     </Grid>
 </Page>
