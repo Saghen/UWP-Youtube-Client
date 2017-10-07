@@ -15,6 +15,8 @@ using Newtonsoft.Json;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml.Media.Animation;
+using Google.Apis.YouTube.v3.Data;
+using System.ComponentModel;
 
 namespace YTApp
 {
@@ -26,6 +28,8 @@ namespace YTApp
         private string YoutubeLink = "";
         private string YoutubeID = "";
         private bool FullSizedMediaElement = true;
+
+        List<SearchListResponse> youtubeVideos = new List<SearchListResponse>();
 
         public MainPage()
         {
@@ -118,7 +122,7 @@ namespace YTApp
             Console.WriteLine("Done");
         }
 
-        private void GetSubscriptions()
+        private SubscriptionListResponse GetSubscriptions()
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
@@ -126,13 +130,12 @@ namespace YTApp
                 ApplicationName = this.GetType().ToString()
             });
 
-            var subscriptions = youtubeService.Subscriptions.List("snippet,contentDetails");
-            subscriptions.OauthToken = "-Rn1-zDrvIFolkFBxm8zSwbB";
+            var subscriptions = youtubeService.Subscriptions.List("snippet, contentDetails");
             subscriptions.ChannelId = "UCfYSGOxQeqO4AaM7eKryjeQ";
+            subscriptions.MaxResults = 50;
 
-            var nice = subscriptions.Execute();
+            return subscriptions.Execute();
         }
-
         #endregion
 
         #endregion
