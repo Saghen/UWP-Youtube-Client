@@ -15,6 +15,8 @@ using Newtonsoft.Json;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml.Media.Animation;
+using Google.Apis.YouTube.v3.Data;
+using System.ComponentModel;
 
 namespace YTApp
 {
@@ -26,6 +28,8 @@ namespace YTApp
         private string YoutubeLink = "";
         private string YoutubeID = "";
         private bool FullSizedMediaElement = true;
+
+        List<SearchListResponse> youtubeVideos = new List<SearchListResponse>();
 
         public MainPage()
         {
@@ -118,7 +122,7 @@ namespace YTApp
             Console.WriteLine("Done");
         }
 
-        private async void GetSubscriptions()
+        private SubscriptionListResponse GetSubscriptions()
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
@@ -126,13 +130,12 @@ namespace YTApp
                 ApplicationName = this.GetType().ToString()
             });
 
-            var subscriptions = youtubeService.Subscriptions.List("snippet,contentDetails");
-            subscriptions.OauthToken = "-Rn1-zDrvIFolkFBxm8zSwbB";
+            var subscriptions = youtubeService.Subscriptions.List("snippet, contentDetails");
             subscriptions.ChannelId = "UCfYSGOxQeqO4AaM7eKryjeQ";
+            subscriptions.MaxResults = 50;
 
-            var nice = subscriptions.Execute();
+            return subscriptions.Execute();
         }
-
         #endregion
 
         #endregion
@@ -144,23 +147,8 @@ namespace YTApp
         public void StartVideo(string URL)
         {
             viewer.Visibility = Visibility.Visible;
-            //ScrollView.Visibility = Visibility.Collapsed;
-            /*if (FullSizedMediaElement == true) { }
-            else
-            {
-                var animation = new DoubleAnimation();
-                animation.From = viewer.ActualWidth;
-                animation.To = 640;
-                animation.Duration = new Duration(new TimeSpan(0, 0, 0, 2, 0));
-                var storyboard = new Storyboard();
-                Storyboard.SetTargetProperty(animation, "Width");
-                Storyboard.SetTarget(animation, viewer);
-
-                storyboard.Children.Add(animation);
-                storyboard.Begin();
-
-            }*/
             viewer.Source = new Uri(URL);
+            viewer.TransportControls.Focus(FocusState.Programmatic);
             var _displayRequest = new Windows.System.Display.DisplayRequest();
             _displayRequest.RequestActive();
         }
@@ -176,7 +164,7 @@ namespace YTApp
                 animationWidth.Duration = TimeSpan.FromSeconds(0.5);
                 var storyboard = new Storyboard();
                 Storyboard.SetTargetProperty(animationWidth, "Width");
-                Storyboard.SetTarget(animationWidth, viewer);
+                Storyboard.SetTarget(animationWidth, MediaElementContainer);
 
                 var animationHeight = new DoubleAnimation();
                 animationHeight.From = viewer.ActualHeight;
@@ -184,7 +172,7 @@ namespace YTApp
                 animationHeight.EnableDependentAnimation = true;
                 animationHeight.Duration = TimeSpan.FromSeconds(0.5);
                 Storyboard.SetTargetProperty(animationHeight, "Height");
-                Storyboard.SetTarget(animationHeight, viewer);
+                Storyboard.SetTarget(animationHeight, MediaElementContainer);
 
                 storyboard.Children.Add(animationWidth);
                 storyboard.Children.Add(animationHeight);
@@ -201,7 +189,7 @@ namespace YTApp
                 animationWidth.Duration = TimeSpan.FromSeconds(0.5);
                 var storyboard = new Storyboard();
                 Storyboard.SetTargetProperty(animationWidth, "Width");
-                Storyboard.SetTarget(animationWidth, viewer);
+                Storyboard.SetTarget(animationWidth, MediaElementContainer);
 
                 var animationHeight = new DoubleAnimation();
                 animationHeight.From = viewer.ActualHeight;
@@ -209,7 +197,7 @@ namespace YTApp
                 animationHeight.EnableDependentAnimation = true;
                 animationHeight.Duration = TimeSpan.FromSeconds(0.5);
                 Storyboard.SetTargetProperty(animationHeight, "Height");
-                Storyboard.SetTarget(animationHeight, viewer);
+                Storyboard.SetTarget(animationHeight, MediaElementContainer);
 
                 storyboard.Children.Add(animationWidth);
                 storyboard.Children.Add(animationHeight);
@@ -218,7 +206,7 @@ namespace YTApp
 
                 FullSizedMediaElement = true;
             }
-            
+
 
             ScrollView.Visibility = Visibility.Visible;
             //viewer.Source = new Uri("about:blank");
@@ -226,8 +214,8 @@ namespace YTApp
 
         private void Storyboard_Completed(object sender, object e)
         {
-            viewer.Height = Double.NaN;
-            viewer.Width = Double.NaN;
+            MediaElementContainer.Height = Double.NaN;
+            MediaElementContainer.Width = Double.NaN;
         }
 
         #endregion
@@ -247,15 +235,6 @@ namespace YTApp
             catch { }
         }
 
-        private void viewer_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            CloseMediaElement.Visibility = Visibility.Visible;
-        }
-
-        private void viewer_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            CloseMediaElement.Visibility = Visibility.Collapsed;
-        }
 
         private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
         {
@@ -310,6 +289,25 @@ namespace YTApp
 
         #endregion
 
+        #endregion
+
+        #region MediaElementButton Management
+        private void viewer_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            CloseMediaElement.Visibility = Visibility.Visible;
+            FadeIn.Begin();
+        }
+
+        private void viewer_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            FadeOut.Completed += MediaButtonCompleted;
+            FadeOut.Begin();
+        }
+
+        private void MediaButtonCompleted(object sender, object e)
+        {
+            if (CloseMediaElement.Opacity == 0) { CloseMediaElement.Visibility = Visibility.Collapsed; }
+        }
         #endregion
 
         private void Flyout_CopyLink(object sender, RoutedEventArgs e)

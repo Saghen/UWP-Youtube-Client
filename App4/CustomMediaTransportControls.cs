@@ -11,7 +11,6 @@ namespace YTApp
 {
     class CustomMediaTransportControls : MediaTransportControls
     {
-        public event EventHandler<EventArgs> CompactMode;
 
         public CustomMediaTransportControls()
         {

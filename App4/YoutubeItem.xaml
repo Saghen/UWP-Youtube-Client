@@ -9,8 +9,8 @@
 	Height="240"
     Width="280">
 
-	<Button Click="Button_Click">
-		<StackPanel Margin="10">
+    <Button Click="Button_Click" Style="{StaticResource ButtonRevealStyle}">
+        <StackPanel Margin="10">
 			<Image x:Name="ImageControl"/>
 			<TextBlock x:Name="TitleControl" FontSize="15" Foreground="#fff" TextWrapping="Wrap" Height="40px"/>
 			<TextBlock x:Name="AuthorControl" FontSize="12" Foreground="#fff"/>
