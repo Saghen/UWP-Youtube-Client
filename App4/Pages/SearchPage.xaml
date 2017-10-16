@@ -1,0 +1,32 @@
+﻿<Page
+    x:Class="YTApp.Pages.SearchPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YTApp.Pages"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:classes="using:YTApp.Classes"
+    mc:Ignorable="d">
+
+    <ScrollViewer x:Name="ScrollView">
+        <Grid x:Name="MainGrid" Background="#1a1a1a">
+            <ListView x:Name="YoutubeItemsGridView" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                        <StackPanel Margin="10" Height="200" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10"/>
+                            <StackPanel>
+                                <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
+                                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#fff" Margin="10,0,0,0"/>
+                                </StackPanel>
+                                <TextBlock x:Name="DescriptionControl" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </ScrollViewer>
+</Page>

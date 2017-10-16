@@ -17,6 +17,20 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml.Media.Animation;
 using Google.Apis.YouTube.v3.Data;
 using System.ComponentModel;
+using YTApp.Classes;
+using Windows.UI.Xaml.Media.Imaging;
+using YTApp.Pages;
+using Windows.UI.Xaml.Navigation;
+using System.Linq;
+using Windows.Storage;
+using System.Net.Http;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
+using Windows.Storage.Streams;
+using Windows.Data.Json;
+using System.Text;
+using Windows.ApplicationModel.Activation;
+using System.Threading;
 
 namespace YTApp
 {
@@ -29,31 +43,65 @@ namespace YTApp
         private string YoutubeID = "";
         private bool FullSizedMediaElement = true;
 
+        private List<SubscriptionDataType> subscriptionsList = new List<SubscriptionDataType>();
+
         List<SearchListResponse> youtubeVideos = new List<SearchListResponse>();
+
+        public string OAuthToken;
+
+        BackgroundWorker bg = new BackgroundWorker();
 
         public MainPage()
         {
             this.InitializeComponent();
+            
+        }
+
+        private void DoWork()
+        {
+            string nextPageToken;
+            var tempSubscriptions = GetSubscriptions(null);
+            foreach (Subscription sub in tempSubscriptions.Items)
+            {
+                var subscription = new SubscriptionDataType();
+                subscription.Id = sub.Snippet.ChannelId;
+                subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
+                subscription.Title = sub.Snippet.Title;
+                subscriptionsList.Add(subscription);
+            }
+            if (tempSubscriptions.NextPageToken != null)
+            {
+                nextPageToken = tempSubscriptions.NextPageToken;
+                while (nextPageToken != null)
+                {
+                    var tempSubs = GetSubscriptions(nextPageToken);
+                    foreach (Subscription sub in tempSubs.Items)
+                    {
+                        var subscription = new SubscriptionDataType();
+                        subscription.Id = sub.Snippet.ChannelId;
+                        subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
+                        subscription.Title = sub.Snippet.Title;
+                        subscriptionsList.Add(subscription);
+                    }
+                    nextPageToken = tempSubs.NextPageToken;
+                }
+            }
+            subscriptionsList.Sort((x, y) => string.Compare(x.Title, y.Title));
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             Window.Current.CoreWindow.KeyDown += Event_KeyDown;
+            SearchBox.Focus(FocusState.Keyboard);
         }
 
         #region Search
 
         #region Events
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void Search_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                await Run();
-            }
-            catch { }
-
-            GetSubscriptions();
+            contentFrame.Navigate(typeof(SearchPage), new Params() { mainPageRef = this });
         }
 
         private async void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -70,68 +118,31 @@ namespace YTApp
                     }
                     catch { }
                 }
-                else { try { await Run(); } catch { } }
+                contentFrame.Navigate(typeof(SearchPage), new Params() { mainPageRef = this });
             }
+        }
+
+        public class Params
+        {
+            public MainPage mainPageRef { get; set; }
         }
 
         #endregion
+
         #region API
 
-        private async Task Run()
+        private SubscriptionListResponse GetSubscriptions(string NextPageToken)
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
-                ApplicationName = this.GetType().ToString()
-            });
-
-            var searchListRequest = youtubeService.Search.List("snippet");
-            searchListRequest.Q = SearchBox.Text; // Replace with your search term.
-            searchListRequest.MaxResults = 50;
-
-            // Call the search.list method to retrieve results matching the specified query term.
-            var searchListResponse = await searchListRequest.ExecuteAsync();
-
-            List<string> videos = new List<string>();
-            List<string> channels = new List<string>();
-            List<string> playlists = new List<string>();
-
-            Putallthethingshere.Children.Clear();
-
-            // Add each result to the appropriate list, and then display the lists of
-            // matching videos, channels, and playlists.
-            foreach (var searchResult in searchListResponse.Items)
-            {
-                switch (searchResult.Id.Kind)
-                {
-                    case "youtube#video":
-                        Putallthethingshere.Children.Add(new YoutubeItem(searchResult.Snippet.Thumbnails.Medium.Url, searchResult.Snippet.Title, searchResult.Snippet.ChannelTitle, searchResult.Id.VideoId));
-                        break;
-
-                    case "youtube#channel":
-                        channels.Add(String.Format("{0} ({1})", searchResult.Snippet.Title, searchResult.Id.ChannelId));
-                        break;
-                }
-            }
-
-            foreach (YoutubeItem obj in Putallthethingshere.Children)
-            {
-                obj.ButtonClick += new EventHandler<YoutubeEventArgs>(YoutubeButtonClick);
-            }
-
-            Console.WriteLine("Done");
-        }
-
-        private SubscriptionListResponse GetSubscriptions()
-        {
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
-            {
-                ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
-                ApplicationName = this.GetType().ToString()
+                ApplicationName = this.GetType().ToString(),
             });
 
             var subscriptions = youtubeService.Subscriptions.List("snippet, contentDetails");
             subscriptions.ChannelId = "UCfYSGOxQeqO4AaM7eKryjeQ";
+            subscriptions.PageToken = NextPageToken;
+            subscriptions.OauthToken = App.OAuthCode;
             subscriptions.MaxResults = 50;
 
             return subscriptions.Execute();
@@ -155,61 +166,16 @@ namespace YTApp
 
         public void StopVideo()
         {
-            if (FullSizedMediaElement == true)
+            if (MediaElementContainer.Width != 640)
             {
-                var animationWidth = new DoubleAnimation();
-                animationWidth.From = viewer.ActualWidth;
-                animationWidth.To = 640;
-                animationWidth.EnableDependentAnimation = true;
-                animationWidth.Duration = TimeSpan.FromSeconds(0.5);
-                var storyboard = new Storyboard();
-                Storyboard.SetTargetProperty(animationWidth, "Width");
-                Storyboard.SetTarget(animationWidth, MediaElementContainer);
-
-                var animationHeight = new DoubleAnimation();
-                animationHeight.From = viewer.ActualHeight;
-                animationHeight.To = 360;
-                animationHeight.EnableDependentAnimation = true;
-                animationHeight.Duration = TimeSpan.FromSeconds(0.5);
-                Storyboard.SetTargetProperty(animationHeight, "Height");
-                Storyboard.SetTarget(animationHeight, MediaElementContainer);
-
-                storyboard.Children.Add(animationWidth);
-                storyboard.Children.Add(animationHeight);
-                storyboard.Begin();
-
-                FullSizedMediaElement = false;
+                MediaElementContainer.Width = 640;
+                MediaElementContainer.Height = 360;
             }
             else
             {
-                var animationWidth = new DoubleAnimation();
-                animationWidth.From = viewer.ActualWidth;
-                animationWidth.To = ActualWidth;
-                animationWidth.EnableDependentAnimation = true;
-                animationWidth.Duration = TimeSpan.FromSeconds(0.5);
-                var storyboard = new Storyboard();
-                Storyboard.SetTargetProperty(animationWidth, "Width");
-                Storyboard.SetTarget(animationWidth, MediaElementContainer);
-
-                var animationHeight = new DoubleAnimation();
-                animationHeight.From = viewer.ActualHeight;
-                animationHeight.To = ActualHeight;
-                animationHeight.EnableDependentAnimation = true;
-                animationHeight.Duration = TimeSpan.FromSeconds(0.5);
-                Storyboard.SetTargetProperty(animationHeight, "Height");
-                Storyboard.SetTarget(animationHeight, MediaElementContainer);
-
-                storyboard.Children.Add(animationWidth);
-                storyboard.Children.Add(animationHeight);
-                storyboard.Completed += Storyboard_Completed;
-                storyboard.Begin();
-
-                FullSizedMediaElement = true;
+                MediaElementContainer.Width = Double.NaN;
+                MediaElementContainer.Height = Double.NaN;
             }
-
-
-            ScrollView.Visibility = Visibility.Visible;
-            //viewer.Source = new Uri("about:blank");
         }
 
         private void Storyboard_Completed(object sender, object e)
@@ -219,21 +185,8 @@ namespace YTApp
         }
 
         #endregion
+
         #region Events
-
-        protected void YoutubeButtonClick(object sender, YoutubeEventArgs e)
-        {
-            try
-            {
-                var youTube = YouTube.Default;
-                var video = youTube.GetVideo(e.URL);
-                StartVideo(video.Uri);
-
-                YoutubeLink = e.URL;
-                YoutubeID = e.ID;
-            }
-            catch { }
-        }
 
 
         private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
@@ -322,6 +275,50 @@ namespace YTApp
             var dataPackage = new DataPackage();
             dataPackage.SetText("https://youtu.be/" + YoutubeID + "?t=" + Convert.ToInt32(viewer.Position.TotalSeconds) + "s");
             Clipboard.SetContent(dataPackage);
+        }
+
+
+        private void HamburgerButton_Click(object sender, RoutedEventArgs e)
+        {
+            SideBarSplitView.IsPaneOpen = !SideBarSplitView.IsPaneOpen;
+        }
+
+        private void HamburgerButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
+        }
+
+        private void HamburgerButton_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 2);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Test();
+        }
+
+        private async Task Test()
+        {
+            UserCredential credential;
+            credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+    new ClientSecrets
+    {
+        ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+        ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+    }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
+
+            // Create the service.
+            var service = new YouTubeService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Youtube Viewer",
+            });
+
+            var subscriptions = service.Subscriptions.List("snippet, contentDetails");
+            subscriptions.MaxResults = 50;
+            subscriptions.Mine = true;
+            var whew = await subscriptions.ExecuteAsync();
         }
     }
 }
