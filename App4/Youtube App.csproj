@@ -113,9 +113,6 @@
       <DependentUpon>YoutubeChannel.xaml</DependentUpon>
     </Compile>
     <Compile Include="YoutubeEventArgs.cs" />
-    <Compile Include="YoutubeItem.xaml.cs">
-      <DependentUpon>YoutubeItem.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -152,10 +149,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="YoutubeChannel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="YoutubeItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
