@@ -114,15 +114,11 @@
     <Compile Include="Pages\HomePage.xaml.cs">
       <DependentUpon>HomePage.xaml</DependentUpon>
     </Compile>
-<<<<<<< HEAD
     <Compile Include="Pages\SearchPage.xaml.cs">
       <DependentUpon>SearchPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classes\YoutubeItemDataType.cs" />
-=======
-    <Compile Include="YoutubeEventArgs.cs" />
->>>>>>> 3ecbc5977405ff26e60a21c178a23d082d4b5ffb
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -206,13 +202,10 @@
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
-<<<<<<< HEAD
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-=======
->>>>>>> 3ecbc5977405ff26e60a21c178a23d082d4b5ffb
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Google.Apis">
