@@ -34,7 +34,7 @@
             <Button x:Name="HamburgerButton" FontFamily="Segoe MDL2 Assets" Content="&#xE700;" FontSize="18" Margin="20,0" Background="Transparent" Click="HamburgerButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
             <TextBox x:Name="SearchBox" Width="500px" VerticalAlignment="Center" PlaceholderText="Search" KeyDown="SearchBox_KeyDown" BorderThickness="1" Style="{StaticResource TextBoxCleanStyle}" Background="#151515" BorderBrush="#2a2a2a" x:FieldModifier="public"/>
             <Button x:Name="SearchButton" Background="#444" Padding="20,0" Height="32" FontFamily="Segoe MDL2 Assets" Content="&#xE094;" Click="Search_Click" Style="{StaticResource TransparentButtonStyle}"/>
-            <Button Click="Button_Click">Test</Button>
+            <Button>Test</Button>
             <Button Click="Button_Click_1">Oauth</Button>
         </StackPanel>
 
@@ -69,17 +69,24 @@
                         </ListView>
                         <MenuFlyoutSeparator/>
                         <TextBlock Text="SUBSCRIPTIONS" Margin="25,10" FontSize="20"/>
-                        <ListView Margin="0" ItemsSource="{x:Bind subscriptionsList}">
+                        <ListView Margin="0" ItemsSource="{x:Bind subscriptionsList, Mode=OneWay}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:SubscriptionDataType">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Ellipse Width="30" Height="30" Margin="15,0">
-                                            <Ellipse.Fill>
-                                                <ImageBrush ImageSource="{x:Bind Thumbnail}"/>
-                                            </Ellipse.Fill>
-                                        </Ellipse>
-                                        <TextBlock Text="{x:Bind Title}"/>
-                                    </StackPanel>
+                                    <Grid Width="Auto">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="270"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="30" Height="30" Margin="15,0">
+                                                <Ellipse.Fill>
+                                                    <ImageBrush ImageSource="{x:Bind Thumbnail}"/>
+                                                </Ellipse.Fill>
+                                            </Ellipse>
+                                            <TextBlock Text="{x:Bind Title}"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{x:Bind NewVideosCount}" HorizontalAlignment="Right" Grid.Column="1"/>
+                                    </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>

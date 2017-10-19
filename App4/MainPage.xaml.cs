@@ -53,20 +53,32 @@ namespace YTApp
 
         public MainPage()
         {
+            DoWork();
             this.InitializeComponent();
-            
         }
 
-        private void DoWork()
+        private async void DoWork()
         {
+            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets {
+            ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+            ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm" }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
+
+            // Create the service.
+            var service = new YouTubeService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Youtube Viewer",
+            });
+
             string nextPageToken;
-            var tempSubscriptions = GetSubscriptions(null);
+            var tempSubscriptions = GetSubscriptions(null, service);
             foreach (Subscription sub in tempSubscriptions.Items)
             {
                 var subscription = new SubscriptionDataType();
                 subscription.Id = sub.Snippet.ChannelId;
                 subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
                 subscription.Title = sub.Snippet.Title;
+                subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
                 subscriptionsList.Add(subscription);
             }
             if (tempSubscriptions.NextPageToken != null)
@@ -74,13 +86,14 @@ namespace YTApp
                 nextPageToken = tempSubscriptions.NextPageToken;
                 while (nextPageToken != null)
                 {
-                    var tempSubs = GetSubscriptions(nextPageToken);
+                    var tempSubs = GetSubscriptions(nextPageToken, service);
                     foreach (Subscription sub in tempSubs.Items)
                     {
                         var subscription = new SubscriptionDataType();
                         subscription.Id = sub.Snippet.ChannelId;
                         subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
                         subscription.Title = sub.Snippet.Title;
+                        subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
                         subscriptionsList.Add(subscription);
                     }
                     nextPageToken = tempSubs.NextPageToken;
@@ -131,18 +144,11 @@ namespace YTApp
 
         #region API
 
-        private SubscriptionListResponse GetSubscriptions(string NextPageToken)
+        private SubscriptionListResponse GetSubscriptions(string NextPageToken, YouTubeService service)
         {
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
-            {
-                ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
-                ApplicationName = this.GetType().ToString(),
-            });
-
-            var subscriptions = youtubeService.Subscriptions.List("snippet, contentDetails");
-            subscriptions.ChannelId = "UCfYSGOxQeqO4AaM7eKryjeQ";
+            var subscriptions = service.Subscriptions.List("snippet, contentDetails");
             subscriptions.PageToken = NextPageToken;
-            subscriptions.OauthToken = App.OAuthCode;
+            subscriptions.Mine = true;
             subscriptions.MaxResults = 50;
 
             return subscriptions.Execute();
@@ -318,7 +324,8 @@ namespace YTApp
             var subscriptions = service.Subscriptions.List("snippet, contentDetails");
             subscriptions.MaxResults = 50;
             subscriptions.Mine = true;
-            var whew = await subscriptions.ExecuteAsync();
+            await subscriptions.ExecuteAsync();
+            DoWork();
         }
     }
 }
