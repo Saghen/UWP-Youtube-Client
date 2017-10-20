@@ -14,9 +14,11 @@
         <ResourceDictionary>
             <Storyboard x:Name="FadeOut">
                 <DoubleAnimation Storyboard.TargetName="CloseMediaElement" EnableDependentAnimation="True"  Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.2"/>
+                <DoubleAnimation Storyboard.TargetName="MinimizeMediaElement" EnableDependentAnimation="True"  Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.2"/>
             </Storyboard>
             <Storyboard x:Name="FadeIn">
                 <DoubleAnimation Storyboard.TargetName="CloseMediaElement" EnableDependentAnimation="True" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2"/>
+                <DoubleAnimation Storyboard.TargetName="MinimizeMediaElement" EnableDependentAnimation="True" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2"/>
             </Storyboard>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/TransparentButton.xaml"/>
@@ -113,8 +115,8 @@
                     </local:CustomMediaTransportControls>
                 </MediaElement.TransportControls>
             </MediaElement>
-            <Button x:Name='CloseMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="CloseMediaElement_Click">
-            </Button>
+            <Button x:Name='MinimizeMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="MinimizeMediaElement_Click"/>
+            <Button x:Name='CloseMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Click="CloseMediaElement_Click"/>
         </Grid>
     </Grid>
 </Page>

@@ -15,6 +15,8 @@ namespace YTApp.Classes
         private string _description;
         private string _length;
         private string _ylink;
+        private string _id;
+        private DateTime _dateSubmitted;
 
         public string Thumbnail { get => _thumbnail; set => _thumbnail = value; }
         public string Title { get => _title; set => _title = value; }
@@ -23,5 +25,7 @@ namespace YTApp.Classes
         public string Description { get => _description; set => _description = value; }
         public string Length { get => _length; set => _length = value; }
         public string Ylink { get => _ylink; set => _ylink = value; }
+        public DateTime DateSubmitted { get => _dateSubmitted; set => _dateSubmitted = value; }
+        public string Id { get => _id; set => _id = value; }
     }
 }

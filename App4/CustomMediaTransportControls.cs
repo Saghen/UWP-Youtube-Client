@@ -34,13 +34,13 @@ namespace YTApp
             {
                 await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
                 CompactView = false;
-                IsCompact = true;
+                IsCompact = false;
             }
             else
             {
                 await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay);
                 CompactView = true;
-                IsCompact = false;
+                IsCompact = true;
             }
         }
     }

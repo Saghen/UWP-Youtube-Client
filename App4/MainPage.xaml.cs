@@ -181,9 +181,15 @@ namespace YTApp
         #region Events
 
 
-        private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
+        private void MinimizeMediaElement_Click(object sender, RoutedEventArgs e)
         {
             StopVideo();
+        }
+
+        private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
+        {
+            viewer.Stop();
+            viewer.Visibility = Visibility.Collapsed;
         }
 
         private void viewer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -239,7 +245,7 @@ namespace YTApp
         #region MediaElementButton Management
         private void viewer_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            CloseMediaElement.Visibility = Visibility.Visible;
+            MinimizeMediaElement.Visibility = Visibility.Visible;
             FadeIn.Begin();
         }
 
@@ -251,7 +257,7 @@ namespace YTApp
 
         private void MediaButtonCompleted(object sender, object e)
         {
-            if (CloseMediaElement.Opacity == 0) { CloseMediaElement.Visibility = Visibility.Collapsed; }
+            if (MinimizeMediaElement.Opacity == 0) { MinimizeMediaElement.Visibility = Visibility.Collapsed; }
         }
         #endregion
 
