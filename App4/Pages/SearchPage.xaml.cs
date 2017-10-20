@@ -104,7 +104,6 @@ namespace YTApp.Pages
 
         private string ViewCountShortner(ulong? viewCount)
         {
-            string ViewCountAdjusted;
             if (viewCount > 1000000)
             {
                 return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000000), 1)) + "M";

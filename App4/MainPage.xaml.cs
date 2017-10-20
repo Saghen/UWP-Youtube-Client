@@ -1,36 +1,23 @@
 ﻿using System;
-using Windows.UI.ViewManagement;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
-using VideoLibrary;
-using Google.Apis.YouTube.v3;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Google.Apis.Services;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Auth.OAuth2.Flows;
-using Windows.UI.Core;
-using Newtonsoft.Json;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.UI.Xaml.Media.Animation;
+using Google.Apis.YouTube.v3;
+using Google.Apis.Services;
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.YouTube.v3.Data;
-using System.ComponentModel;
+using VideoLibrary;
 using YTApp.Classes;
-using Windows.UI.Xaml.Media.Imaging;
 using YTApp.Pages;
-using Windows.UI.Xaml.Navigation;
-using System.Linq;
-using Windows.Storage;
-using System.Net.Http;
-using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Core;
-using Windows.Storage.Streams;
-using Windows.Data.Json;
-using System.Text;
-using Windows.ApplicationModel.Activation;
-using System.Threading;
+
 
 namespace YTApp
 {
@@ -39,11 +26,9 @@ namespace YTApp
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private string YoutubeLink = "";
         private string YoutubeID = "";
-        private bool FullSizedMediaElement = true;
 
-        private List<SubscriptionDataType> subscriptionsList = new List<SubscriptionDataType>();
+        public List<SubscriptionDataType> subscriptionsList = new List<SubscriptionDataType>();
 
         List<SearchListResponse> youtubeVideos = new List<SearchListResponse>();
 
@@ -53,8 +38,8 @@ namespace YTApp
 
         public MainPage()
         {
-            DoWork();
             this.InitializeComponent();
+            DoWork();
         }
 
         private async void DoWork()
@@ -75,7 +60,7 @@ namespace YTApp
             foreach (Subscription sub in tempSubscriptions.Items)
             {
                 var subscription = new SubscriptionDataType();
-                subscription.Id = sub.Snippet.ChannelId;
+                subscription.Id = sub.Snippet.ResourceId.ChannelId;
                 subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
                 subscription.Title = sub.Snippet.Title;
                 subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
@@ -90,7 +75,7 @@ namespace YTApp
                     foreach (Subscription sub in tempSubs.Items)
                     {
                         var subscription = new SubscriptionDataType();
-                        subscription.Id = sub.Snippet.ChannelId;
+                        subscription.Id = sub.Snippet.ResourceId.ChannelId;
                         subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
                         subscription.Title = sub.Snippet.Title;
                         subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
@@ -100,6 +85,7 @@ namespace YTApp
                 }
             }
             subscriptionsList.Sort((x, y) => string.Compare(x.Title, y.Title));
+            
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -112,12 +98,12 @@ namespace YTApp
 
         #region Events
 
-        private async void Search_Click(object sender, RoutedEventArgs e)
+        private void Search_Click(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigate(typeof(SearchPage), new Params() { mainPageRef = this });
         }
 
-        private async void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
+        private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
@@ -301,7 +287,7 @@ namespace YTApp
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Test();
+            contentFrame.Navigate(typeof(HomePage), new Params() { mainPageRef = this });
         }
 
         private async Task Test()

@@ -7,7 +7,7 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace YTApp.Classes
 {
-    class SubscriptionDataType
+    public class SubscriptionDataType
     {
         private string id;
         private string title;

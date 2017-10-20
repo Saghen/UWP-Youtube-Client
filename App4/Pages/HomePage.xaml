@@ -8,19 +8,24 @@
     xmlns:classes="using:YTApp.Classes"
     mc:Ignorable="d">
 
-    <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <TextBlock FontSize="18" Margin="0,20,20,20">Recoommended Videos</TextBlock>
-        <GridView x:Name="VideoItemGridView" >
-            <GridView.ItemTemplate>
+    <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10">
+        <TextBlock FontSize="18" Margin="0,20,20,20">Recommended Videos</TextBlock>
+        <ListView x:Name="VideoItemGridView" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsList, Mode=TwoWay}">
+            <ListView.ItemTemplate>
                 <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                    <StackPanel Margin="10" Height="240" Width="280">
-                        <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}"/>
-                        <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="Wrap" Height="40px" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
-                        <TextBlock x:Name="OtherInfoControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#fff"/>
+                    <StackPanel Margin="10" Height="200" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                        <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10"/>
+                        <StackPanel>
+                            <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
+                                <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#fff" Margin="10,0,0,0"/>
+                            </StackPanel>
+                            <TextBlock x:Name="DescriptionControl" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
+                        </StackPanel>
                     </StackPanel>
                 </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
+            </ListView.ItemTemplate>
+        </ListView>
     </StackPanel>
 </Page>
