@@ -35,7 +35,8 @@ namespace YTApp.Pages
 
         private YouTubeService service;
         private ObservableCollection<YoutubeItemDataType> YTItemsList = new ObservableCollection<YoutubeItemDataType>();
-        private ObservableCollection<YoutubeItemDataType> YTItemsListTemp = new ObservableCollection<YoutubeItemDataType>();
+        private ObservableCollection<YoutubeItemDataType> YTItemsListYesterday = new ObservableCollection<YoutubeItemDataType>();
+        
 
         public HomePage()
         {
@@ -75,8 +76,11 @@ namespace YTApp.Pages
             MainPageReference.StartVideo(video.Uri);
         }
 
-        private async void UpdateHomeItems()
+        private void UpdateHomeItems()
         {
+            ObservableCollection<YoutubeItemDataType> YTItemsListTemp = new ObservableCollection<YoutubeItemDataType>();
+            ObservableCollection<YoutubeItemDataType> YTItemsListTempYesterday = new ObservableCollection<YoutubeItemDataType>();
+
             VideoItemGridView.Items.Clear();
             Parallel.ForEach(MainPageReference.subscriptionsList, subscription =>
             {
@@ -92,32 +96,23 @@ namespace YTApp.Pages
                         DateTime now = DateTime.Now;
                         if (video.Snippet.PublishedAt > now.AddHours(-24) && video.Snippet.PublishedAt <= now)
                         {
-                            var VideoToAdd = new YoutubeItemDataType();
-                            VideoToAdd.Author = video.Snippet.ChannelTitle;
-                            VideoToAdd.Description = video.Snippet.Description;
-                            VideoToAdd.Thumbnail = video.Snippet.Thumbnails.Medium.Url;
-                            VideoToAdd.Title = video.Snippet.Title;
-                            VideoToAdd.Id = video.Id.VideoId;
-                            VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId;
-                            VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
-                            YTItemsListTemp.Add(VideoToAdd);
+                            var methods2 = new YoutubeItemMethods();
+                            YTItemsListTemp.Add(methods2.VideoToYoutubeItem(video));
+                        }
+                        else if (video.Snippet.PublishedAt > now.AddHours(-48) && video.Snippet.PublishedAt <= now)
+                        {
+                            var methods2 = new YoutubeItemMethods();
+                            YTItemsListTempYesterday.Add(methods2.VideoToYoutubeItem(video));
                         }
                     }
                 }
             });
-            string VideoIDs = "";
-            foreach (var video in YTItemsListTemp) { VideoIDs += video.Id + ","; }
-            var getViewsRequest = service.Videos.List("statistics");
-            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
-
-            var videoListResponse = getViewsRequest.Execute();
-
-            for (int i = 0; i < YTItemsListTemp.Count; i++)
-            {
-                YTItemsListTemp[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + YTItemsListTemp[i].ViewsAndDate;
-            }
+            var methods = new YoutubeItemMethods();
+            methods.FillInViews(YTItemsListTemp, service);
+            methods.FillInViews(YTItemsListTempYesterday, service);
 
             YTItemsList = new ObservableCollection<YoutubeItemDataType>(YTItemsListTemp.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
+            YTItemsListYesterday = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempYesterday.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
         }
 
         private string ViewCountShortner(ulong? viewCount)

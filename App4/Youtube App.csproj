@@ -102,9 +102,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\OAuthVerification.cs" />
     <Compile Include="Classes\SplitViewItemDataType.cs" />
     <Compile Include="Classes\SubscriptionDataType.cs" />
+    <Compile Include="Classes\YoutubeItemMethods.cs" />
     <Compile Include="CustomMediaTransportControls.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -238,6 +238,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="YoutubeAppKey.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Classes\DataTypes\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

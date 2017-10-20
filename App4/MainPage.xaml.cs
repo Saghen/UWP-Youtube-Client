@@ -39,10 +39,11 @@ namespace YTApp
         public MainPage()
         {
             this.InitializeComponent();
-            DoWork();
+            RunOAuth();
+            contentFrame.Navigate(typeof(HomePage), new Params() { mainPageRef = this });
         }
 
-        private async void DoWork()
+        private async void RunOAuth()
         {
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets {
             ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
@@ -289,35 +290,6 @@ namespace YTApp
         private void HamburgerButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 2);
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            contentFrame.Navigate(typeof(HomePage), new Params() { mainPageRef = this });
-        }
-
-        private async Task Test()
-        {
-            UserCredential credential;
-            credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-    new ClientSecrets
-    {
-        ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-        ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-    }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
-
-            var subscriptions = service.Subscriptions.List("snippet, contentDetails");
-            subscriptions.MaxResults = 50;
-            subscriptions.Mine = true;
-            await subscriptions.ExecuteAsync();
-            DoWork();
         }
     }
 }
