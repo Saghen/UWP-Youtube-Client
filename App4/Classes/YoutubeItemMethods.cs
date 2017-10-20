@@ -21,14 +21,18 @@ namespace YTApp.Classes
             VideoToAdd.Id = video.Id.VideoId;
             VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId;
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
+            VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
+            if (VideoToAdd == null)
+            { Console.WriteLine("Hi"); }
             return VideoToAdd;
         }
 
         public void FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
+            if (collection.Count <= 0) return;
 
             string VideoIDs = "";
-            foreach (var video in collection) { if (video == null) { collection.Remove(video); } VideoIDs += video.Id + ","; }
+            foreach (var video in collection) { VideoIDs += video.Id + ","; }
             var getViewsRequest = service.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 

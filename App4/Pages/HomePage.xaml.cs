@@ -36,7 +36,10 @@ namespace YTApp.Pages
         private YouTubeService service;
         private ObservableCollection<YoutubeItemDataType> YTItemsList = new ObservableCollection<YoutubeItemDataType>();
         private ObservableCollection<YoutubeItemDataType> YTItemsListYesterday = new ObservableCollection<YoutubeItemDataType>();
-        
+        private ObservableCollection<YoutubeItemDataType> YTItemsListTwoDays = new ObservableCollection<YoutubeItemDataType>();
+        private ObservableCollection<YoutubeItemDataType> YTItemsListThreeDays = new ObservableCollection<YoutubeItemDataType>();
+        private ObservableCollection<YoutubeItemDataType> YTItemsListFourDays = new ObservableCollection<YoutubeItemDataType>();
+        private ObservableCollection<YoutubeItemDataType> YTItemsListFiveDays = new ObservableCollection<YoutubeItemDataType>();
 
         public HomePage()
         {
@@ -80,6 +83,10 @@ namespace YTApp.Pages
         {
             ObservableCollection<YoutubeItemDataType> YTItemsListTemp = new ObservableCollection<YoutubeItemDataType>();
             ObservableCollection<YoutubeItemDataType> YTItemsListTempYesterday = new ObservableCollection<YoutubeItemDataType>();
+            ObservableCollection<YoutubeItemDataType> YTItemsListTempTwoDays = new ObservableCollection<YoutubeItemDataType>();
+            ObservableCollection<YoutubeItemDataType> YTItemsListTempThreeDays = new ObservableCollection<YoutubeItemDataType>();
+            ObservableCollection<YoutubeItemDataType> YTItemsListTempFourDays = new ObservableCollection<YoutubeItemDataType>();
+            ObservableCollection<YoutubeItemDataType> YTItemsListTempFiveDays = new ObservableCollection<YoutubeItemDataType>();
 
             VideoItemGridView.Items.Clear();
             Parallel.ForEach(MainPageReference.subscriptionsList, subscription =>
@@ -96,23 +103,63 @@ namespace YTApp.Pages
                         DateTime now = DateTime.Now;
                         if (video.Snippet.PublishedAt > now.AddHours(-24) && video.Snippet.PublishedAt <= now)
                         {
-                            var methods2 = new YoutubeItemMethods();
-                            YTItemsListTemp.Add(methods2.VideoToYoutubeItem(video));
+                            var methods = new YoutubeItemMethods();
+                            if (video != null)
+                                YTItemsListTemp.Add(methods.VideoToYoutubeItem(video));
+                            else { Console.WriteLine("Hi"); }
                         }
                         else if (video.Snippet.PublishedAt > now.AddHours(-48) && video.Snippet.PublishedAt <= now)
                         {
-                            var methods2 = new YoutubeItemMethods();
-                            YTItemsListTempYesterday.Add(methods2.VideoToYoutubeItem(video));
+                            var methods = new YoutubeItemMethods();
+                            if (video != null)
+                                YTItemsListTempYesterday.Add(methods.VideoToYoutubeItem(video));
+                            else { Console.WriteLine("Hi"); }
+                        }
+                        else if (video.Snippet.PublishedAt > now.AddHours(-72) && video.Snippet.PublishedAt <= now)
+                        {
+                            var methods = new YoutubeItemMethods();
+                            if (video != null)
+                                YTItemsListTempTwoDays.Add(methods.VideoToYoutubeItem(video));
+                            else { Console.WriteLine("Hi"); }
+                        }
+                        else if (video.Snippet.PublishedAt > now.AddHours(-96) && video.Snippet.PublishedAt <= now)
+                        {
+                            var methods = new YoutubeItemMethods();
+                            if (video != null)
+                                YTItemsListTempThreeDays.Add(methods.VideoToYoutubeItem(video));
+                            else { Console.WriteLine("Hi"); }
+                        }
+                        else if (video.Snippet.PublishedAt > now.AddHours(-120) && video.Snippet.PublishedAt <= now)
+                        {
+                            var methods = new YoutubeItemMethods();
+                            if (video != null)
+                                YTItemsListTempFourDays.Add(methods.VideoToYoutubeItem(video));
+                            else { Console.WriteLine("Hi"); }
+                        }
+                        else if (video.Snippet.PublishedAt > now.AddHours(-144) && video.Snippet.PublishedAt <= now)
+                        {
+                            var methods = new YoutubeItemMethods();
+                            if (video != null)
+                                YTItemsListTempFiveDays.Add(methods.VideoToYoutubeItem(video));
+                            else { Console.WriteLine("Hi"); }
                         }
                     }
                 }
             });
-            var methods = new YoutubeItemMethods();
-            methods.FillInViews(YTItemsListTemp, service);
-            methods.FillInViews(YTItemsListTempYesterday, service);
+            var methods2 = new YoutubeItemMethods();
+            methods2.FillInViews(YTItemsListTemp, service);
+            methods2.FillInViews(YTItemsListTempYesterday, service);
+            methods2.FillInViews(YTItemsListTempTwoDays, service);
+            methods2.FillInViews(YTItemsListTempThreeDays, service);
+            methods2.FillInViews(YTItemsListTempFourDays, service);
+            methods2.FillInViews(YTItemsListTempFiveDays, service);
 
             YTItemsList = new ObservableCollection<YoutubeItemDataType>(YTItemsListTemp.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
             YTItemsListYesterday = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempYesterday.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
+            YTItemsListTwoDays = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempTwoDays.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
+            YTItemsListThreeDays = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempThreeDays.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
+            YTItemsListFourDays = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempFourDays.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
+            YTItemsListFiveDays = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempFiveDays.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
         }
 
         private string ViewCountShortner(ulong? viewCount)

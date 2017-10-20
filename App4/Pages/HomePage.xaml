@@ -13,7 +13,7 @@
             <GridView x:Name="VideoItemGridView" Header="Today" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsList, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                        <StackPanel Margin="10" Orientation="Vertical" Width="250" HorizontalAlignment="Center">
+                        <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
                             <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
                             <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
                             <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
@@ -25,7 +25,55 @@
             <GridView x:Name="VideoItemGridViewYesterday" Header="Yesterday" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListYesterday, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                        <StackPanel Margin="10" Orientation="Vertical" Width="250" HorizontalAlignment="Center">
+                        <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
+                            <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <GridView x:Name="VideoItemGridViewTwoDays" Header="Two Days Ago" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListTwoDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                        <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
+                            <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <GridView x:Name="VideoItemGridViewThreeDays" Header="Three Days Ago" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListThreeDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                        <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
+                            <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <GridView x:Name="VideoItemGridViewFourDays" Header="Four Days Ago" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListFourDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                        <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
+                            <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+            <GridView x:Name="VideoItemGridViewFiveDays" Header="Five Days Ago" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListFiveDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                        <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
                             <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
                             <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
                             <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
