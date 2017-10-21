@@ -12,17 +12,34 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="258"/>
-                <RowDefinition Height="140"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Image x:Name="SplashImage"/>
-            <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <Ellipse x:Name="ProfileImage" Width="80" Height="80"/>
-                <StackPanel>
-                    <TextBlock x:Name="ChannelName" FontSize="24"/>
-                    <TextBlock x:Name="SubscribersCount"/>
+            <StackPanel Orientation="Vertical" Grid.Row="1">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse x:Name="ProfileImage" Width="80" Height="80"/>
+                    <StackPanel>
+                        <TextBlock x:Name="ChannelName" FontSize="24"/>
+                        <TextBlock x:Name="SubscribersCount"/>
+                    </StackPanel>
                 </StackPanel>
+                <Pivot x:Name="rootPivot">
+                    <PivotItem x:Name="HomePivot" Header="Home">
+                        <StackPanel x:Name="HomeGridView">
+                            
+                        </StackPanel>
+                    </PivotItem>
+                    <PivotItem Header="Pivot Item 2">
+                        <!--Pivot content goes here-->
+                        <TextBlock Text="Content of pivot item 2."/>
+                    </PivotItem>
+                    <PivotItem Header="Pivot Item 3">
+                        <!--Pivot content goes here-->
+                        <TextBlock Text="Content of pivot item 3."/>
+                    </PivotItem>
+                </Pivot>
             </StackPanel>
+            
         </Grid>
     </ScrollViewer>
 </Page>

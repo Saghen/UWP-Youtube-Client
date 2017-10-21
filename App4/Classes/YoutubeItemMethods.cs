@@ -22,25 +22,78 @@ namespace YTApp.Classes
             VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId;
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
             VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
-            if (VideoToAdd == null)
-            { Console.WriteLine("Hi"); }
+            return VideoToAdd;
+        }
+
+        public YoutubeItemDataType VideoToYoutubeItem(PlaylistItem video)
+        {
+            var VideoToAdd = new YoutubeItemDataType();
+            VideoToAdd.Author = video.Snippet.ChannelTitle;
+            VideoToAdd.Description = video.Snippet.Description;
+            VideoToAdd.Thumbnail = video.Snippet.Thumbnails.Medium.Url;
+            VideoToAdd.Title = video.Snippet.Title;
+            VideoToAdd.Id = video.Snippet.ResourceId.VideoId;
+            VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Snippet.ResourceId.VideoId;
+            VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
+            VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
             return VideoToAdd;
         }
 
         public void FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
+            int j = 0;
 
             string VideoIDs = "";
-            foreach (var video in collection) { VideoIDs += video.Id + ","; }
+            foreach (var video in collection)
+            {
+                if (video == null)
+                {
+                    collection.RemoveAt(j); break;
+                }
+                VideoIDs += video.Id + ",";
+                j++;
+            }
             var getViewsRequest = service.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
             var videoListResponse = getViewsRequest.Execute();
 
+            j = 0;
             for (int i = 0; i < collection.Count; i++)
             {
-                collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                if (collection[i].Id == null) { break; }
+                collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[j].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                j++;
+            }
+        }
+
+        public void FillInViews(List<YoutubeItemDataType> collection, YouTubeService service)
+        {
+            if (collection.Count <= 0) return;
+            int j = 0;
+
+            string VideoIDs = "";
+            foreach (var video in collection)
+            {
+                if (video == null)
+                {
+                    collection.RemoveAt(j); break;
+                }
+                VideoIDs += video.Id + ",";
+                j++;
+            }
+            var getViewsRequest = service.Videos.List("statistics");
+            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
+
+            var videoListResponse = getViewsRequest.Execute();
+
+            j = 0;
+            for (int i = 0; i < collection.Count; i++)
+            {
+                if (collection[i].Id == null) { break; }
+                collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[j].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                j++;
             }
         }
 

@@ -125,6 +125,7 @@ namespace YTApp
         public class Params
         {
             public MainPage mainPageRef { get; set; }
+            public string ID { get; set; }
         }
 
         #endregion
@@ -290,6 +291,16 @@ namespace YTApp
         private void HamburgerButton_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 2);
+        }
+
+        private void SubscriptionsList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var temp = (SubscriptionDataType)e.ClickedItem;
+            contentFrame.Navigate(typeof(ChannelPage), new Params()
+            {
+                mainPageRef = this,
+                ID = temp.Id
+        });
         }
     }
 }

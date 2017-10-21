@@ -69,7 +69,7 @@
                         </ListView>
                         <MenuFlyoutSeparator/>
                         <TextBlock Text="SUBSCRIPTIONS" Margin="25,10" FontSize="20"/>
-                        <ListView x:Name="SubscriptionsList" Margin="0" ItemsSource="{x:Bind Path=subscriptionsList, Mode=TwoWay}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <ListView x:Name="SubscriptionsList" Margin="0" ItemsSource="{x:Bind Path=subscriptionsList, Mode=TwoWay}" SelectionMode="None" IsItemClickEnabled="True" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" ItemClick="SubscriptionsList_ItemClick">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:SubscriptionDataType">
                                     <Grid Width="Auto">

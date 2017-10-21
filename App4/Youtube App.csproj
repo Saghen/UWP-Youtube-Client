@@ -102,6 +102,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\ChannelPlaylistGridView.xaml.cs">
+      <DependentUpon>ChannelPlaylistGridView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Classes\SplitViewItemDataType.cs" />
     <Compile Include="Classes\SubscriptionDataType.cs" />
     <Compile Include="Classes\YoutubeItemMethods.cs" />
@@ -176,6 +179,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="UserControls\ChannelPlaylistGridView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ChannelPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
