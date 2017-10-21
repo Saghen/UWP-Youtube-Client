@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -20,10 +21,12 @@ namespace YTApp
 {
     public sealed partial class ChannelPlaylistGridView : UserControl
     {
-        public ChannelPlaylistGridView(List<YoutubeItemDataType> list)
+        public ChannelPlaylistGridView(List<YoutubeItemDataType> list, string header)
         {
             this.InitializeComponent();
-            VideoItemGridView.ItemsSource = list;
+            VideoItemGridView.Header = header;
+            this.Height = Double.NaN;
+            VideoItemGridView.ItemsSource = new ObservableCollection<YoutubeItemDataType>(list);
         }
     }
 }

@@ -8,9 +8,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignWidth="400" Margin="0,15">
 
-    <ScrollViewer VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Hidden">
+    <ScrollViewer VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Visible">
         <GridView x:Name="VideoItemGridView" HorizontalContentAlignment="Center" SelectionMode="None" IsItemClickEnabled="True">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="classes:YoutubeItemDataType">

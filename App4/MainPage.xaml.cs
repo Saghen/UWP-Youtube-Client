@@ -17,6 +17,7 @@ using Google.Apis.YouTube.v3.Data;
 using VideoLibrary;
 using YTApp.Classes;
 using YTApp.Pages;
+using YTApp.Classes.DataTypes;
 
 
 namespace YTApp
@@ -39,11 +40,23 @@ namespace YTApp
         public MainPage()
         {
             this.InitializeComponent();
-            RunOAuth();
-            contentFrame.Navigate(typeof(HomePage), new Params() { mainPageRef = this });
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+            SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
+            LoadSubscriptions();
+
+            contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
         }
 
-        private async void RunOAuth()
+        private void MainPage_BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            if (contentFrame.CanGoBack && e.Handled == false)
+            {
+                e.Handled = true;
+                contentFrame.GoBack();
+            }
+        }
+
+        private async void LoadSubscriptions()
         {
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets {
             ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
@@ -86,7 +99,6 @@ namespace YTApp
                 }
             }
             subscriptionsList.Sort((x, y) => string.Compare(x.Title, y.Title));
-            
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -101,7 +113,7 @@ namespace YTApp
 
         private void Search_Click(object sender, RoutedEventArgs e)
         {
-            contentFrame.Navigate(typeof(SearchPage), new Params() { mainPageRef = this });
+            contentFrame.Navigate(typeof(SearchPage), new NavigateParams() { mainPageRef = this });
         }
 
         private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -118,14 +130,8 @@ namespace YTApp
                     }
                     catch { }
                 }
-                contentFrame.Navigate(typeof(SearchPage), new Params() { mainPageRef = this });
+                contentFrame.Navigate(typeof(SearchPage), new NavigateParams() { mainPageRef = this });
             }
-        }
-
-        public class Params
-        {
-            public MainPage mainPageRef { get; set; }
-            public string ID { get; set; }
         }
 
         #endregion
@@ -296,11 +302,26 @@ namespace YTApp
         private void SubscriptionsList_ItemClick(object sender, ItemClickEventArgs e)
         {
             var temp = (SubscriptionDataType)e.ClickedItem;
-            contentFrame.Navigate(typeof(ChannelPage), new Params()
+            contentFrame.Navigate(typeof(ChannelPage), new NavigateParams()
             {
                 mainPageRef = this,
                 ID = temp.Id
         });
+        }
+
+        private void HomeButton_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this });
+        }
+
+        private void HomeButton_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
+        }
+
+        private void HomeButton_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
         }
     }
 }

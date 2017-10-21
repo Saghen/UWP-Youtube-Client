@@ -8,34 +8,52 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/RoundButton.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
     <ScrollViewer Background="#1a1a1a">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="258"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Image x:Name="SplashImage"/>
+            <Image x:Name="SplashImage" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Grid.Row="1">
-                <StackPanel Orientation="Horizontal">
-                    <Ellipse x:Name="ProfileImage" Width="80" Height="80"/>
-                    <StackPanel>
-                        <TextBlock x:Name="ChannelName" FontSize="24"/>
-                        <TextBlock x:Name="SubscribersCount"/>
+                <Grid Padding="70,40" Background="#222">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse x:Name="ProfileImage" Width="80" Height="80"/>
+                        <StackPanel VerticalAlignment="Center" Margin="10,0">
+                            <TextBlock x:Name="ChannelName" FontSize="24"/>
+                            <TextBlock x:Name="SubscribersCount"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-                <Pivot x:Name="rootPivot">
+                    <Button x:Name="SubscribeButton" Background="#c22" BorderThickness="0" Content="Subscribe" Padding="25,10" HorizontalAlignment="Right" Style="{StaticResource RoundButtonStyle}" Click="SubscribeButton_Click"/>
+                </Grid>
+                <Pivot x:Name="rootPivot" Padding="30,0">
                     <PivotItem x:Name="HomePivot" Header="Home">
                         <StackPanel x:Name="HomeGridView">
                             
                         </StackPanel>
                     </PivotItem>
-                    <PivotItem Header="Pivot Item 2">
-                        <!--Pivot content goes here-->
-                        <TextBlock Text="Content of pivot item 2."/>
-                    </PivotItem>
-                    <PivotItem Header="Pivot Item 3">
-                        <!--Pivot content goes here-->
-                        <TextBlock Text="Content of pivot item 3."/>
+                    <PivotItem x:Name="VideoPivot" Header="Videos">
+                        <GridView x:Name="VideosGridView" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="PlayVideoEvent">
+                            <GridView.ItemTemplate>
+                                <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                                    <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
+                                        <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                        </GridView>
                     </PivotItem>
                 </Pivot>
             </StackPanel>

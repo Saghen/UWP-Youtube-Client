@@ -20,7 +20,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
-using static YTApp.MainPage;
+using YTApp.Classes.DataTypes;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -45,6 +45,8 @@ namespace YTApp.Pages
         {
             this.InitializeComponent();
             GetService();
+
+            NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
         public async void GetService()
@@ -65,7 +67,7 @@ namespace YTApp.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Params result = (Params)e.Parameter;
+            NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
             UpdateHomeItems();
@@ -81,15 +83,16 @@ namespace YTApp.Pages
 
         private void UpdateHomeItems()
         {
-            ObservableCollection<YoutubeItemDataType> YTItemsListTemp = new ObservableCollection<YoutubeItemDataType>();
-            ObservableCollection<YoutubeItemDataType> YTItemsListTempYesterday = new ObservableCollection<YoutubeItemDataType>();
-            ObservableCollection<YoutubeItemDataType> YTItemsListTempTwoDays = new ObservableCollection<YoutubeItemDataType>();
-            ObservableCollection<YoutubeItemDataType> YTItemsListTempThreeDays = new ObservableCollection<YoutubeItemDataType>();
-            ObservableCollection<YoutubeItemDataType> YTItemsListTempFourDays = new ObservableCollection<YoutubeItemDataType>();
-            ObservableCollection<YoutubeItemDataType> YTItemsListTempFiveDays = new ObservableCollection<YoutubeItemDataType>();
+            List<YoutubeItemDataType> YTItemsListTemp = new List<YoutubeItemDataType>();
+            List<YoutubeItemDataType> YTItemsListTempYesterday = new List<YoutubeItemDataType>();
+            List<YoutubeItemDataType> YTItemsListTempTwoDays = new List<YoutubeItemDataType>();
+            List<YoutubeItemDataType> YTItemsListTempThreeDays = new List<YoutubeItemDataType>();
+            List<YoutubeItemDataType> YTItemsListTempFourDays = new List<YoutubeItemDataType>();
+            List<YoutubeItemDataType> YTItemsListTempFiveDays = new List<YoutubeItemDataType>();
 
             VideoItemGridView.Items.Clear();
             Parallel.ForEach(MainPageReference.subscriptionsList, subscription =>
+            //foreach(var subscription in MainPageReference.subscriptionsList)
             {
                 if (subscription.NewVideosCount != "")
                 {
@@ -100,36 +103,39 @@ namespace YTApp.Pages
                     var tempList = tempService.Execute();
                     foreach (var video in tempList.Items)
                     {
-                        DateTime now = DateTime.Now;
-                        if (video.Snippet.PublishedAt > now.AddHours(-24) && video.Snippet.PublishedAt <= now)
+                        if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
                         {
-                            var methods = new YoutubeItemMethods();
-                            YTItemsListTemp.Add(methods.VideoToYoutubeItem(video));
-                        }
-                        else if (video.Snippet.PublishedAt > now.AddHours(-48) && video.Snippet.PublishedAt <= now)
-                        {
-                            var methods = new YoutubeItemMethods();
-                            YTItemsListTempYesterday.Add(methods.VideoToYoutubeItem(video));
-                        }
-                        else if (video.Snippet.PublishedAt > now.AddHours(-72) && video.Snippet.PublishedAt <= now)
-                        {
-                            var methods = new YoutubeItemMethods();
-                            YTItemsListTempTwoDays.Add(methods.VideoToYoutubeItem(video));
-                        }
-                        else if (video.Snippet.PublishedAt > now.AddHours(-96) && video.Snippet.PublishedAt <= now)
-                        {
-                            var methods = new YoutubeItemMethods();
-                            YTItemsListTempThreeDays.Add(methods.VideoToYoutubeItem(video));
-                        }
-                        else if (video.Snippet.PublishedAt > now.AddHours(-120) && video.Snippet.PublishedAt <= now)
-                        {
-                            var methods = new YoutubeItemMethods();
-                            YTItemsListTempFourDays.Add(methods.VideoToYoutubeItem(video));
-                        }
-                        else if (video.Snippet.PublishedAt > now.AddHours(-144) && video.Snippet.PublishedAt <= now)
-                        {
-                            var methods = new YoutubeItemMethods();
-                            YTItemsListTempFiveDays.Add(methods.VideoToYoutubeItem(video));
+                            DateTime now = DateTime.Now;
+                            if (video.Snippet.PublishedAt > now.AddHours(-24) && video.Snippet.PublishedAt <= now)
+                            {
+                                var methods = new YoutubeItemMethods();
+                                YTItemsListTemp.Add(methods.VideoToYoutubeItem(video));
+                            }
+                            else if (video.Snippet.PublishedAt > now.AddHours(-48) && video.Snippet.PublishedAt <= now)
+                            {
+                                var methods = new YoutubeItemMethods();
+                                YTItemsListTempYesterday.Add(methods.VideoToYoutubeItem(video));
+                            }
+                            else if (video.Snippet.PublishedAt > now.AddHours(-72) && video.Snippet.PublishedAt <= now)
+                            {
+                                var methods = new YoutubeItemMethods();
+                                YTItemsListTempTwoDays.Add(methods.VideoToYoutubeItem(video));
+                            }
+                            else if (video.Snippet.PublishedAt > now.AddHours(-96) && video.Snippet.PublishedAt <= now)
+                            {
+                                var methods = new YoutubeItemMethods();
+                                YTItemsListTempThreeDays.Add(methods.VideoToYoutubeItem(video));
+                            }
+                            else if (video.Snippet.PublishedAt > now.AddHours(-120) && video.Snippet.PublishedAt <= now)
+                            {
+                                var methods = new YoutubeItemMethods();
+                                YTItemsListTempFourDays.Add(methods.VideoToYoutubeItem(video));
+                            }
+                            else if (video.Snippet.PublishedAt > now.AddHours(-144) && video.Snippet.PublishedAt <= now)
+                            {
+                                var methods = new YoutubeItemMethods();
+                                YTItemsListTempFiveDays.Add(methods.VideoToYoutubeItem(video));
+                            }
                         }
                     }
                 }

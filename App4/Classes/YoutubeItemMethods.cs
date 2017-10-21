@@ -39,6 +39,23 @@ namespace YTApp.Classes
             return VideoToAdd;
         }
 
+        public YoutubeChannelDataType ChannelToYoutubeChannel(SearchResult video, YouTubeService service)
+        {
+            var getChannelInfo = service.Channels.List("snippet, statistics");
+            getChannelInfo.Id = video.Snippet.ChannelId;
+            var channelInfo = getChannelInfo.Execute();
+            
+
+            var VideoToAdd = new YoutubeChannelDataType();
+            VideoToAdd.Description = video.Snippet.Description;
+            VideoToAdd.Thumbnail = channelInfo.Items[0].Snippet.Thumbnails.Medium.Url;
+            VideoToAdd.Title = video.Snippet.Title;
+            VideoToAdd.Id = video.Id.ChannelId;
+            VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId;
+            VideoToAdd.SubscribersAndVideos = Convert.ToString(channelInfo.Items[0].Statistics.SubscriberCount) + " subscribers • videos " + Convert.ToString(channelInfo.Items[0].Statistics.VideoCount);
+            return VideoToAdd;
+        }
+
         public void FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
@@ -59,41 +76,33 @@ namespace YTApp.Classes
 
             var videoListResponse = getViewsRequest.Execute();
 
-            j = 0;
             for (int i = 0; i < collection.Count; i++)
             {
-                if (collection[i].Id == null) { break; }
                 collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[j].Statistics.ViewCount) + collection[i].ViewsAndDate;
-                j++;
             }
         }
 
         public void FillInViews(List<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
-            int j = 0;
 
             string VideoIDs = "";
             foreach (var video in collection)
             {
-                if (video == null)
-                {
-                    collection.RemoveAt(j); break;
-                }
                 VideoIDs += video.Id + ",";
-                j++;
             }
             var getViewsRequest = service.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
             var videoListResponse = getViewsRequest.Execute();
 
-            j = 0;
             for (int i = 0; i < collection.Count; i++)
             {
-                if (collection[i].Id == null) { break; }
-                collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[j].Statistics.ViewCount) + collection[i].ViewsAndDate;
-                j++;
+                try
+                {
+                    collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                }
+                catch { collection[i].ViewsAndDate = "Unknown" + collection[i].ViewsAndDate; }
             }
         }
 

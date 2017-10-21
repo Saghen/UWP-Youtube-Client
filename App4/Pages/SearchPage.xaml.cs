@@ -18,7 +18,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
-using static YTApp.MainPage;
+using YTApp.Classes.DataTypes;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -33,7 +33,7 @@ namespace YTApp.Pages
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Params result = (Params)e.Parameter;
+            NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
             await Run();
@@ -47,12 +47,21 @@ namespace YTApp.Pages
 
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var item = (YoutubeItemDataType)e.ClickedItem;
-            var youTube = YouTube.Default;
-            var video = youTube.GetVideo(item.Ylink);
-            MainPageReference.StartVideo(video.Uri);
+            if (e.ClickedItem.GetType() == typeof(YoutubeItemDataType))
+            {
+                var item = (YoutubeItemDataType)e.ClickedItem;
+                var youTube = YouTube.Default;
+                var video = youTube.GetVideo(item.Ylink);
+                MainPageReference.StartVideo(video.Uri);
+            }
+            else if (e.ClickedItem.GetType() == typeof(YoutubeChannelDataType))
+            {
+                var item = (YoutubeChannelDataType)e.ClickedItem;
+                MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { mainPageRef = MainPageReference, ID = item.Id });
+            }
         }
 
+        #region Search
         private async Task Run()
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
@@ -69,7 +78,7 @@ namespace YTApp.Pages
             var searchListResponse = await searchListRequest.ExecuteAsync();
 
             string VideoIDs = "";
-            foreach(var searchResult in searchListResponse.Items) { VideoIDs += searchResult.Id.VideoId + ","; }
+            foreach (var searchResult in searchListResponse.Items) { VideoIDs += searchResult.Id.VideoId + ","; }
             var getViewsRequest = youtubeService.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
@@ -81,24 +90,18 @@ namespace YTApp.Pages
             // Add each result to the ListView
             foreach (var searchResult in searchListResponse.Items)
             {
-                switch (searchResult.Id.Kind)
+                if (searchResult.Id.Kind == "youtube#video")
                 {
-                    case "youtube#video":
-                        var data = new YoutubeItemDataType();
-                        data.Thumbnail = searchResult.Snippet.Thumbnails.Medium.Url;
-                        data.Title = searchResult.Snippet.Title;
-                        data.Author = searchResult.Snippet.ChannelTitle;
-                        data.Description = searchResult.Snippet.Description;
-
-                        data.ViewsAndDate = ViewCountShortner(videoListResponse.Items[VideoIDsSplit.IndexOf(searchResult.Id.VideoId)].Statistics.ViewCount) + " views • " + TimeSinceDate(searchResult.Snippet.PublishedAt);
-                        data.Ylink = "https://www.youtube.com/watch?v=" + searchResult.Id.VideoId;
-                        YoutubeItemsGridView.Items.Add(data);
-                        break;
-
-                    case "youtube#channel":
-                        //channels.Add(String.Format("{0} ({1})", searchResult.Snippet.Title, searchResult.Id.ChannelId));
-                        break;
+                    var methods = new YoutubeItemMethods();
+                    var data = methods.VideoToYoutubeItem(searchResult);
+                    YoutubeItemsGridView.Items.Add(data);
                 }
+                else if (searchResult.Id.Kind == "youtube#channel")
+                {
+                    var methods = new YoutubeItemMethods();
+                    var data = methods.ChannelToYoutubeChannel(searchResult, youtubeService);
+                    YoutubeItemsGridView.Items.Add(data);
+                }     
             }
         }
 
@@ -138,5 +141,7 @@ namespace YTApp.Pages
             }
             catch { return "unkown date"; }
         }
+        #endregion
+
     }
 }

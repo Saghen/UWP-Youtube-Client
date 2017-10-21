@@ -8,22 +8,43 @@
     xmlns:classes="using:YTApp.Classes"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <DataTemplate x:Key="VideoDataTemplate" x:DataType="classes:YoutubeItemDataType">
+            <StackPanel Margin="10" Height="200" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10"/>
+                <StackPanel>
+                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
+                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#fff" Margin="10,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock x:Name="DescriptionControl" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="ChannelDataTemplate" x:DataType="classes:YoutubeChannelDataType">
+            <StackPanel Margin="10" Height="130" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Ellipse x:Name="ImageControl" Margin="10" Width="100" Height="100">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="{x:Bind Thumbnail}"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind SubscribersAndVideos}" FontSize="12"/>
+                    <TextBlock x:Name="DescriptionControl" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <classes:SearchTemplateSelector x:Key="SearchTemplateSelector" VideoTemplate="{StaticResource VideoDataTemplate}" ChannelTemplate="{StaticResource ChannelDataTemplate}" />
+    </Page.Resources>
+    
     <ScrollViewer x:Name="ScrollView">
         <Grid x:Name="MainGrid" Background="#1a1a1a">
             <ListView x:Name="YoutubeItemsGridView" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                        <StackPanel Margin="10" Height="200" Orientation="Horizontal" HorizontalAlignment="Stretch">
-                            <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10"/>
-                            <StackPanel>
-                                <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
-                                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#fff" Margin="10,0,0,0"/>
-                                </StackPanel>
-                                <TextBlock x:Name="DescriptionControl" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </StackPanel>
+                        <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource SearchTemplateSelector}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
