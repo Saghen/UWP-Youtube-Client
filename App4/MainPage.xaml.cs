@@ -56,11 +56,15 @@ namespace YTApp
             }
         }
 
+        #region Menu
+
         private async void LoadSubscriptions()
         {
-            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets {
-            ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-            ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm" }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
+            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            {
+                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
 
             // Create the service.
             var service = new YouTubeService(new BaseClientService.Initializer()
@@ -78,6 +82,7 @@ namespace YTApp
                 subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
                 subscription.Title = sub.Snippet.Title;
                 subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
+                subscription.SubscriptionID = sub.Id;
                 subscriptionsList.Add(subscription);
             }
             if (tempSubscriptions.NextPageToken != null)
@@ -100,6 +105,15 @@ namespace YTApp
             }
             subscriptionsList.Sort((x, y) => string.Compare(x.Title, y.Title));
         }
+
+        private void ListView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var item = (SplitViewItemDataType)e.ClickedItem;
+            if(item.Text == "Home")
+                contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this });
+        }
+
+        #endregion
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -306,22 +320,7 @@ namespace YTApp
             {
                 mainPageRef = this,
                 ID = temp.Id
-        });
-        }
-
-        private void HomeButton_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this });
-        }
-
-        private void HomeButton_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
-        }
-
-        private void HomeButton_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
+            });
         }
     }
 }

@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
+using YTApp.Classes.EventsArgs;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -21,12 +22,21 @@ namespace YTApp
 {
     public sealed partial class ChannelPlaylistGridView : UserControl
     {
+        public event EventHandler<RoutedEventArgsWithID> ItemClicked;
+
         public ChannelPlaylistGridView(List<YoutubeItemDataType> list, string header)
         {
             this.InitializeComponent();
             VideoItemGridView.Header = header;
             this.Height = Double.NaN;
             VideoItemGridView.ItemsSource = new ObservableCollection<YoutubeItemDataType>(list);
+        }
+
+        private void VideoItemGridView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var item = (YoutubeItemDataType)e.ClickedItem;
+            if (ItemClicked != null)
+                ItemClicked(this, new RoutedEventArgsWithID(item.Id));
         }
     }
 }

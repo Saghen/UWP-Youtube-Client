@@ -11,7 +11,7 @@
     d:DesignWidth="400" Margin="0,15">
 
     <ScrollViewer VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Visible">
-        <GridView x:Name="VideoItemGridView" HorizontalContentAlignment="Center" SelectionMode="None" IsItemClickEnabled="True">
+        <GridView x:Name="VideoItemGridView" HorizontalContentAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="VideoItemGridView_ItemClick">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="classes:YoutubeItemDataType">
                     <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">

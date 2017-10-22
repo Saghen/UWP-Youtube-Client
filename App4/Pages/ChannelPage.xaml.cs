@@ -22,6 +22,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
 using YTApp.Classes.DataTypes;
+using YTApp.Classes.EventsArgs;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -139,6 +140,7 @@ namespace YTApp.Pages
             }
             methods.FillInViews(YoutubeItemsTemp, service);
             var PlaylistUserControlUploads = new ChannelPlaylistGridView(YoutubeItemsTemp, "Uploads");
+            PlaylistUserControlUploads.ItemClicked += HomePageItemClicked;
             HomeGridView.Children.Add(PlaylistUserControlUploads);
             #endregion
 
@@ -157,6 +159,7 @@ namespace YTApp.Pages
             }
             methods.FillInViews(YoutubeItemsTemp, service);
             var PlaylistUserControlPopular = new ChannelPlaylistGridView(YoutubeItemsTemp, "Popular Uploads");
+            PlaylistUserControlPopular.ItemClicked += HomePageItemClicked;
             HomeGridView.Children.Add(PlaylistUserControlPopular);
             #endregion
 
@@ -182,9 +185,17 @@ namespace YTApp.Pages
                 }
                 methods.FillInViews(YoutubeItemsTemp, service);
                 var PlaylistUserControlPlaylist = new ChannelPlaylistGridView(YoutubeItemsTemp, playlist.Snippet.Title);
+                PlaylistUserControlPlaylist.ItemClicked += HomePageItemClicked;
                 HomeGridView.Children.Add(PlaylistUserControlPlaylist);
             }
             #endregion
+        }
+
+        public void HomePageItemClicked(object sender, RoutedEventArgsWithID e)
+        {
+            var youTube = YouTube.Default;
+            var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + e.ID);
+            MainPageReference.StartVideo(video.Uri);
         }
 
         private async void SubscribeButton_Click(object sender, RoutedEventArgs e)
@@ -204,13 +215,15 @@ namespace YTApp.Pages
 
             if (isSubscribed == true)
             {
-                var unsubscribe = service.Subscriptions.Delete(ChannelID);
+                var subscription = MainPageReference.subscriptionsList.Find(x => x.Id == ChannelID);
+                var unsubscribe = service.Subscriptions.Delete(subscription.SubscriptionID);
                 unsubscribe.Execute();
             }
             else
             {
                 var subscription = new Subscription();
-                subscription.Id = ChannelID;
+                subscription.Snippet.ResourceId.ChannelId = ChannelID;
+                subscription.Snippet.ResourceId.Kind = "youtube#channel";
                 var subscribe = service.Subscriptions.Insert(subscription, "snippet");
                 subscribe.Execute();
             }
@@ -234,6 +247,7 @@ namespace YTApp.Pages
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.ChannelId = ChannelID;
             searchListRequest.Type = "video";
+            searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
             searchListRequest.MaxResults = 50;
 
             // Call the search.list method to retrieve results matching the specified query term.
@@ -255,6 +269,8 @@ namespace YTApp.Pages
             var video = youTube.GetVideo(item.Ylink);
             MainPageReference.StartVideo(video.Uri);
         }
+
+        
 
         #endregion
     }

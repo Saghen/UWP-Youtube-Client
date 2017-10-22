@@ -41,11 +41,12 @@ namespace YTApp.Pages
         private ObservableCollection<YoutubeItemDataType> YTItemsListFourDays = new ObservableCollection<YoutubeItemDataType>();
         private ObservableCollection<YoutubeItemDataType> YTItemsListFiveDays = new ObservableCollection<YoutubeItemDataType>();
 
+        public bool isLoaded = false;
+
         public HomePage()
         {
             this.InitializeComponent();
             GetService();
-
             NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
@@ -70,7 +71,9 @@ namespace YTApp.Pages
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
-            UpdateHomeItems();
+            if (isLoaded == false)
+                UpdateHomeItems();
+            isLoaded = true;
         }
 
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)

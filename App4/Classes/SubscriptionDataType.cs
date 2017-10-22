@@ -13,10 +13,12 @@ namespace YTApp.Classes
         private string title;
         private BitmapImage thumbnail;
         private string newVideosCount;
+        private string subscriptionID;
 
         public string Id { get => id; set => id = value; }
         public string Title { get => title; set => title = value; }
         public BitmapImage Thumbnail { get => thumbnail; set => thumbnail = value; }
         public string NewVideosCount { get => newVideosCount; set { if (value == "0") { newVideosCount = ""; } else { newVideosCount = value; } } }
+        public string SubscriptionID { get => subscriptionID; set => subscriptionID = value; }
     }
 }

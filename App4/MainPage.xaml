@@ -34,7 +34,6 @@
 
         <StackPanel Orientation="Horizontal" Background="#222">
             <Button x:Name="HamburgerButton" FontFamily="Segoe MDL2 Assets" Content="&#xE700;" FontSize="18" Margin="20,0" Background="Transparent" Click="HamburgerButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
-            <Image x:Name="HomeButton" Tapped="HomeButton_Tapped" PointerEntered="HomeButton_PointerEntered" PointerExited="HomeButton_PointerExited" Source="../Assets/Images/yt_logo_rgb_dark.png" Margin="0,18,30,18"/>
             <TextBox x:Name="SearchBox" Width="500px" VerticalAlignment="Center" PlaceholderText="Search" KeyDown="SearchBox_KeyDown" BorderThickness="1" Style="{StaticResource TextBoxCleanStyle}" Background="#151515" BorderBrush="#2a2a2a" x:FieldModifier="public"/>
             <Button x:Name="SearchButton" Background="#444" Padding="20,0" Height="32" FontFamily="Segoe MDL2 Assets" Content="&#xE094;" Click="Search_Click" Style="{StaticResource TransparentButtonStyle}"/>
         </StackPanel>
@@ -43,7 +42,7 @@
             <SplitView.Pane>
                 <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
                     <StackPanel>
-                        <ListView Header="">
+                        <ListView Header="" ItemClick="ListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:SplitViewItemDataType">
                                     <StackPanel Orientation="Horizontal">
@@ -57,7 +56,7 @@
                         </ListView>
                         <MenuFlyoutSeparator/>
                         <TextBlock Text="LIBRARY" Margin="25,10" FontSize="20"/>
-                        <ListView Margin="0">
+                        <ListView Margin="0" SelectionMode="None" IsItemClickEnabled="True">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:SplitViewItemDataType">
                                     <StackPanel Orientation="Horizontal">

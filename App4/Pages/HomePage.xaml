@@ -9,8 +9,8 @@
     mc:Ignorable="d">
 
     <ScrollViewer>
-        <StackPanel Margin="10">
-            <GridView x:Name="VideoItemGridView" Header="Today" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsList, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+        <StackPanel Margin="30,10">
+            <GridView x:Name="VideoItemGridView" Header="Today" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsList, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
                         <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
@@ -22,7 +22,7 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-            <GridView x:Name="VideoItemGridViewYesterday" Header="Yesterday" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListYesterday, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+            <GridView x:Name="VideoItemGridViewYesterday" Header="Yesterday" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListYesterday, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
                         <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
@@ -34,7 +34,7 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-            <GridView x:Name="VideoItemGridViewTwoDays" Header="Two Days Ago" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListTwoDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+            <GridView x:Name="VideoItemGridViewTwoDays" Header="Two Days Ago" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListTwoDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
                         <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
@@ -46,7 +46,7 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-            <GridView x:Name="VideoItemGridViewThreeDays" Header="Three Days Ago" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListThreeDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+            <GridView x:Name="VideoItemGridViewThreeDays" Header="Three Days Ago" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListThreeDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
                         <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
@@ -58,7 +58,7 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-            <GridView x:Name="VideoItemGridViewFourDays" Header="Four Days Ago" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListFourDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+            <GridView x:Name="VideoItemGridViewFourDays" Header="Four Days Ago" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListFourDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
                         <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
@@ -70,7 +70,7 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-            <GridView x:Name="VideoItemGridViewFiveDays" Header="Five Days Ago" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListFiveDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
+            <GridView x:Name="VideoItemGridViewFiveDays" Header="Five Days Ago" SelectionMode="None" IsItemClickEnabled="True" ItemsSource="{x:Bind Path=YTItemsListFiveDays, Mode=OneWay}" ItemClick="YoutubeItemsGridView_ItemClick">
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
                         <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
