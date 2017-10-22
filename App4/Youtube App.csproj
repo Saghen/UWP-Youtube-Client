@@ -107,6 +107,7 @@
     <Compile Include="Classes\EventsArgs\RoutedEventArgsWithID.cs" />
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\YoutubeChannelDataType.cs" />
+    <Compile Include="Classes\YoutubeItemMethodsStatic.cs" />
     <Compile Include="UserControls\ChannelPlaylistGridView.xaml.cs">
       <DependentUpon>ChannelPlaylistGridView.xaml</DependentUpon>
     </Compile>

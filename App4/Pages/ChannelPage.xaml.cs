@@ -265,13 +265,8 @@ namespace YTApp.Pages
         private void PlayVideoEvent(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeItemDataType)e.ClickedItem;
-            var youTube = YouTube.Default;
-            var video = youTube.GetVideo(item.Ylink);
-            MainPageReference.StartVideo(video.Uri);
+            YoutubeItemMethodsStatic.StartVideo(item.Id, MainPageReference);
         }
-
-        
-
         #endregion
     }
 }

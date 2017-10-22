@@ -50,9 +50,7 @@ namespace YTApp.Pages
             if (e.ClickedItem.GetType() == typeof(YoutubeItemDataType))
             {
                 var item = (YoutubeItemDataType)e.ClickedItem;
-                var youTube = YouTube.Default;
-                var video = youTube.GetVideo(item.Ylink);
-                MainPageReference.StartVideo(video.Uri);
+                YoutubeItemMethodsStatic.StartVideo(item.Id, MainPageReference);
             }
             else if (e.ClickedItem.GetType() == typeof(YoutubeChannelDataType))
             {

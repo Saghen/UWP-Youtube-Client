@@ -27,7 +27,7 @@ namespace YTApp
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private string YoutubeID = "";
+        public string VideoID = "";
 
         public List<SubscriptionDataType> subscriptionsList = new List<SubscriptionDataType>();
 
@@ -54,6 +54,12 @@ namespace YTApp
                 e.Handled = true;
                 contentFrame.GoBack();
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window.Current.CoreWindow.KeyDown += Event_KeyDown;
+            SearchBox.Focus(FocusState.Keyboard);
         }
 
         #region Menu
@@ -106,20 +112,29 @@ namespace YTApp
             subscriptionsList.Sort((x, y) => string.Compare(x.Title, y.Title));
         }
 
-        private void ListView_ItemClick(object sender, ItemClickEventArgs e)
+        private void SubscriptionsList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var temp = (SubscriptionDataType)e.ClickedItem;
+            contentFrame.Navigate(typeof(ChannelPage), new NavigateParams()
+            {
+                mainPageRef = this,
+                ID = temp.Id
+            });
+        }
+
+        private void PageMenuControls_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (SplitViewItemDataType)e.ClickedItem;
             if(item.Text == "Home")
                 contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this });
         }
 
-        #endregion
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private void HamburgerButton_Click(object sender, RoutedEventArgs e)
         {
-            Window.Current.CoreWindow.KeyDown += Event_KeyDown;
-            SearchBox.Focus(FocusState.Keyboard);
+            SideBarSplitView.IsPaneOpen = !SideBarSplitView.IsPaneOpen;
         }
+
+        #endregion
 
         #region Search
 
@@ -233,10 +248,12 @@ namespace YTApp
             if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing && e.VirtualKey == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
             {
                 viewer.Pause();
+                e.Handled = true;
             }
             else if (e.VirtualKey == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
             {
                 viewer.Play();
+                e.Handled = true;
             }
         }
 
@@ -283,44 +300,24 @@ namespace YTApp
         }
         #endregion
 
+        #region Flyout
+
         private void Flyout_CopyLink(object sender, RoutedEventArgs e)
         {
             var dataPackage = new DataPackage();
-            dataPackage.SetText("https://youtu.be/" + YoutubeID);
+            dataPackage.SetText("https://youtu.be/" + VideoID);
             Clipboard.SetContent(dataPackage);
         }
 
         private void Flyout_CopyLinkAtTime(object sender, RoutedEventArgs e)
         {
             var dataPackage = new DataPackage();
-            dataPackage.SetText("https://youtu.be/" + YoutubeID + "?t=" + Convert.ToInt32(viewer.Position.TotalSeconds) + "s");
+            dataPackage.SetText("https://youtu.be/" + VideoID + "?t=" + Convert.ToInt32(viewer.Position.TotalSeconds) + "s");
             Clipboard.SetContent(dataPackage);
         }
 
+        #endregion
 
-        private void HamburgerButton_Click(object sender, RoutedEventArgs e)
-        {
-            SideBarSplitView.IsPaneOpen = !SideBarSplitView.IsPaneOpen;
-        }
-
-        private void HamburgerButton_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
-        }
-
-        private void HamburgerButton_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 2);
-        }
-
-        private void SubscriptionsList_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            var temp = (SubscriptionDataType)e.ClickedItem;
-            contentFrame.Navigate(typeof(ChannelPage), new NavigateParams()
-            {
-                mainPageRef = this,
-                ID = temp.Id
-            });
-        }
+        
     }
 }
