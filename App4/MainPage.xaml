@@ -42,7 +42,7 @@
             <SplitView.Pane>
                 <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
                     <StackPanel>
-                        <ListView Header="" ItemClick="ListView_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
+                        <ListView ItemClick="PageMenuControls_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:SplitViewItemDataType">
                                     <StackPanel Orientation="Horizontal">
@@ -99,7 +99,7 @@
         </SplitView>
 
         <Grid Grid.RowSpan="2" x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-            <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed">
+            <MediaElement x:Name="viewer" x:FieldModifier="public" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed">
                 <MediaElement.TransportControls>
                     <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" RightTapped="viewer_RightTapped">
                         <FlyoutBase.AttachedFlyout>
