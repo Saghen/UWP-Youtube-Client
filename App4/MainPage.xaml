@@ -104,7 +104,7 @@
                     <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" RightTapped="viewer_RightTapped">
                         <FlyoutBase.AttachedFlyout>
                             <MenuFlyout>
-                                <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink" Width="200"/>
+                                <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink"/>
                                 <MenuFlyoutItem Text="Copy link at current time" Click="Flyout_CopyLinkAtTime"/>
                             </MenuFlyout>
                         </FlyoutBase.AttachedFlyout>

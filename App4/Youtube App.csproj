@@ -108,6 +108,9 @@
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\YoutubeChannelDataType.cs" />
     <Compile Include="Classes\YoutubeItemMethodsStatic.cs" />
+    <Compile Include="Pages\VideoPage.xaml.cs">
+      <DependentUpon>VideoPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\ChannelPlaylistGridView.xaml.cs">
       <DependentUpon>ChannelPlaylistGridView.xaml</DependentUpon>
     </Compile>
@@ -187,6 +190,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Pages\VideoPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Styles\RoundButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

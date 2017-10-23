@@ -81,7 +81,7 @@ namespace YTApp.Pages
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeItemDataType)e.ClickedItem;
-            YoutubeItemMethodsStatic.StartVideo(item.Id, MainPageReference);
+            MainPageReference.StartVideo(item.Id);
         }
 
         private void UpdateHomeItems()

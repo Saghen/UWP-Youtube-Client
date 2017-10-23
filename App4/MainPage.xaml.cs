@@ -184,15 +184,9 @@ namespace YTApp
 
         #region Methods
 
-        public void StartVideo(string URL)
+        public void StartVideo(string Id)
         {
-            MediaElementContainer.Width = Double.NaN;
-            MediaElementContainer.Height = Double.NaN;
-            viewer.Visibility = Visibility.Visible;
-            viewer.Source = new Uri(URL);
-            viewer.TransportControls.Focus(FocusState.Programmatic);
-            var _displayRequest = new Windows.System.Display.DisplayRequest();
-            _displayRequest.RequestActive();
+            contentFrame.Navigate(typeof(VideoPage), new NavigateParams() { mainPageRef = this, ID = Id });
         }
 
         public void ChangePlayerSize()
