@@ -171,6 +171,8 @@ namespace YTApp
 
         public void StartVideo(string URL)
         {
+            MediaElementContainer.Width = Double.NaN;
+            MediaElementContainer.Height = Double.NaN;
             viewer.Visibility = Visibility.Visible;
             viewer.Source = new Uri(URL);
             viewer.TransportControls.Focus(FocusState.Programmatic);
@@ -178,7 +180,7 @@ namespace YTApp
             _displayRequest.RequestActive();
         }
 
-        public void StopVideo()
+        public void ChangePlayerSize()
         {
             if (MediaElementContainer.Width != 640)
             {
@@ -205,7 +207,7 @@ namespace YTApp
 
         private void MinimizeMediaElement_Click(object sender, RoutedEventArgs e)
         {
-            StopVideo();
+            ChangePlayerSize();
         }
 
         private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
