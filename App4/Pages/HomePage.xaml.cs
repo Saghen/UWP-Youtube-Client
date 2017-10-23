@@ -46,11 +46,8 @@ namespace YTApp.Pages
         public HomePage()
         {
             this.InitializeComponent();
-            YoutubeItemMethodsStatic.GetService();
             NavigationCacheMode = NavigationCacheMode.Enabled;
         }
-
-        
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
@@ -58,8 +55,27 @@ namespace YTApp.Pages
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
             if (isLoaded == false)
+            {
+                GetService();
                 UpdateHomeItems();
+            }   
             isLoaded = true;
+        }
+
+        public async void GetService()
+        {
+            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            {
+                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
+
+            // Create the service.
+            service = new YouTubeService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Youtube Viewer",
+            });
         }
 
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using VideoLibrary;
 using Windows.UI.Xaml;
 
 namespace YTApp.Classes
@@ -19,20 +20,19 @@ namespace YTApp.Classes
             var viewer = mainPageRef.viewer;
             try
             {
+                var youTube = YouTube.Default;
+                var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + ID);
+                viewer.Source = new Uri(video.GetUri());
                 viewer.Visibility = Visibility.Visible;
-                viewer.Source = new Uri("https://www.youtube.com/watch?v=" + ID);
                 viewer.TransportControls.Focus(FocusState.Programmatic);
             }
-            catch
-            {
-                //Implement code for when the video has music in it
-            }
+            catch { }
 
             //Set the video id for the flyout menu when right clicking on the video
             mainPageRef.VideoID = ID;
         }
 
-        static async public YouTubeService GetService()
+        /*static async public YouTubeService GetService()
         {
             var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {
@@ -46,6 +46,6 @@ namespace YTApp.Classes
                 HttpClientInitializer = credential,
                 ApplicationName = "Youtube Viewer",
             });
-        }
+        }*/
     }
 }
