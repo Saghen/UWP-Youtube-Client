@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
+using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using YTApp.Classes;
 using YTApp.Classes.DataTypes;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -33,6 +35,7 @@ namespace YTApp.Pages
         MainPage MainPageReference;
         string VideoID;
         Google.Apis.YouTube.v3.Data.Video video;
+        Channel channel;
 
         public VideoPage()
         {
@@ -83,13 +86,26 @@ namespace YTApp.Pages
             var videoList = await getVideoInfo.ExecuteAsync();
             video = videoList.Items[0];
 
+            var getChannelInfo = service.Channels.List("snippet,");
+            getChannelInfo.Id = video.Snippet.ChannelId;
+            var channelInfo = await getChannelInfo.ExecuteAsync();
+
             UpdatePageInfo();
         }
 
         public async void UpdatePageInfo()
         {
+            var methods = new YoutubeItemMethods();
+
             Title.Text = video.Snippet.Title;
             Views.Text = video.Statistics.ViewCount + " Views";
+            LikeCount.Text = methods.ViewCountShortner(video.Statistics.LikeCount);
+            DislikeCount.Text = methods.ViewCountShortner(video.Statistics.DislikeCount);
+
+            var likeDislikeRatio = Convert.ToDecimal(video.Statistics.LikeCount) / Convert.ToDecimal(video.Statistics.DislikeCount + video.Statistics.LikeCount);
+            LikesBar.Value = Convert.ToDouble(likeDislikeRatio * 100);
+
+
         }
 
         public void ChangePlayerSize()

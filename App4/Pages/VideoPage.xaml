@@ -61,7 +61,7 @@
                             <TextBlock x:Name="DislikeIcon" FontFamily="Segoe MDL2 Assets" FontSize="24" Text="&#xE8E0;"/>
                         </StackPanel>
                     </Grid>
-                    <ProgressBar Value="50" Height="3"/>
+                    <ProgressBar x:Name="LikesBar" Value="50" Height="3"/>
                 </StackPanel>
                 <MenuFlyoutSeparator/>
             </StackPanel>
