@@ -86,7 +86,7 @@ namespace YTApp.Pages
             var videoList = await getVideoInfo.ExecuteAsync();
             video = videoList.Items[0];
 
-            var getChannelInfo = service.Channels.List("snippet, statistics, contentDetails");
+            var getChannelInfo = service.Channels.List("snippet,");
             getChannelInfo.Id = video.Snippet.ChannelId;
             var channelInfo = await getChannelInfo.ExecuteAsync();
             channel = channelInfo.Items[0];
@@ -94,7 +94,7 @@ namespace YTApp.Pages
             UpdatePageInfo();
         }
 
-        public void UpdatePageInfo()
+        public async void UpdatePageInfo()
         {
             var methods = new YoutubeItemMethods();
 
@@ -106,7 +106,8 @@ namespace YTApp.Pages
             var likeDislikeRatio = Convert.ToDecimal(video.Statistics.LikeCount) / Convert.ToDecimal(video.Statistics.DislikeCount + video.Statistics.LikeCount);
             LikesBar.Value = Convert.ToDouble(likeDislikeRatio * 100);
 
-
+            ChannelTitle.Text = channel.Snippet.Title;
+            DatePosted.Text = video.Snippet.PublishedAt.Value.GetDateTimeFormats(;
         }
 
         public void ChangePlayerSize()

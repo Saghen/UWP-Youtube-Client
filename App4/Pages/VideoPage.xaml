@@ -64,6 +64,18 @@
                     <ProgressBar x:Name="LikesBar" Value="50" Height="3"/>
                 </StackPanel>
                 <MenuFlyoutSeparator/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Ellipse Width="50" Height="50" HorizontalAlignment="Center" Margin="0,20"/>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock x:Name="ChannelTitle"/>
+                        <TextBlock x:Name="DatePosted" Foreground="#aaa" Margin="0,5,0,20"/>
+                        <TextBlock x:Name="Description" MaxHeight="100"/>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
         </Grid>
     </StackPanel>
