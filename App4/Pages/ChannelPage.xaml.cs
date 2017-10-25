@@ -195,7 +195,7 @@ namespace YTApp.Pages
         {
             var youTube = YouTube.Default;
             var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + e.ID);
-            MainPageReference.StartVideo(video.Uri);
+            MainPageReference.StartVideo(video.GetUri());
         }
 
         private async void SubscribeButton_Click(object sender, RoutedEventArgs e)

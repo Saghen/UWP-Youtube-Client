@@ -155,7 +155,7 @@ namespace YTApp
                     {
                         var youTube = YouTube.Default;
                         var video = youTube.GetVideo(SearchBox.Text);
-                        StartVideo(video.Uri);
+                        StartVideo(video.GetUri());
                     }
                     catch { }
                 }

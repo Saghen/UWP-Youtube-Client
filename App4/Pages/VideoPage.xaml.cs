@@ -86,14 +86,15 @@ namespace YTApp.Pages
             var videoList = await getVideoInfo.ExecuteAsync();
             video = videoList.Items[0];
 
-            var getChannelInfo = service.Channels.List("snippet,");
+            var getChannelInfo = service.Channels.List("snippet, statistics, contentDetails");
             getChannelInfo.Id = video.Snippet.ChannelId;
             var channelInfo = await getChannelInfo.ExecuteAsync();
+            channel = channelInfo.Items[0];
 
             UpdatePageInfo();
         }
 
-        public async void UpdatePageInfo()
+        public void UpdatePageInfo()
         {
             var methods = new YoutubeItemMethods();
 

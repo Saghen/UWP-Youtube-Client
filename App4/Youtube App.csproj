@@ -245,13 +245,13 @@
       <Version>1.30.0-beta01</Version>
     </PackageReference>
     <PackageReference Include="Google.Apis.Oauth2.v2">
-      <Version>1.29.1.994</Version>
+      <Version>1.29.2.994</Version>
     </PackageReference>
     <PackageReference Include="Google.Apis.YouTube.v3">
-      <Version>1.29.1.991</Version>
+      <Version>1.29.2.1006</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>5.4.0</Version>
+      <Version>6.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
       <Version>2.0.0</Version>
@@ -267,7 +267,7 @@
   <ItemGroup>
     <Reference Include="libvideo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\libvideo.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\libvideo.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
