@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
 using YTApp.Classes.DataTypes;
@@ -36,6 +37,7 @@ namespace YTApp.Pages
         string VideoID;
         Google.Apis.YouTube.v3.Data.Video video;
         Channel channel;
+        SearchListResponse relatedVideos;
 
         public VideoPage()
         {
@@ -86,15 +88,22 @@ namespace YTApp.Pages
             var videoList = await getVideoInfo.ExecuteAsync();
             video = videoList.Items[0];
 
-            var getChannelInfo = service.Channels.List("snippet,");
+            var getChannelInfo = service.Channels.List("snippet");
             getChannelInfo.Id = video.Snippet.ChannelId;
             var channelInfo = await getChannelInfo.ExecuteAsync();
             channel = channelInfo.Items[0];
 
+            var getRelatedVideos = service.Search.List("snippet");
+            getRelatedVideos.RelatedToVideoId = VideoID;
+            getRelatedVideos.Type = "video";
+            relatedVideos = await getRelatedVideos.ExecuteAsync();
+
             UpdatePageInfo();
+
+            UpdateRelatedVideos();
         }
 
-        public async void UpdatePageInfo()
+        public void UpdatePageInfo()
         {
             var methods = new YoutubeItemMethods();
 
@@ -107,7 +116,31 @@ namespace YTApp.Pages
             LikesBar.Value = Convert.ToDouble(likeDislikeRatio * 100);
 
             ChannelTitle.Text = channel.Snippet.Title;
-            DatePosted.Text = video.Snippet.PublishedAt.Value.GetDateTimeFormats(;
+            DatePosted.Text = video.Snippet.PublishedAt.Value.ToString("MMMM d, yyyy");
+            Description.Text = video.Snippet.Description;
+            var image = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url));
+            var imageBrush = new ImageBrush();
+            imageBrush.ImageSource = image;
+            ChannelProfileIcon.Fill = imageBrush;
+        }
+
+        public void UpdateRelatedVideos()
+        {
+            List<YoutubeItemDataType> relatedVideosList = new List<YoutubeItemDataType>();
+
+            var methods = new YoutubeItemMethods();
+            foreach(SearchResult video in relatedVideos.Items)
+            {
+                relatedVideosList.Add(methods.VideoToYoutubeItem(video));
+            }
+
+            RelatedVideosGridView.ItemsSource = relatedVideosList;
+        }
+
+        private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var item = (YoutubeItemDataType)e.ClickedItem;
+            MainPageReference.StartVideo(item.Id);
         }
 
         public void ChangePlayerSize()

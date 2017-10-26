@@ -174,14 +174,17 @@ namespace YTApp.Pages
             foreach(var playlist in ChannelPlaylistsResult.Items)
             {
                 YoutubeItemsTemp.Clear();
-                var GetPlaylistVideos = service.PlaylistItems.List("snippet");
+                var GetPlaylistVideos = service.PlaylistItems.List("snippet,status");
                 GetPlaylistVideos.PlaylistId = playlist.Id;
                 GetPlaylistVideos.MaxResults = 15;
                 var PlaylistVideosResult = await GetPlaylistVideos.ExecuteAsync();
                 if(PlaylistVideosResult.Items.Count == 0) { break; }
                 foreach (var video in PlaylistVideosResult.Items)
                 {
+                    if (video.Status.PrivacyStatus != "private")
+                    {
                         YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
+                    }
                 }
                 methods.FillInViews(YoutubeItemsTemp, service);
                 var PlaylistUserControlPlaylist = new ChannelPlaylistGridView(YoutubeItemsTemp, playlist.Snippet.Title);
