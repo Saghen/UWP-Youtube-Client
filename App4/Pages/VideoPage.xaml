@@ -26,7 +26,7 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <ScrollViewer>
+    <ScrollViewer x:Name="Scrollviewer">
         <StackPanel Background="Transparent">
             <Grid x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" MaxHeight="700">
                 <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Center">
@@ -63,12 +63,12 @@
                             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom">
                                 <Grid Width="140" Margin="10,8">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock x:Name="LikeIcon" FontFamily="Segoe MDL2 Assets" FontSize="24" Text="&#xE8E1;"/>
+                                        <TextBlock x:Name="LikeIcon" FontFamily="Segoe MDL2 Assets" FontSize="24" Text="&#xE8E1;" Tapped="LikeIcon_Tapped"/>
                                         <TextBlock x:Name="LikeCount" Text="50k" FontSize="14" Margin="10,0"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                         <TextBlock x:Name="DislikeCount" Text="50k" FontSize="14" Margin="10,0"/>
-                                        <TextBlock x:Name="DislikeIcon" FontFamily="Segoe MDL2 Assets" FontSize="24" Text="&#xE8E0;"/>
+                                        <TextBlock x:Name="DislikeIcon" FontFamily="Segoe MDL2 Assets" FontSize="24" Text="&#xE8E0;" Tapped="DislikeIcon_Tapped"/>
                                     </StackPanel>
                                 </Grid>
                                 <ProgressBar x:Name="LikesBar" Value="50" Height="3"/>
@@ -80,7 +80,7 @@
                                 <ColumnDefinition Width="80"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <Ellipse x:Name="ChannelProfileIcon" Width="50" Height="50" HorizontalAlignment="Center" Margin="0,20"/>
+                            <Ellipse x:Name="ChannelProfileIcon" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20"/>
                             <StackPanel Grid.Column="1" Margin="0,20">
                                 <TextBlock x:Name="ChannelTitle"/>
                                 <TextBlock x:Name="DatePosted" Foreground="#aaa" Margin="0,5,0,20"/>
@@ -89,13 +89,13 @@
                         </Grid>
                     </Grid>
                 </StackPanel>
-                <ListView x:Name="RelatedVideosGridView" Grid.Column="1" Header="Related" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick">
+                <ListView x:Name="RelatedVideosGridView" Grid.Column="1" Header="Related" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" Margin="0,10,0,0">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                            <StackPanel Margin="10" Height="150" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <StackPanel Margin="10" Height="130" Orientation="Horizontal" HorizontalAlignment="Stretch">
                                 <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" Width="200" VerticalAlignment="Top"/>
                                 <StackPanel>
-                                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="Wrap" MaxWidth="450"/>
                                     <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
                                     <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#fff" Margin="10,0,0,0"/>
                                 </StackPanel>

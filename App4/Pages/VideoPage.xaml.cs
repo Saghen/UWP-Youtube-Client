@@ -12,6 +12,7 @@ using VideoLibrary;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -49,9 +50,26 @@ namespace YTApp.Pages
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
             this.InitializeComponent();
+            MainPageReference.contentFrame.Navigated += ContentFrame_Navigated;
+            if (Frame.Width == 640)
+            {
+                Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
+                MediaElementContainer.MaxHeight = 360;
+            }
             VideoID = result.ID;
             StartVideo(result.ID);
             GetVideoInfo(result.ID);
+        }
+
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
+        {
+            if(Frame.Width != 640 && Frame.Visibility == Visibility.Visible)
+            {
+                Frame.Width = 640;
+                Frame.Height = 360;
+                MediaElementContainer.MaxHeight = 360;
+                Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
+            }
         }
 
         #region Methods
@@ -95,6 +113,7 @@ namespace YTApp.Pages
 
             var getRelatedVideos = service.Search.List("snippet");
             getRelatedVideos.RelatedToVideoId = VideoID;
+            getRelatedVideos.MaxResults = 15;
             getRelatedVideos.Type = "video";
             relatedVideos = await getRelatedVideos.ExecuteAsync();
 
@@ -145,15 +164,19 @@ namespace YTApp.Pages
 
         public void ChangePlayerSize()
         {
-            if (MediaElementContainer.Width != 640)
+            if (Frame.Width != 640)
             {
-                MediaElementContainer.Width = 640;
-                MediaElementContainer.Height = 360;
+                Frame.Width = 640;
+                Frame.Height = 360;
+                MediaElementContainer.MaxHeight = 360;
+                Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
             }
             else
             {
-                MediaElementContainer.Width = Double.NaN;
-                MediaElementContainer.Height = Double.NaN;
+                Frame.Width = Double.NaN;
+                Frame.Height = Double.NaN;
+                MediaElementContainer.MaxHeight = 700;
+                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
             }
         }
 
@@ -176,7 +199,7 @@ namespace YTApp.Pages
         private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
         {
             viewer.Stop();
-            viewer.Visibility = Visibility.Collapsed;
+            Frame.Visibility = Visibility.Collapsed;
         }
 
         private void viewer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -264,5 +287,49 @@ namespace YTApp.Pages
         }
 
         #endregion
+
+        private async void LikeIcon_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            {
+                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
+
+            // Create the service.
+            var service = new YouTubeService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Youtube Viewer",
+            });
+
+            var LikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Like);
+            LikeVideo.ExecuteAsync();
+
+            LikeIcon.Foreground = new SolidColorBrush(Color.FromArgb(255, 190, 40, 40));
+            DislikeIcon.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+        }
+
+        private async void DislikeIcon_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            {
+                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
+
+            // Create the service.
+            var service = new YouTubeService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Youtube Viewer",
+            });
+
+            var DislikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Dislike);
+            DislikeVideo.ExecuteAsync();
+
+            DislikeIcon.Foreground = new SolidColorBrush(Color.FromArgb(255, 190, 40, 40));
+            LikeIcon.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+        }
     }
 }

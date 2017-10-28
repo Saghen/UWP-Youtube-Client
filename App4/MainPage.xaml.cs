@@ -186,7 +186,8 @@ namespace YTApp
 
         public void StartVideo(string Id)
         {
-            contentFrame.Navigate(typeof(VideoPage), new NavigateParams() { mainPageRef = this, ID = Id });
+            videoFrame.Visibility = Visibility.Visible;
+            videoFrame.Navigate(typeof(VideoPage), new NavigateParams() { mainPageRef = this, ID = Id });
         }
 
         public void ChangePlayerSize()

@@ -17,7 +17,7 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <ScrollViewer Background="#1a1a1a">
+    <ScrollViewer x:Name="MainScrollViewer" Background="#1a1a1a" ViewChanged="ScrollViewer_ViewChanged">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="258"/>
@@ -42,7 +42,7 @@
                         </StackPanel>
                     </PivotItem>
                     <PivotItem x:Name="VideoPivot" Header="Videos">
-                        <GridView x:Name="VideosGridView" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="PlayVideoEvent">
+                        <GridView x:Name="VideosGridView" ItemsSource="{x:Bind VideosList, Mode=OneWay}" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="PlayVideoEvent">
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:YoutubeItemDataType">
                                     <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">

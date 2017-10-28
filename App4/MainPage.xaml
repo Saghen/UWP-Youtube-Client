@@ -94,7 +94,10 @@
                 </ScrollViewer>
             </SplitView.Pane>
             <SplitView.Content>
-                <Frame x:Name="contentFrame" Background="#1a1a1a" x:FieldModifier="public"/>
+                <Grid>
+                    <Frame x:Name="contentFrame" Background="#1a1a1a" x:FieldModifier="public"/>
+                    <Frame x:Name="videoFrame" Background="#1a1a1a" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                </Grid>
             </SplitView.Content>
         </SplitView>
 

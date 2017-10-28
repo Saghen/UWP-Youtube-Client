@@ -36,6 +36,9 @@ namespace YTApp.Pages
         public MainPage MainPageReference;
         public string ChannelID;
         public bool isSubscribed;
+        public string nextPageToken;
+        ObservableCollection<YoutubeItemDataType> VideosList = new ObservableCollection<YoutubeItemDataType>();
+        public bool addingVideos = false;
 
         public ChannelPage()
         {
@@ -237,6 +240,11 @@ namespace YTApp.Pages
 
         public async void UpdateVideos()
         {
+            if(addingVideos == false)
+            {
+                addingVideos = true;
+            }
+            else { return; }
             List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
 
             YoutubeItemMethods methods = new YoutubeItemMethods();
@@ -262,14 +270,86 @@ namespace YTApp.Pages
             }
             methods.FillInViews(tempList, youtubeService);
 
-            VideosGridView.ItemsSource = tempList;
+            nextPageToken = searchListResponse.NextPageToken;
+
+            foreach(var item in tempList)
+            {
+                VideosList.Add(item);
+            }
+            addingVideos = false;
+        }
+
+        public async void AddMoreVideos()
+        {
+            if (addingVideos == false)
+            {
+                addingVideos = true;
+            }
+            else { return; }
+
+            List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
+            if (VideosGridView.ItemsSource != null && nextPageToken != null && nextPageToken != "")
+            {
+                
+            }
+            else
+            {
+                UpdateVideos();
+                return;
+            }
+
+            YoutubeItemMethods methods = new YoutubeItemMethods();
+
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
+                ApplicationName = this.GetType().ToString()
+            });
+
+            var searchListRequest = youtubeService.Search.List("snippet");
+            searchListRequest.ChannelId = ChannelID;
+            searchListRequest.Type = "video";
+            searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
+            searchListRequest.PageToken = nextPageToken;
+            searchListRequest.MaxResults = 25;
+
+            // Call the search.list method to retrieve results matching the specified query term.
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+
+            foreach (var video in searchListResponse.Items)
+            {
+                tempList.Add(methods.VideoToYoutubeItem(video));
+            }
+            methods.FillInViews(tempList, youtubeService);
+            nextPageToken = searchListResponse.NextPageToken;
+
+            foreach (var video in tempList)
+            {
+                VideosList.Add(video);
+            }
+            addingVideos = false;
         }
 
         private void PlayVideoEvent(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeItemDataType)e.ClickedItem;
-            YoutubeItemMethodsStatic.StartVideo(item.Id, MainPageReference);
+            MainPageReference.StartVideo(item.Id);
         }
         #endregion
+
+        private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            if(rootPivot.SelectedItem == VideoPivot)
+            {
+                var verticalOffset = MainScrollViewer.VerticalOffset;
+                var maxVerticalOffset = MainScrollViewer.ScrollableHeight - 1000; //sv.ExtentHeight - sv.ViewportHeight;
+
+                if (maxVerticalOffset < 0 ||
+                    verticalOffset >= maxVerticalOffset)
+                {
+                    AddMoreVideos();
+                }
+            }
+        }
     }
 }
