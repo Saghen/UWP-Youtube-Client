@@ -16,8 +16,8 @@
                         <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
                             <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
                             <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
-                            <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
-                            <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" Foreground="#aaa" FontSize="12" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" Foreground="#aaa" FontSize="12" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>
                 </GridView.ItemTemplate>

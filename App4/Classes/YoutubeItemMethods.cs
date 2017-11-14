@@ -79,7 +79,7 @@ namespace YTApp.Classes
 
             for (int i = 0; i < collection.Count; i++)
             {
-                collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[j].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
             }
         }
 
@@ -88,9 +88,15 @@ namespace YTApp.Classes
             if (collection.Count <= 0) return;
 
             string VideoIDs = "";
+            int j = 0;
             foreach (var video in collection)
             {
+                if (video == null)
+                {
+                    collection.RemoveAt(j); break;
+                }
                 VideoIDs += video.Id + ",";
+                j++;
             }
             var getViewsRequest = service.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);

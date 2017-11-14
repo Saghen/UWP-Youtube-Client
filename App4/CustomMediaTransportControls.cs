@@ -11,6 +11,16 @@ namespace YTApp
 {
     class CustomMediaTransportControls : MediaTransportControls
     {
+        public event EventHandler SwitchedToCompact;
+        public event EventHandler SwitchedToFullSize;
+
+        public readonly DependencyProperty IsCompactProperty = DependencyProperty.Register("IsCompact", typeof(bool), typeof(CustomMediaTransportControls), new PropertyMetadata(false));
+
+        public bool IsCompact
+        {
+            get { return (bool)GetValue(IsCompactProperty); }
+            set { SetValue(IsCompactProperty, value); }
+        }
 
         public CustomMediaTransportControls()
         {
@@ -30,19 +40,17 @@ namespace YTApp
         private async void CompactButton_Click(object sender, RoutedEventArgs e)
         {
             // Raise an event on the custom control when 'like' is clicked.
-            if (CompactView == true)
+            if (IsCompact == true)
             {
                 await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
-                CompactView = false;
-                IsCompact = false;
+                SwitchedToFullSize.Invoke(this, new EventArgs());
             }
             else
             {
                 ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
                 compactOptions.CustomSize = new Windows.Foundation.Size(500, 281);
                 await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions);
-                CompactView = true;
-                IsCompact = true;
+                SwitchedToCompact.Invoke(this, new EventArgs());
             }
         }
     }

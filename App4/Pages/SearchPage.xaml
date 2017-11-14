@@ -15,10 +15,10 @@
                 <StackPanel>
                     <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
-                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#fff" Margin="10,0,0,0"/>
+                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#aaa"/>
+                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#aaa" Margin="10,0,0,0"/>
                     </StackPanel>
-                    <TextBlock x:Name="DescriptionControl" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="DescriptionControl" FontSize="12" Foreground="#aaa" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
@@ -31,8 +31,8 @@
                 </Ellipse>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind SubscribersAndVideos}" FontSize="12"/>
-                    <TextBlock x:Name="DescriptionControl" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind SubscribersAndVideos}" FontSize="12" Foreground="#aaa"/>
+                    <TextBlock x:Name="DescriptionControl" FontSize="12" Foreground="#aaa" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>

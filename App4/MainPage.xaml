@@ -32,7 +32,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Background="#222">
+        <StackPanel Orientation="Horizontal" Background="#2a2a2a">
             <Button x:Name="HamburgerButton" FontFamily="Segoe MDL2 Assets" Content="&#xE700;" FontSize="18" Margin="20,0" Background="Transparent" Click="HamburgerButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
             <TextBox x:Name="SearchBox" Width="500px" VerticalAlignment="Center" PlaceholderText="Search" KeyDown="SearchBox_KeyDown" BorderThickness="1" Style="{StaticResource TextBoxCleanStyle}" Background="#151515" BorderBrush="#2a2a2a" x:FieldModifier="public"/>
             <Button x:Name="SearchButton" Background="#444" Padding="20,0" Height="32" FontFamily="Segoe MDL2 Assets" Content="&#xE094;" Click="Search_Click" Style="{StaticResource TransparentButtonStyle}"/>
@@ -40,7 +40,7 @@
 
         <SplitView Grid.Row="1" x:Name="SideBarSplitView" DisplayMode="Overlay">
             <SplitView.Pane>
-                <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
+                <ScrollViewer Background="#252525" VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
                     <StackPanel>
                         <ListView ItemClick="PageMenuControls_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
                             <ListView.ItemTemplate>
@@ -95,16 +95,16 @@
             </SplitView.Pane>
             <SplitView.Content>
                 <Grid>
-                    <Frame x:Name="contentFrame" Background="#1a1a1a" x:FieldModifier="public"/>
-                    <Frame x:Name="videoFrame" Background="#1a1a1a" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                    <Frame x:Name="contentFrame" Background="#222" x:FieldModifier="public"/>
+                    <Frame x:Name="videoFrame" Background="#222" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                 </Grid>
             </SplitView.Content>
         </SplitView>
 
-        <Grid Grid.RowSpan="2" x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+        <Grid Grid.RowSpan="2" x:Name="MediaElementContainer" VerticalAlignment="Bottom" HorizontalAlignment="Right">
             <MediaElement x:Name="viewer" x:FieldModifier="public" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed">
                 <MediaElement.TransportControls>
-                    <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" RightTapped="viewer_RightTapped">
+                    <local:CustomMediaTransportControls IsCompact="True" Background="#AA000000" SwitchedToFullSize="viewer_SwitchToFullSize">
                         <FlyoutBase.AttachedFlyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink"/>
@@ -114,8 +114,6 @@
                     </local:CustomMediaTransportControls>
                 </MediaElement.TransportControls>
             </MediaElement>
-            <Button x:Name='MinimizeMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="MinimizeMediaElement_Click"/>
-            <Button x:Name='CloseMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Click="CloseMediaElement_Click"/>
         </Grid>
     </Grid>
 </Page>

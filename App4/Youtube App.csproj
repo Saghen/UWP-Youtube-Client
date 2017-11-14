@@ -132,6 +132,9 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classes\YoutubeItemDataType.cs" />
+    <Compile Include="UserControls\LikeDislikeUserControl.xaml.cs">
+      <DependentUpon>LikeDislikeUserControl.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -176,6 +179,20 @@
     <Content Include="Assets\Wide310x150Logo.scale-125.png" />
     <Content Include="Assets\Wide310x150Logo.scale-150.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
+    <Content Include="Icons\DislikeIcon.svg" />
+    <Content Include="Icons\LikeIcon.svg" />
+    <Content Include="Icons\Thumbs_Down_Pressed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Thumbs_Down_NotPressed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Thumbs_Up_Pressed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Thumbs_Up_NotPressed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -233,6 +250,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UserControls\LikeDislikeUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Google.Apis">
@@ -267,7 +288,7 @@
   <ItemGroup>
     <Reference Include="libvideo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Desktop\libvideo.dll</HintPath>
+      <HintPath>..\..\..\..\Desktop\src\libvideo\bin\Release\libvideo.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

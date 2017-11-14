@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace YTApp.Classes
 {
-    class YoutubeChannelDataType
+    public class YoutubeChannelDataType
     {
         private string _thumbnail;
         private string _title;

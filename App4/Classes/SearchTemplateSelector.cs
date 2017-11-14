@@ -8,7 +8,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace YTApp.Classes
 {
-    class SearchTemplateSelector : DataTemplateSelector
+    public class SearchTemplateSelector : DataTemplateSelector
     {
         public DataTemplate VideoTemplate { get; set; }
         public DataTemplate ChannelTemplate { get; set; }
@@ -21,7 +21,6 @@ namespace YTApp.Classes
                 {
                     return VideoTemplate;
                 }
-
                 return ChannelTemplate;
             }
 

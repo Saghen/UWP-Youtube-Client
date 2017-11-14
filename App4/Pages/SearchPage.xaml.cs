@@ -3,6 +3,7 @@ using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -85,22 +86,43 @@ namespace YTApp.Pages
 
             YoutubeItemsGridView.Items.Clear();
 
-            // Add each result to the ListView
+            ObservableCollection<YoutubeItemDataType> ObservableSearchResponse = new ObservableCollection<YoutubeItemDataType>();
+            ObservableCollection<YoutubeChannelDataType> ObservableSearchResponseChannels = new ObservableCollection<YoutubeChannelDataType>();
+
+            var methods = new YoutubeItemMethods();
             foreach (var searchResult in searchListResponse.Items)
             {
                 if (searchResult.Id.Kind == "youtube#video")
                 {
-                    var methods = new YoutubeItemMethods();
                     var data = methods.VideoToYoutubeItem(searchResult);
-                    YoutubeItemsGridView.Items.Add(data);
+                    ObservableSearchResponse.Add(data);
                 }
                 else if (searchResult.Id.Kind == "youtube#channel")
                 {
-                    var methods = new YoutubeItemMethods();
                     var data = methods.ChannelToYoutubeChannel(searchResult, youtubeService);
-                    YoutubeItemsGridView.Items.Add(data);
-                }     
+                    ObservableSearchResponseChannels.Add(data);
+                }
             }
+
+            methods.FillInViews(ObservableSearchResponse, youtubeService);
+
+            ObservableCollection<object> FinalCollection = new ObservableCollection<object>();
+
+            FinalCollection.Add(ObservableSearchResponse);
+            FinalCollection.Add(ObservableSearchResponseChannels);
+
+            foreach (var obj in ObservableSearchResponseChannels)
+            {
+                YoutubeItemsGridView.Items.Add(obj);
+            }
+            foreach (var obj in ObservableSearchResponse)
+            {
+                YoutubeItemsGridView.Items.Add(obj);
+            }
+            //YoutubeItemsGridView.ItemsSource = FinalCollection;
+
+            // Add each result to the ListView
+
         }
 
         private string ViewCountShortner(ulong? viewCount)
