@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="a4a569c0-3c12-499d-b719-af6971d0b1cf" Publisher="CN=Saghen" Version="0.3.4.0" />
+  <Identity Name="a4a569c0-3c12-499d-b719-af6971d0b1cf" Publisher="CN=Saghen" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="a4a569c0-3c12-499d-b719-af6971d0b1cf" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Youtube Viewer</DisplayName>
@@ -15,7 +15,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="App4.App">
-      <uap:VisualElements DisplayName="Naton" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Some UWP youtube viewer for learning." BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="Youtube" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="A high-performance youtube app." BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\LargeTile.png" Square71x71Logo="Assets\SmallTile.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
@@ -23,6 +23,7 @@
       <Extensions>
         <uap:Extension Category="windows.protocol">
           <uap:Protocol Name="viewer.youtube">
+            <uap:Logo>Logo1by1.png</uap:Logo>
             <uap:DisplayName>Youtube Viewer</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
