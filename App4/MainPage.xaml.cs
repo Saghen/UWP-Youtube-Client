@@ -18,7 +18,7 @@ using VideoLibrary;
 using YTApp.Classes;
 using YTApp.Pages;
 using YTApp.Classes.DataTypes;
-
+using Google.Apis.Auth.OAuth2.Flows;
 
 namespace YTApp
 {
@@ -40,11 +40,12 @@ namespace YTApp
 
         public MainPage()
         {
-            FirstStartupCheck();
-
             this.InitializeComponent();
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
+
+            FirstStartupCheck();
+
             LoadSubscriptions();
 
             contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
@@ -57,7 +58,7 @@ namespace YTApp
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
                 ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
             }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-        }
+         }
 
         private void MainPage_BackRequested(object sender, BackRequestedEventArgs e)
         {
@@ -136,7 +137,7 @@ namespace YTApp
         private void PageMenuControls_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (SplitViewItemDataType)e.ClickedItem;
-            if(item.Text == "Home")
+            if (item.Text == "Home")
                 contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this });
         }
 
@@ -232,6 +233,6 @@ namespace YTApp
 
         #endregion
 
-        
+
     }
 }
