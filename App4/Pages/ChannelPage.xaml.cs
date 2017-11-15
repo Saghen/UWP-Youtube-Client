@@ -227,17 +227,27 @@ namespace YTApp.Pages
                 Subscription subscription = new Subscription();
 
                 MainPageReference.LoadSubscriptions();
-                var sub = MainPageReference.subscriptionsList.Find(x => x.Id == ChannelID);
                 try
                 {
-                    var unsubscribe = service.Subscriptions.Delete(sub.SubscriptionID);
-                    await unsubscribe.ExecuteAsync();
-                    
-                    isSubscribed = false;
+                    var sub = MainPageReference.subscriptionsList.Single(x => x.Id == ChannelID);
+                    try
+                    {
+                        var unsubscribe = service.Subscriptions.Delete(sub.SubscriptionID);
+                        await unsubscribe.ExecuteAsync();
+
+                        isSubscribed = false;
+                    }
+                    catch
+                    {
+                        //Fires if subscription could not be removed for whatever reason.
+                        SubscribeButton.Content = "Subscribed " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount + 1);
+                    }
                 }
                 catch
                 {
-                    SubscribeButton.Content = "Subscribed " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount + 1);
+                    //Fires if subscription doesn't exist.
+                    SubscribeButton.Content = "Subscribe " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
+                    isSubscribed = false;
                 }
             }
             else

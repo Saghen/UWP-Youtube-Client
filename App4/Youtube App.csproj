@@ -108,6 +108,9 @@
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\YoutubeChannelDataType.cs" />
     <Compile Include="Classes\YoutubeItemMethodsStatic.cs" />
+    <Compile Include="Pages\FirstStartupPage.xaml.cs">
+      <DependentUpon>FirstStartupPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\VideoPage.xaml.cs">
       <DependentUpon>VideoPage.xaml</DependentUpon>
     </Compile>
@@ -142,8 +145,7 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Images\yt_logo_rgb_dark.png" />
-    <Content Include="Assets\Images\yt_logo_rgb_dark.svg" />
+    <Content Include="Assets\Images\Welcome_Smile.png" />
     <Content Include="Assets\LargeTile.scale-100.png" />
     <Content Include="Assets\LargeTile.scale-125.png" />
     <Content Include="Assets\LargeTile.scale-150.png" />
@@ -207,6 +209,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Pages\FirstStartupPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\VideoPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
