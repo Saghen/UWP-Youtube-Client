@@ -13,26 +13,26 @@
             <StackPanel Margin="10" Height="200" Orientation="Horizontal" HorizontalAlignment="Stretch">
                 <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10"/>
                 <StackPanel>
-                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="18" Foreground="#fff" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#aaa"/>
-                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#aaa" Margin="10,0,0,0"/>
+                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="14" Foreground="#aaa"/>
+                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="14" Foreground="#aaa" Margin="10,0,0,0"/>
                     </StackPanel>
-                    <TextBlock x:Name="DescriptionControl" FontSize="12" Foreground="#aaa" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis"/>
+                    <TextBlock x:Name="DescriptionControl" FontSize="14" Foreground="#aaa" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="ChannelDataTemplate" x:DataType="classes:YoutubeChannelDataType">
-            <StackPanel Margin="10" Height="130" Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <Ellipse x:Name="ImageControl" Margin="10" Width="100" Height="100">
+            <StackPanel Margin="10" Height="150" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Ellipse x:Name="ImageControl" Margin="10" Width="130" Height="130">
                     <Ellipse.Fill>
                         <ImageBrush ImageSource="{x:Bind Thumbnail}"/>
                     </Ellipse.Fill>
                 </Ellipse>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind SubscribersAndVideos}" FontSize="12" Foreground="#aaa"/>
-                    <TextBlock x:Name="DescriptionControl" FontSize="12" Foreground="#aaa" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap"/>
+                <StackPanel VerticalAlignment="Center" Margin="10">
+                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="18" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" Margin="3"/>
+                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind SubscribersAndVideos}" FontSize="14" Foreground="#aaa" Margin="3"/>
+                    <TextBlock x:Name="DescriptionControl" FontSize="14" Foreground="#aaa" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap" Margin="3"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>

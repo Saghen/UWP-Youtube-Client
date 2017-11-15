@@ -30,8 +30,8 @@
 
     <ScrollViewer x:Name="Scrollviewer">
         <StackPanel Background="Transparent">
-            <Grid x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" MaxHeight="700">
-                <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Center">
+            <Grid x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" >
+                <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Center" MaxHeight="900">
                     <MediaElement.TransportControls>
                         <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" RightTapped="viewer_RightTapped" SwitchedToCompact="CustomMediaTransportControls_SwitchedToCompact" SwitchedToFullSize="CustomMediaTransportControls_SwitchedToFullSize">
                             <FlyoutBase.AttachedFlyout>

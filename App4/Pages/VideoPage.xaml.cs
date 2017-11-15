@@ -190,16 +190,18 @@ namespace YTApp.Pages
             {
                 Scrollviewer.ChangeView(0, 0, 1, true);
                 Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
+                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 Frame.Width = 640;
                 Frame.Height = 360;
                 viewer.MaxHeight = 360;
             }
             else
             {
+                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
+                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 Frame.Width = Double.NaN;
                 Frame.Height = Double.NaN;
-                MediaElementContainer.MaxHeight = 700;
-                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
+                viewer.MaxHeight = 900;
             }
         }
 
@@ -330,50 +332,6 @@ namespace YTApp.Pages
         }
 
         #endregion
-
-        private async void LikeIcon_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
-
-            var LikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Like);
-            LikeVideo.ExecuteAsync();
-
-            //LikeIcon.Source = new BitmapImage(new Uri(Package.Current.InstalledLocation.Path + "\\Icons\\Thumbs_Up_Pressed.png"));
-            //DislikeIcon.Source = new BitmapImage(new Uri(Package.Current.InstalledLocation.Path + "\\Icons\\Thumbs_Down_NotPressed.png"));
-        }
-
-        private async void DislikeIcon_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
-
-            var DislikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Dislike);
-            DislikeVideo.ExecuteAsync();
-
-            //LikeIcon.Source = new BitmapImage(new Uri(Package.Current.InstalledLocation.Path + "\\Icons\\Thumbs_Up_NotPressed.png"));
-            //DislikeIcon.Source = new BitmapImage(new Uri(Package.Current.InstalledLocation.Path + "\\Icons\\Thumbs_Down_Pressed.png"));
-        }
 
         private void CustomMediaTransportControls_SwitchedToCompact(object sender, EventArgs e)
         {

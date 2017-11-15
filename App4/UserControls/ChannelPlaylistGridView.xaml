@@ -10,18 +10,16 @@
     d:DesignHeight="300"
     d:DesignWidth="400" Margin="0,15">
 
-    <ScrollViewer VerticalScrollMode="Disabled" HorizontalScrollBarVisibility="Visible">
-        <GridView x:Name="VideoItemGridView" HorizontalContentAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="VideoItemGridView_ItemClick">
-            <GridView.ItemTemplate>
-                <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                    <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
-                        <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
-                        <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
-                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
-                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
-    </ScrollViewer>
+    <GridView x:Name="VideoItemGridView" HorizontalContentAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="VideoItemGridView_ItemClick" Height="300" ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.HorizontalScrollMode="Enabled">
+        <GridView.ItemTemplate>
+            <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
+                    <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </DataTemplate>
+        </GridView.ItemTemplate>
+    </GridView>
 </UserControl>

@@ -32,6 +32,38 @@ namespace YTApp.Classes
             mainPageRef.VideoID = ID;
         }
 
+        static public string ViewCountShortner(long viewCount)
+        {
+            if (viewCount > 1000000)
+            {
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000000), 1)) + "M";
+            }
+            else if (viewCount > 1000)
+            {
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000), 1)) + "K";
+            }
+            else
+            {
+                return Convert.ToString(viewCount);
+            }
+        }
+
+        static public string ViewCountShortner(ulong? viewCount)
+        {
+            if (viewCount > 1000000)
+            {
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000000), 1)) + "M";
+            }
+            else if (viewCount > 1000)
+            {
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000), 1)) + "K";
+            }
+            else
+            {
+                return Convert.ToString(viewCount);
+            }
+        }
+
         /*static async public YouTubeService GetService()
         {
             var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets

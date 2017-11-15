@@ -38,6 +38,7 @@ namespace YTApp.Pages
         public bool isSubscribed;
         public string nextPageToken;
         ObservableCollection<YoutubeItemDataType> VideosList = new ObservableCollection<YoutubeItemDataType>();
+        public Channel channel;
         public bool addingVideos = false;
 
         public ChannelPage()
@@ -77,14 +78,15 @@ namespace YTApp.Pages
             var GetChannelInfo = service.Channels.List("snippet, brandingSettings, statistics");
             GetChannelInfo.Id = ChannelID;
             var ChannelInfoResults = await GetChannelInfo.ExecuteAsync();
+            channel = ChannelInfoResults.Items[0];
 
             //Profile Image
             var ProfileImageBrush = new ImageBrush();
-            ProfileImageBrush.ImageSource = new BitmapImage(new Uri(ChannelInfoResults.Items[0].Snippet.Thumbnails.High.Url));
+            ProfileImageBrush.ImageSource = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url));
             ProfileImage.Fill = ProfileImageBrush;
 
             //Channel Name
-            ChannelName.Text = ChannelInfoResults.Items[0].Snippet.Title;
+            ChannelName.Text = channel.Snippet.Title;
 
             //Subscribe Button
             var CheckIfSubscribed = service.Subscriptions.List("snippet");
@@ -92,23 +94,19 @@ namespace YTApp.Pages
             CheckIfSubscribed.ForChannelId = ChannelID;
             var IsSubscribed = await CheckIfSubscribed.ExecuteAsync();
 
-            if(IsSubscribed.Items.Count == 0)
+            if (IsSubscribed.Items.Count == 0)
             {
-                SubscribeButton.Content = "Subscribe " + methods.ViewCountShortner(ChannelInfoResults.Items[0].Statistics.SubscriberCount);
+                SubscribeButton.Content = "Subscribe " + methods.ViewCountShortner(channel.Statistics.SubscriberCount);
                 isSubscribed = false;
             }
             else
             {
-                SubscribeButton.Content = "Subscribed " + methods.ViewCountShortner(ChannelInfoResults.Items[0].Statistics.SubscriberCount);
-
-                var DarkRedBackground = new SolidColorBrush();
-                DarkRedBackground.Color = Windows.UI.Color.FromArgb(255, 153, 34, 34);
-                SubscribeButton.Background = DarkRedBackground;
+                SubscribeButton.Content = "Subscribed " + methods.ViewCountShortner(channel.Statistics.SubscriberCount);
                 isSubscribed = true;
             }
 
             //Banner Image
-            SplashImage.Source = new BitmapImage(new Uri(ChannelInfoResults.Items[0].BrandingSettings.Image.BannerImageUrl));
+            SplashImage.Source = new BitmapImage(new Uri(channel.BrandingSettings.Image.BannerImageUrl));
         }
 
         public async void UpdateChannelHome()
@@ -134,7 +132,7 @@ namespace YTApp.Pages
             GetChannelVideosUploads.ChannelId = ChannelID;
             GetChannelVideosUploads.Order = SearchResource.ListRequest.OrderEnum.Date;
             GetChannelVideosUploads.Type = "video";
-            GetChannelVideosUploads.MaxResults = 15;
+            GetChannelVideosUploads.MaxResults = 10;
             var ChannelVideosResultUploads = await GetChannelVideosUploads.ExecuteAsync();
             foreach (var video in ChannelVideosResultUploads.Items)
             {
@@ -153,10 +151,10 @@ namespace YTApp.Pages
             GetChannelVideosPopular.ChannelId = ChannelID;
             GetChannelVideosPopular.Order = SearchResource.ListRequest.OrderEnum.ViewCount;
             GetChannelVideosPopular.Type = "video";
-            GetChannelVideosPopular.MaxResults = 15;
+            GetChannelVideosPopular.MaxResults = 10;
             var ChannelVideosResultPopular = await GetChannelVideosPopular.ExecuteAsync();
             foreach (var video in ChannelVideosResultPopular.Items)
-            { 
+            {
                 if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
                     YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
             }
@@ -174,14 +172,14 @@ namespace YTApp.Pages
             var ChannelPlaylistsResult = GetChannelPlaylists.Execute();
 
             //Go through each playlist and get all its items
-            foreach(var playlist in ChannelPlaylistsResult.Items)
+            foreach (var playlist in ChannelPlaylistsResult.Items)
             {
                 YoutubeItemsTemp.Clear();
                 var GetPlaylistVideos = service.PlaylistItems.List("snippet,status");
                 GetPlaylistVideos.PlaylistId = playlist.Id;
-                GetPlaylistVideos.MaxResults = 15;
+                GetPlaylistVideos.MaxResults = 10;
                 var PlaylistVideosResult = await GetPlaylistVideos.ExecuteAsync();
-                if(PlaylistVideosResult.Items.Count == 0) { break; }
+                if (PlaylistVideosResult.Items.Count == 0) { break; }
                 foreach (var video in PlaylistVideosResult.Items)
                 {
                     if (video.Status.PrivacyStatus != "private")
@@ -221,17 +219,45 @@ namespace YTApp.Pages
 
             if (isSubscribed == true)
             {
-                var subscription = MainPageReference.subscriptionsList.Find(x => x.Id == ChannelID);
-                var unsubscribe = service.Subscriptions.Delete(subscription.SubscriptionID);
-                unsubscribe.Execute();
+                SubscribeButton.Content = "Subscribe " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
+
+                var getSubscription = service.Subscriptions.List("snippet");
+                getSubscription.Mine = true;
+                var subscriptions = await getSubscription.ExecuteAsync();
+                Subscription subscription = new Subscription();
+
+                MainPageReference.LoadSubscriptions();
+                var sub = MainPageReference.subscriptionsList.Find(x => x.Id == ChannelID);
+                try
+                {
+                    var unsubscribe = service.Subscriptions.Delete(sub.SubscriptionID);
+                    await unsubscribe.ExecuteAsync();
+                    
+                    isSubscribed = false;
+                }
+                catch
+                {
+                    SubscribeButton.Content = "Subscribed " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount + 1);
+                }
             }
             else
             {
-                var subscription = new Subscription();
-                subscription.Snippet.ResourceId.ChannelId = ChannelID;
-                subscription.Snippet.ResourceId.Kind = "youtube#channel";
+                Subscription subscription = new Subscription();
+                SubscriptionSnippet snippet = new SubscriptionSnippet();
+                ResourceId resourceId = new ResourceId();
+
+                resourceId.ChannelId = ChannelID;
+                resourceId.Kind = "youtube#channel";
+
+                snippet.ResourceId = resourceId;
+                subscription.Snippet = snippet;
+
                 var subscribe = service.Subscriptions.Insert(subscription, "snippet");
                 subscribe.Execute();
+
+                SubscribeButton.Content = "Subscribed " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount + 1);
+
+                isSubscribed = true;
             }
         }
         #endregion
@@ -240,7 +266,7 @@ namespace YTApp.Pages
 
         public async void UpdateVideos()
         {
-            if(addingVideos == false)
+            if (addingVideos == false)
             {
                 addingVideos = true;
             }
@@ -272,7 +298,7 @@ namespace YTApp.Pages
 
             nextPageToken = searchListResponse.NextPageToken;
 
-            foreach(var item in tempList)
+            foreach (var item in tempList)
             {
                 VideosList.Add(item);
             }
@@ -290,7 +316,7 @@ namespace YTApp.Pages
             List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
             if (VideosGridView.ItemsSource != null && nextPageToken != null && nextPageToken != "")
             {
-                
+
             }
             else
             {
@@ -339,7 +365,7 @@ namespace YTApp.Pages
 
         private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
-            if(rootPivot.SelectedItem == VideoPivot)
+            if (rootPivot.SelectedItem == VideoPivot)
             {
                 var verticalOffset = MainScrollViewer.VerticalOffset;
                 var maxVerticalOffset = MainScrollViewer.ScrollableHeight - 1000; //sv.ExtentHeight - sv.ViewportHeight;

@@ -33,7 +33,7 @@
                             <TextBlock x:Name="SubscribersCount"/>
                         </StackPanel>
                     </StackPanel>
-                    <Button x:Name="SubscribeButton" Background="#c22" BorderThickness="0" Content="Subscribe" Padding="25,10" HorizontalAlignment="Right" Style="{StaticResource RoundButtonStyle}" Click="SubscribeButton_Click"/>
+                    <Button x:Name="SubscribeButton" Background="#f22" BorderThickness="0" Content="Subscribe" Width="130" Height="40" HorizontalAlignment="Right" Style="{StaticResource RoundButtonStyle}" Click="SubscribeButton_Click"/>
                 </Grid>
                 <Pivot x:Name="rootPivot" Padding="30,0">
                     <PivotItem x:Name="HomePivot" Header="Home">

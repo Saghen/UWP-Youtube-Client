@@ -64,7 +64,7 @@ namespace YTApp
 
         #region Menu
 
-        private async void LoadSubscriptions()
+        public async void LoadSubscriptions()
         {
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {

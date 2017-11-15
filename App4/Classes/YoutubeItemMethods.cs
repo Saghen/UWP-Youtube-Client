@@ -53,7 +53,7 @@ namespace YTApp.Classes
             VideoToAdd.Title = video.Snippet.Title;
             VideoToAdd.Id = video.Id.ChannelId;
             VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId;
-            VideoToAdd.SubscribersAndVideos = Convert.ToString(channelInfo.Items[0].Statistics.SubscriberCount) + " subscribers • videos " + Convert.ToString(channelInfo.Items[0].Statistics.VideoCount);
+            VideoToAdd.SubscribersAndVideos = string.Format("{0:#,###0.#}", channelInfo.Items[0].Statistics.SubscriberCount) + " Subscribers • Videos " + Convert.ToString(channelInfo.Items[0].Statistics.VideoCount);
             return VideoToAdd;
         }
 

@@ -23,6 +23,7 @@ namespace YTApp
     public sealed partial class ChannelPlaylistGridView : UserControl
     {
         public event EventHandler<RoutedEventArgsWithID> ItemClicked;
+        public int index = 0;
 
         public ChannelPlaylistGridView(List<YoutubeItemDataType> list, string header)
         {
