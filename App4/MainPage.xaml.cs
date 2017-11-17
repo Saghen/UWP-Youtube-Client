@@ -18,6 +18,10 @@ using VideoLibrary;
 using YTApp.Classes;
 using YTApp.Pages;
 using YTApp.Classes.DataTypes;
+<<<<<<< HEAD
+=======
+using System.Collections.ObjectModel;
+>>>>>>> a0dd23b37eaca0b70f9685707333a02afdae71f7
 
 namespace YTApp
 {
@@ -28,7 +32,7 @@ namespace YTApp
     {
         public string VideoID = "";
 
-        public List<SubscriptionDataType> subscriptionsList = new List<SubscriptionDataType>();
+        public ObservableCollection<SubscriptionDataType> subscriptionsList = new ObservableCollection<SubscriptionDataType>();
         List<SearchListResponse> youtubeVideos = new List<SearchListResponse>();
 
         public string OAuthToken;
@@ -44,20 +48,22 @@ namespace YTApp
             SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
 
             FirstStartupCheck();
-
-            LoadSubscriptions();
-
-            contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
         }
 
-        public async void FirstStartupCheck()
+        public void FirstStartupCheck()
         {
-            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            if (localSettings.Values["FirstStartup"] == null)
             {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-         }
+                contentFrame.Navigate(typeof(FirstStartupPage), new NavigateParams() { mainPageRef = this, Refresh = true });
+                localSettings.Values["FirstStartup"] = false;
+            }
+            else
+            {
+                LoadSubscriptions();
+                contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
+            }          
+        }
 
         private void MainPage_BackRequested(object sender, BackRequestedEventArgs e)
         {
@@ -92,6 +98,9 @@ namespace YTApp
 
             string nextPageToken;
             var tempSubscriptions = GetSubscriptions(null, service);
+
+            List<SubscriptionDataType> subscriptionsListTemp = new List<SubscriptionDataType>();
+
             foreach (Subscription sub in tempSubscriptions.Items)
             {
                 var subscription = new SubscriptionDataType();
@@ -100,7 +109,7 @@ namespace YTApp
                 subscription.Title = sub.Snippet.Title;
                 subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
                 subscription.SubscriptionID = sub.Id;
-                subscriptionsList.Add(subscription);
+                subscriptionsListTemp.Add(subscription);
             }
             if (tempSubscriptions.NextPageToken != null)
             {
@@ -115,12 +124,14 @@ namespace YTApp
                         subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
                         subscription.Title = sub.Snippet.Title;
                         subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
-                        subscriptionsList.Add(subscription);
+                        subscriptionsListTemp.Add(subscription);
                     }
                     nextPageToken = tempSubs.NextPageToken;
                 }
             }
-            subscriptionsList.Sort((x, y) => string.Compare(x.Title, y.Title));
+            subscriptionsListTemp.Sort((x, y) => string.Compare(x.Title, y.Title));
+            subscriptionsList = new ObservableCollection<SubscriptionDataType>(subscriptionsListTemp);
+            SubscriptionsList.ItemsSource = subscriptionsList;
         }
 
         private void SubscriptionsList_ItemClick(object sender, ItemClickEventArgs e)
