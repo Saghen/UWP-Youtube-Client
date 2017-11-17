@@ -358,5 +358,10 @@ namespace YTApp.Pages
             viewer.Position = MainPageReference.viewer.Position;
             MainPageReference.viewer.Source = new Uri("about:blank");
         }
+
+        private void OpenChannel(object sender, TappedRoutedEventArgs e)
+        {
+            MainPageReference.contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = MainPageReference, Refresh = true, ID = video.Snippet.ChannelId });
+        }
     }
 }
