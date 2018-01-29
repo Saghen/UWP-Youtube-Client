@@ -8,6 +8,7 @@
     xmlns:userctrls="using:YTApp.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -30,7 +31,7 @@
     <ScrollViewer x:Name="Scrollviewer">
         <StackPanel>
             <Grid x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited">
-                <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Center" MaxHeight="900">
+                <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Stretch" Stretch="Uniform" MaxHeight="600">
                     <MediaElement.TransportControls>
                         <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" RightTapped="viewer_RightTapped" SwitchedToCompact="CustomMediaTransportControls_SwitchedToCompact" SwitchedToFullSize="CustomMediaTransportControls_SwitchedToFullSize">
                             <FlyoutBase.AttachedFlyout>
@@ -46,15 +47,15 @@
                 <Button x:Name='MinimizeMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="MinimizeMediaElement_Click"/>
                 <Button x:Name='CloseMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Click="CloseMediaElement_Click"/>
             </Grid>
-            <Grid Margin="100,0">
+            <Grid Margin="10,0" MaxWidth="1400">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="450"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition MaxWidth="500"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="100"/>
+                            <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid x:Name="TitleGrid" VerticalAlignment="Center" Margin="20">
@@ -63,7 +64,7 @@
                                 <ColumnDefinition Width="180"/>
                             </Grid.ColumnDefinitions>
                             <StackPanel MaxWidth="500" HorizontalAlignment="Left">
-                                <TextBlock x:Name="Title" Text="Title" FontSize="20"/>
+                                <TextBlock x:Name="Title" Text="Title" FontSize="20" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock x:Name="Views" Text="Views" MaxHeight="200" FontSize="14"/>
                             </StackPanel>
                         </Grid>
@@ -73,9 +74,9 @@
                                 <ColumnDefinition Width="80"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <Ellipse x:Name="ChannelProfileIcon" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20" Tapped="OpenChannel"/>
+                            <Ellipse x:Name="ChannelProfileIcon" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20" Tapped="OpenChannel" PointerEntered="ChannelProfileIcon_PointerEntered" PointerExited="ChannelProfileIcon_PointerExited"/>
                             <StackPanel Grid.Column="1" Margin="0,20">
-                                <TextBlock x:Name="ChannelTitle" Tapped="OpenChannel"/>
+                                <TextBlock x:Name="ChannelTitle" Tapped="OpenChannel" PointerEntered="ChannelProfileIcon_PointerEntered" PointerExited="ChannelProfileIcon_PointerExited"/>
                                 <TextBlock x:Name="DatePosted" Foreground="#aaa" Margin="0,5,0,20"/>
                                 <TextBlock x:Name="Description" MaxLines="6" TextTrimming="CharacterEllipsis" TextWrapping="WrapWholeWords"/>
                             </StackPanel>
@@ -85,10 +86,10 @@
                 <ListView x:Name="RelatedVideosGridView" Grid.Column="1" Header="Related" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" Margin="0,10,0,0">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                            <StackPanel Height="130" Orientation="Horizontal">
-                                <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" Width="200" VerticalAlignment="Top"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" Width="180" VerticalAlignment="Top"/>
                                 <StackPanel>
-                                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextTrimming="CharacterEllipsis"/>
                                     <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
                                     <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" Foreground="#fff"/>
                                 </StackPanel>

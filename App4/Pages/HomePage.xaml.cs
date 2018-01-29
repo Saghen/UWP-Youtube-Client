@@ -1,6 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
+using Google.Apis.Oauth2.v2;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -49,7 +50,7 @@ namespace YTApp.Pages
             NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
@@ -58,7 +59,7 @@ namespace YTApp.Pages
             {
                 GetService();
                 UpdateHomeItems();
-            }   
+            }
             isLoaded = true;
         }
 
@@ -68,7 +69,7 @@ namespace YTApp.Pages
             {
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
                 ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
+            }, new[] { YouTubeService.Scope.Youtube, Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
 
             // Create the service.
             service = new YouTubeService(new BaseClientService.Initializer()
@@ -84,7 +85,7 @@ namespace YTApp.Pages
             MainPageReference.StartVideo(item.Id);
         }
 
-        private void UpdateHomeItems()
+        private async void UpdateHomeItems()
         {
             List<YoutubeItemDataType> YTItemsListTemp = new List<YoutubeItemDataType>();
             List<YoutubeItemDataType> YTItemsListTempYesterday = new List<YoutubeItemDataType>();
@@ -94,54 +95,58 @@ namespace YTApp.Pages
             List<YoutubeItemDataType> YTItemsListTempFiveDays = new List<YoutubeItemDataType>();
 
             VideoItemGridView.Items.Clear();
-            Parallel.ForEach(MainPageReference.subscriptionsList, subscription =>
-            //foreach(var subscription in MainPageReference.subscriptionsList)
+
+            await Task.Run(() =>
             {
-                if (subscription.NewVideosCount != "")
+                Parallel.ForEach(MainPageReference.subscriptionsList, subscription =>
+                //foreach(var subscription in MainPageReference.subscriptionsList)
                 {
-                    var tempService = service.Search.List("snippet");
-                    tempService.ChannelId = subscription.Id;
-                    tempService.Order = SearchResource.ListRequest.OrderEnum.Date;
-                    tempService.MaxResults = 8;
-                    var tempList = tempService.Execute();
-                    foreach (var video in tempList.Items)
+                    if (subscription.NewVideosCount != "")
                     {
-                        if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
+                        var tempService = service.Search.List("snippet");
+                        tempService.ChannelId = subscription.Id;
+                        tempService.Order = SearchResource.ListRequest.OrderEnum.Date;
+                        tempService.MaxResults = 8;
+                        var tempList = tempService.Execute();
+                        foreach (var video in tempList.Items)
                         {
-                            DateTime now = DateTime.Now;
-                            if (video.Snippet.PublishedAt > now.AddHours(-24) && video.Snippet.PublishedAt <= now)
+                            if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
                             {
-                                var methods = new YoutubeItemMethods();
-                                YTItemsListTemp.Add(methods.VideoToYoutubeItem(video));
-                            }
-                            else if (video.Snippet.PublishedAt > now.AddHours(-48) && video.Snippet.PublishedAt <= now)
-                            {
-                                var methods = new YoutubeItemMethods();
-                                YTItemsListTempYesterday.Add(methods.VideoToYoutubeItem(video));
-                            }
-                            else if (video.Snippet.PublishedAt > now.AddHours(-72) && video.Snippet.PublishedAt <= now)
-                            {
-                                var methods = new YoutubeItemMethods();
-                                YTItemsListTempTwoDays.Add(methods.VideoToYoutubeItem(video));
-                            }
-                            else if (video.Snippet.PublishedAt > now.AddHours(-96) && video.Snippet.PublishedAt <= now)
-                            {
-                                var methods = new YoutubeItemMethods();
-                                YTItemsListTempThreeDays.Add(methods.VideoToYoutubeItem(video));
-                            }
-                            else if (video.Snippet.PublishedAt > now.AddHours(-120) && video.Snippet.PublishedAt <= now)
-                            {
-                                var methods = new YoutubeItemMethods();
-                                YTItemsListTempFourDays.Add(methods.VideoToYoutubeItem(video));
-                            }
-                            else if (video.Snippet.PublishedAt > now.AddHours(-144) && video.Snippet.PublishedAt <= now)
-                            {
-                                var methods = new YoutubeItemMethods();
-                                YTItemsListTempFiveDays.Add(methods.VideoToYoutubeItem(video));
+                                DateTime now = DateTime.Now;
+                                if (video.Snippet.PublishedAt > now.AddHours(-24) && video.Snippet.PublishedAt <= now)
+                                {
+                                    var methods = new YoutubeItemMethods();
+                                    YTItemsListTemp.Add(methods.VideoToYoutubeItem(video));
+                                }
+                                else if (video.Snippet.PublishedAt > now.AddHours(-48) && video.Snippet.PublishedAt <= now)
+                                {
+                                    var methods = new YoutubeItemMethods();
+                                    YTItemsListTempYesterday.Add(methods.VideoToYoutubeItem(video));
+                                }
+                                else if (video.Snippet.PublishedAt > now.AddHours(-72) && video.Snippet.PublishedAt <= now)
+                                {
+                                    var methods = new YoutubeItemMethods();
+                                    YTItemsListTempTwoDays.Add(methods.VideoToYoutubeItem(video));
+                                }
+                                else if (video.Snippet.PublishedAt > now.AddHours(-96) && video.Snippet.PublishedAt <= now)
+                                {
+                                    var methods = new YoutubeItemMethods();
+                                    YTItemsListTempThreeDays.Add(methods.VideoToYoutubeItem(video));
+                                }
+                                else if (video.Snippet.PublishedAt > now.AddHours(-120) && video.Snippet.PublishedAt <= now)
+                                {
+                                    var methods = new YoutubeItemMethods();
+                                    YTItemsListTempFourDays.Add(methods.VideoToYoutubeItem(video));
+                                }
+                                else if (video.Snippet.PublishedAt > now.AddHours(-144) && video.Snippet.PublishedAt <= now)
+                                {
+                                    var methods = new YoutubeItemMethods();
+                                    YTItemsListTempFiveDays.Add(methods.VideoToYoutubeItem(video));
+                                }
                             }
                         }
                     }
-                }
+                });
             });
             var methods2 = new YoutubeItemMethods();
             methods2.FillInViews(YTItemsListTemp, service);
@@ -157,6 +162,22 @@ namespace YTApp.Pages
             YTItemsListThreeDays = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempThreeDays.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
             YTItemsListFourDays = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempFourDays.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
             YTItemsListFiveDays = new ObservableCollection<YoutubeItemDataType>(YTItemsListTempFiveDays.OrderByDescending(d => d.DateSubmitted).ToList() as List<YoutubeItemDataType>);
+
+            VideoItemGridView.ItemsSource = YTItemsList;
+            VideoItemGridViewYesterday.ItemsSource = YTItemsListYesterday;
+            VideoItemGridViewTwoDays.ItemsSource = YTItemsListTwoDays;
+            VideoItemGridViewThreeDays.ItemsSource = YTItemsListThreeDays;
+            VideoItemGridViewFourDays.ItemsSource = YTItemsListFourDays;
+            VideoItemGridViewFiveDays.ItemsSource = YTItemsListFiveDays;
+
+            VideoItemGridView.Visibility = Visibility.Visible;
+            VideoItemGridViewYesterday.Visibility = Visibility.Visible;
+            VideoItemGridViewTwoDays.Visibility = Visibility.Visible;
+            VideoItemGridViewThreeDays.Visibility = Visibility.Visible;
+            VideoItemGridViewFourDays.Visibility = Visibility.Visible;
+            VideoItemGridViewFiveDays.Visibility = Visibility.Visible;
+
+            LoadingRing.IsActive = false;
         }
 
         private string ViewCountShortner(ulong? viewCount)

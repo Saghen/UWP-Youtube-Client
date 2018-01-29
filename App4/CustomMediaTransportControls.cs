@@ -14,14 +14,6 @@ namespace YTApp
         public event EventHandler SwitchedToCompact;
         public event EventHandler SwitchedToFullSize;
 
-        public readonly DependencyProperty IsCompactProperty = DependencyProperty.Register("IsCompact", typeof(bool), typeof(CustomMediaTransportControls), new PropertyMetadata(false));
-
-        public bool IsCompact
-        {
-            get { return (bool)GetValue(IsCompactProperty); }
-            set { SetValue(IsCompactProperty, value); }
-        }
-
         public CustomMediaTransportControls()
         {
             this.DefaultStyleKey = typeof(CustomMediaTransportControls);
@@ -34,8 +26,6 @@ namespace YTApp
             compactButton.Click += CompactButton_Click;
             base.OnApplyTemplate();
         }
-
-        bool CompactView;
 
         private async void CompactButton_Click(object sender, RoutedEventArgs e)
         {

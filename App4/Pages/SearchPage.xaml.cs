@@ -37,7 +37,6 @@ namespace YTApp.Pages
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
-            await Run();
             try { await Run(); } catch { }
         }
 
@@ -65,7 +64,7 @@ namespace YTApp.Pages
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
+                ApiKey = Constants.APIKey,
                 ApplicationName = this.GetType().ToString()
             });
 
@@ -119,10 +118,6 @@ namespace YTApp.Pages
             {
                 YoutubeItemsGridView.Items.Add(obj);
             }
-            //YoutubeItemsGridView.ItemsSource = FinalCollection;
-
-            // Add each result to the ListView
-
         }
 
         private string ViewCountShortner(ulong? viewCount)

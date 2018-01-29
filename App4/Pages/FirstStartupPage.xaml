@@ -24,7 +24,15 @@
         <StackPanel x:Name="MainStackPanel" Grid.Row="1" HorizontalAlignment="Center">
             <TextBlock x:Name="Header1" Text="Welcome!" FontFamily="Segoe UI" FontSize="30" TextAlignment="Center"/>
             <TextBlock x:Name="Header2" Text="Let's get logged in." FontFamily="Segoe UI" FontSize="18" TextAlignment="Center" Margin="15"/>
-            <Button Content="Log In to Youtube" HorizontalAlignment="Center" Padding="20,10" Style="{StaticResource TransparentButtonStyle}" Tapped="Button_Tapped">
+            <Button x:Name="btnLogin" Content="Log In to Youtube" HorizontalAlignment="Center" Padding="20,10" Style="{StaticResource TransparentButtonStyle}" Tapped="Button_Tapped">
+                <Button.Background>
+                    <LinearGradientBrush EndPoint="0,0.5" StartPoint="1,0.5">
+                        <GradientStop Color="#ff6417" Offset="0"/>
+                        <GradientStop Color="#802929" Offset="1"/>
+                    </LinearGradientBrush>
+                </Button.Background>
+            </Button>
+            <Button x:Name="btnContinue" Content="Continue" HorizontalAlignment="Center" Padding="20,10" Style="{StaticResource TransparentButtonStyle}" Tapped="Continue_Tapped" Visibility="Collapsed">
                 <Button.Background>
                     <LinearGradientBrush EndPoint="0,0.5" StartPoint="1,0.5">
                         <GradientStop Color="#ff6417" Offset="0"/>

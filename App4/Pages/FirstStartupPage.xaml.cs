@@ -42,9 +42,20 @@ namespace YTApp.Pages
             {
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
                 ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { Google.Apis.YouTube.v3.YouTubeService.Scope.Youtube }, "user", System.Threading.CancellationToken.None);
+            }, new[] { Google.Apis.YouTube.v3.YouTubeService.Scope.Youtube, Google.Apis.Oauth2.v2.Oauth2Service.Scope.UserinfoProfile }, "user", System.Threading.CancellationToken.None);
+            btnLogin.Visibility = Visibility.Collapsed;
+            btnContinue.Visibility = Visibility.Visible;
+        }
+
+        private void Continue_Tapped(object sender, TappedRoutedEventArgs e)
+        {
             MainPageReference.LoadSubscriptions();
-            MainPageReference.contentFrame.Navigate(typeof(HomePage), new Classes.DataTypes.NavigateParams() { mainPageRef = MainPageReference, Refresh = true });
+            MainPageReference.UpdateLoginDetails();
+            MainPageReference.contentFrame.Navigate(typeof(HomePage), new Classes.DataTypes.NavigateParams()
+            {
+                mainPageRef = MainPageReference,
+                Refresh = true
+            });
         }
     }
 }

@@ -128,6 +128,8 @@ namespace YTApp.Pages
             UpdatePageInfo(service);
 
             UpdateRelatedVideos(service);
+
+           
         }
 
         public async void UpdatePageInfo(YouTubeService service)
@@ -136,11 +138,6 @@ namespace YTApp.Pages
 
             Title.Text = video.Snippet.Title;
             Views.Text = string.Format("{0:#,###0.#}", video.Statistics.ViewCount) + " Views";
-            //LikeCount.Text = methods.ViewCountShortner(video.Statistics.LikeCount);
-            //DislikeCount.Text = methods.ViewCountShortner(video.Statistics.DislikeCount);
-
-            //var likeDislikeRatio = Convert.ToDecimal(video.Statistics.LikeCount) / Convert.ToDecimal(video.Statistics.DislikeCount + video.Statistics.LikeCount);
-            //LikesBar.Value = Convert.ToDouble(likeDislikeRatio * 100);
 
             ChannelTitle.Text = channel.Snippet.Title;
             DatePosted.Text = video.Snippet.PublishedAt.Value.ToString("MMMM d, yyyy");
@@ -149,20 +146,6 @@ namespace YTApp.Pages
             var imageBrush = new ImageBrush();
             imageBrush.ImageSource = image;
             ChannelProfileIcon.Fill = imageBrush;
-
-            //Update like/dislike
-            var checkRatingRequest = service.Videos.GetRating(video.Id);
-            VideoGetRatingResponse rating = await checkRatingRequest.ExecuteAsync();
-            //if (rating.Items[0].Rating == "like")
-            //{
-            //    LikeIcon.Source = new BitmapImage(new Uri(Package.Current.InstalledLocation.Path + "\\Icons\\Thumbs_Up_Pressed.png"));
-            //    DislikeIcon.Source = new BitmapImage(new Uri(Package.Current.InstalledLocation.Path + "\\Icons\\Thumbs_Down_NotPressed.png"));
-            //}
-            //else if (rating.Items[0].Rating == "dislike")
-            //{
-            //    LikeIcon.Source = new BitmapImage(new Uri(Package.Current.InstalledLocation.Path + "\\Icons\\Thumbs_Up_NotPressed.png"));
-            //    DislikeIcon.Source = new BitmapImage(new Uri(Package.Current.InstalledLocation.Path + "\\Icons\\Thumbs_Down_Pressed.png"));
-            //}
         }
 
         public void UpdateRelatedVideos(YouTubeService service)
@@ -201,14 +184,8 @@ namespace YTApp.Pages
                 Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 Frame.Width = Double.NaN;
                 Frame.Height = Double.NaN;
-                viewer.MaxHeight = 900;
+                viewer.MaxHeight = 600;
             }
-        }
-
-        private void Storyboard_Completed(object sender, object e)
-        {
-            MediaElementContainer.Height = Double.NaN;
-            MediaElementContainer.Width = Double.NaN;
         }
 
         #endregion
@@ -361,7 +338,17 @@ namespace YTApp.Pages
 
         private void OpenChannel(object sender, TappedRoutedEventArgs e)
         {
-            MainPageReference.contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = MainPageReference, Refresh = true, ID = video.Snippet.ChannelId });
+            MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { mainPageRef = MainPageReference, Refresh = true, ID = video.Snippet.ChannelId });
+        }
+
+        private void ChannelProfileIcon_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 1);
+        }
+
+        private void ChannelProfileIcon_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 2);
         }
     }
 }

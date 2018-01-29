@@ -14,14 +14,13 @@ using Google.Apis.YouTube.v3;
 using Google.Apis.Services;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.YouTube.v3.Data;
+using Google.Apis.Oauth2.v2;
 using VideoLibrary;
 using YTApp.Classes;
 using YTApp.Pages;
 using YTApp.Classes.DataTypes;
-<<<<<<< HEAD
-=======
 using System.Collections.ObjectModel;
->>>>>>> a0dd23b37eaca0b70f9685707333a02afdae71f7
+using Google.Apis.Auth.OAuth2.Flows;
 
 namespace YTApp
 {
@@ -44,13 +43,14 @@ namespace YTApp
         public MainPage()
         {
             this.InitializeComponent();
+            
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
 
             FirstStartupCheck();
         }
 
-        public void FirstStartupCheck()
+        public async void FirstStartupCheck()
         {
             Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
             if (localSettings.Values["FirstStartup"] == null)
@@ -60,7 +60,8 @@ namespace YTApp
             }
             else
             {
-                LoadSubscriptions();
+                await LoadSubscriptions();
+                UpdateLoginDetails();
                 contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
             }          
         }
@@ -81,13 +82,13 @@ namespace YTApp
 
         #region Menu
 
-        public async void LoadSubscriptions()
+        public async Task<bool> LoadSubscriptions()
         {
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
                 ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
+            }, new[] { YouTubeService.Scope.Youtube, Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
 
             // Create the service.
             var service = new YouTubeService(new BaseClientService.Initializer()
@@ -132,6 +133,8 @@ namespace YTApp
             subscriptionsListTemp.Sort((x, y) => string.Compare(x.Title, y.Title));
             subscriptionsList = new ObservableCollection<SubscriptionDataType>(subscriptionsListTemp);
             SubscriptionsList.ItemsSource = subscriptionsList;
+
+            return true;
         }
 
         private void SubscriptionsList_ItemClick(object sender, ItemClickEventArgs e)
@@ -142,6 +145,42 @@ namespace YTApp
                 mainPageRef = this,
                 ID = temp.Id
             });
+        }
+
+        public async void UpdateLoginDetails()
+        {
+            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            {
+                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+            }, new[] { Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
+
+
+            // Create the service.
+            var service = new Oauth2Service(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Youtube Viewer",
+            });
+
+            var GetLoginInfo = service.Userinfo.Get();
+
+
+            try
+            {
+                var LoginInfo = await GetLoginInfo.ExecuteAsync();
+
+                txtLoginName.Text = LoginInfo.Name;
+
+                var profileImg = new Windows.UI.Xaml.Media.ImageBrush();
+                profileImg.ImageSource = new BitmapImage(new Uri(LoginInfo.Picture));
+                imgProfileIcon.Fill = profileImg;
+            }
+            catch (Exception ex)
+            {
+                txtLoginName.Text = "";
+                imgProfileIcon.Fill = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
+            }
         }
 
         private void PageMenuControls_ItemClick(object sender, ItemClickEventArgs e)
@@ -241,8 +280,36 @@ namespace YTApp
             Clipboard.SetContent(dataPackage);
         }
 
+
         #endregion
 
+        #region Login Management
 
+        #endregion
+
+        private async void btnSignOut_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            {
+                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+            }, new[] { YouTubeService.Scope.Youtube, Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
+
+            await credential.RevokeTokenAsync(CancellationToken.None);
+
+            //Clear Login details
+            txtLoginName.Text = "";
+            imgProfileIcon.Fill = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
+
+            //Clear Subscriptions
+            SubscriptionsList.ItemsSource = null;
+
+            contentFrame.Navigate(typeof(FirstStartupPage), new NavigateParams() { mainPageRef = this, Refresh = true });
+        }
+
+        private void btnLoginFlyout_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+        }
     }
 }

@@ -63,19 +63,21 @@ namespace YTApp.UserControls
             LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr);
             DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr);
 
+            LikesBar.Value = LikeCountStr * 100 / (LikeCountStr + DislikeCountStr + 1) ;
+
             //Find and set the rating if it already exists
             var videoRequest = service.Videos.GetRating(VideoID);
             var video = await videoRequest.ExecuteAsync();
 
             if (video.Items[0].Rating == "like")
             {
-                LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 200, 200, 200));
+                LikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush;
                 CurrentSelection = "like";
                 LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr + 1);
             }
             else if (video.Items[0].Rating == "dislike")
             {
-                DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 200, 200, 200));
+                DislikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush;
                 CurrentSelection = "dislike";
                 DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr + 1);
             }
@@ -102,7 +104,7 @@ namespace YTApp.UserControls
             CurrentSelection = "dislike";
 
             LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
-            DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 200, 200, 200));
+            DislikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush;
 
             LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr);
             DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr + 1);
@@ -128,7 +130,7 @@ namespace YTApp.UserControls
 
             CurrentSelection = "like";
 
-            LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 200, 200, 200));
+            LikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush;
             DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
 
             LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr + 1);
@@ -148,13 +150,13 @@ namespace YTApp.UserControls
 
         private void DislikeIcon_Exited(object sender, PointerRoutedEventArgs e)
         {
-            if (CurrentSelection == "dislike") { DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 200, 200, 200)); }
+            if (CurrentSelection == "dislike") { DislikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush; }
             else { DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136)); }
         }
 
         private void LikeIcon_Exited(object sender, PointerRoutedEventArgs e)
         {
-            if (CurrentSelection == "like") { LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 200, 200, 200)); }
+            if (CurrentSelection == "like") { LikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush; }
             else { LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136)); }
         }
     }
