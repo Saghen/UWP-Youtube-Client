@@ -77,7 +77,7 @@ namespace YTApp.Pages
 
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
-            ChangePlayerSize();
+            ChangePlayerSize(true);
         }
 
         #region Methods
@@ -170,6 +170,27 @@ namespace YTApp.Pages
         public void ChangePlayerSize()
         {
             if (Frame.Width != 640)
+            {
+                Scrollviewer.ChangeView(0, 0, 1, true);
+                Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
+                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                Frame.Width = 640;
+                Frame.Height = 360;
+                viewer.MaxHeight = 360;
+            }
+            else
+            {
+                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
+                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                Frame.Width = Double.NaN;
+                Frame.Height = Double.NaN;
+                viewer.MaxHeight = 600;
+            }
+        }
+
+        public void ChangePlayerSize(bool MakeSmall)
+        {
+            if (MakeSmall)
             {
                 Scrollviewer.ChangeView(0, 0, 1, true);
                 Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
