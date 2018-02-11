@@ -10,6 +10,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.ApplicationModel.DataTransfer;
+using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.YouTube.v3;
 using Google.Apis.Services;
 using Google.Apis.Auth.OAuth2;
@@ -20,7 +21,8 @@ using YTApp.Classes;
 using YTApp.Pages;
 using YTApp.Classes.DataTypes;
 using System.Collections.ObjectModel;
-using Google.Apis.Auth.OAuth2.Flows;
+using Google.Apis.Auth.OAuth2.Requests;
+using Google.Apis.Util.Store;
 
 namespace YTApp
 {
@@ -43,17 +45,43 @@ namespace YTApp
         public MainPage()
         {
             this.InitializeComponent();
-            
+
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
 
+            IsUserAuthenticated();
+
             FirstStartupCheck();
+        }
+
+        private async void IsUserAuthenticated()
+        {
+            GoogleAuthorizationCodeFlow.Initializer initializer = new GoogleAuthorizationCodeFlow.Initializer();
+            var secrets = new ClientSecrets
+            {
+                ClientSecret = Constants.ClientSecret,
+                ClientId = Constants.ClientID
+            };
+            initializer.ClientSecrets = secrets;
+            initializer.DataStore = new PasswordVaultDataStore();
+            var test = new AuthorizationCodeFlow(initializer);
+            var token = await test.LoadTokenAsync("user", CancellationToken.None);
+            if (token == null)
+            {
+                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                localSettings.Values["FirstStartup"] = true;
+            }
+            else
+            {
+                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                localSettings.Values["FirstStartup"] = false;
+            }
         }
 
         public async void FirstStartupCheck()
         {
             Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            if (localSettings.Values["FirstStartup"] == null)
+            if (Convert.ToBoolean(localSettings.Values["FirstStartup"]) == true)
             {
                 contentFrame.Navigate(typeof(FirstStartupPage), new NavigateParams() { mainPageRef = this, Refresh = true });
                 localSettings.Values["FirstStartup"] = false;
@@ -63,7 +91,7 @@ namespace YTApp
                 await LoadSubscriptions();
                 UpdateLoginDetails();
                 contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
-            }          
+            }
         }
 
         private void MainPage_BackRequested(object sender, BackRequestedEventArgs e)
@@ -87,7 +115,7 @@ namespace YTApp
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm",
             }, new[] { YouTubeService.Scope.Youtube, Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
 
             // Create the service.
@@ -104,12 +132,14 @@ namespace YTApp
 
             foreach (Subscription sub in tempSubscriptions.Items)
             {
-                var subscription = new SubscriptionDataType();
-                subscription.Id = sub.Snippet.ResourceId.ChannelId;
-                subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
-                subscription.Title = sub.Snippet.Title;
-                subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
-                subscription.SubscriptionID = sub.Id;
+                var subscription = new SubscriptionDataType
+                {
+                    Id = sub.Snippet.ResourceId.ChannelId,
+                    Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url)),
+                    Title = sub.Snippet.Title,
+                    NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount),
+                    SubscriptionID = sub.Id
+                };
                 subscriptionsListTemp.Add(subscription);
             }
             if (tempSubscriptions.NextPageToken != null)
@@ -120,11 +150,13 @@ namespace YTApp
                     var tempSubs = GetSubscriptions(nextPageToken, service);
                     foreach (Subscription sub in tempSubs.Items)
                     {
-                        var subscription = new SubscriptionDataType();
-                        subscription.Id = sub.Snippet.ResourceId.ChannelId;
-                        subscription.Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url));
-                        subscription.Title = sub.Snippet.Title;
-                        subscription.NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount);
+                        var subscription = new SubscriptionDataType
+                        {
+                            Id = sub.Snippet.ResourceId.ChannelId,
+                            Thumbnail = new BitmapImage(new Uri(sub.Snippet.Thumbnails.Medium.Url)),
+                            Title = sub.Snippet.Title,
+                            NewVideosCount = Convert.ToString(sub.ContentDetails.NewItemCount)
+                        };
                         subscriptionsListTemp.Add(subscription);
                     }
                     nextPageToken = tempSubs.NextPageToken;
@@ -165,18 +197,19 @@ namespace YTApp
 
             var GetLoginInfo = service.Userinfo.Get();
 
-
             try
             {
                 var LoginInfo = await GetLoginInfo.ExecuteAsync();
 
                 txtLoginName.Text = LoginInfo.Name;
 
-                var profileImg = new Windows.UI.Xaml.Media.ImageBrush();
-                profileImg.ImageSource = new BitmapImage(new Uri(LoginInfo.Picture));
+                var profileImg = new Windows.UI.Xaml.Media.ImageBrush
+                {
+                    ImageSource = new BitmapImage(new Uri(LoginInfo.Picture))
+                };
                 imgProfileIcon.Fill = profileImg;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 txtLoginName.Text = "";
                 imgProfileIcon.Fill = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
@@ -188,6 +221,15 @@ namespace YTApp
             var item = (SplitViewItemDataType)e.ClickedItem;
             if (item.Text == "Home")
                 contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this });
+        }
+
+        private void PlaylistOptions_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var item = (SplitViewItemDataType)e.ClickedItem;
+            if (item.Text == "Trending")
+                contentFrame.Navigate(typeof(TrendingPage), new NavigateParams() { mainPageRef = this });
+            else if (item.Text == "History")
+                contentFrame.Navigate(typeof(HistoryPage), new NavigateParams() { mainPageRef = this, Refresh = true });
         }
 
         private void HamburgerButton_Click(object sender, RoutedEventArgs e)
@@ -255,7 +297,7 @@ namespace YTApp
 
         #region Events
 
-        public void viewer_SwitchToFullSize(object sender, EventArgs e)
+        public void Viewer_SwitchToFullSize(object sender, EventArgs e)
         {
             SwitchToFullSize.Invoke(this, new EventArgs());
         }
@@ -283,10 +325,7 @@ namespace YTApp
 
         #endregion
 
-        #region Login Management
-
-        #endregion
-
+        #region Login Region
         private async void btnSignOut_Tapped(object sender, TappedRoutedEventArgs e)
         {
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
@@ -310,6 +349,30 @@ namespace YTApp
         private void btnLoginFlyout_Tapped(object sender, TappedRoutedEventArgs e)
         {
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
+        }
+        #endregion
+
+        private async void btnMyChannel_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            {
+                ClientId = Constants.ClientID,
+                ClientSecret = Constants.ClientSecret
+            }, new[] { Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
+
+
+            // Create the service.
+            var service = new YouTubeService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Youtube Viewer",
+            });
+
+            var getMyChannel = service.Channels.List("snippet");
+            getMyChannel.Mine = true;
+            var result = await getMyChannel.ExecuteAsync();
+
+            contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { mainPageRef = this, ID = result.Items[0].Id});
         }
     }
 }

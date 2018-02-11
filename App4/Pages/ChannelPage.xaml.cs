@@ -60,8 +60,6 @@ namespace YTApp.Pages
         #region Main Channel Area
         public async void UpdateChannel()
         {
-            var methods = new YoutubeItemMethods();
-
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
@@ -80,6 +78,9 @@ namespace YTApp.Pages
             var ChannelInfoResults = await GetChannelInfo.ExecuteAsync();
             channel = ChannelInfoResults.Items[0];
 
+            //View Count
+            VideoCount.Text = channel.Statistics.VideoCount + " videos";
+
             //Profile Image
             var ProfileImageBrush = new ImageBrush();
             ProfileImageBrush.ImageSource = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url));
@@ -96,12 +97,12 @@ namespace YTApp.Pages
 
             if (IsSubscribed.Items.Count == 0)
             {
-                SubscribeButton.Content = "Subscribe " + methods.ViewCountShortner(channel.Statistics.SubscriberCount);
+                SubscribeButton.Content = "Subscribe " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
                 isSubscribed = false;
             }
             else
             {
-                SubscribeButton.Content = "Subscribed " + methods.ViewCountShortner(channel.Statistics.SubscriberCount);
+                SubscribeButton.Content = "Subscribed " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
                 isSubscribed = true;
             }
 
@@ -197,9 +198,7 @@ namespace YTApp.Pages
 
         public void HomePageItemClicked(object sender, RoutedEventArgsWithID e)
         {
-            var youTube = YouTube.Default;
-            var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + e.ID);
-            MainPageReference.StartVideo(video.GetUri());
+            MainPageReference.StartVideo(e.ID);
         }
 
         private async void SubscribeButton_Click(object sender, RoutedEventArgs e)
@@ -226,7 +225,7 @@ namespace YTApp.Pages
                 var subscriptions = await getSubscription.ExecuteAsync();
                 Subscription subscription = new Subscription();
 
-                MainPageReference.LoadSubscriptions();
+                await MainPageReference.LoadSubscriptions();
                 try
                 {
                     var sub = MainPageReference.subscriptionsList.Single(x => x.Id == ChannelID);

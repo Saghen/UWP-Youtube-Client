@@ -30,19 +30,17 @@
                         <Ellipse x:Name="ProfileImage" Width="80" Height="80"/>
                         <StackPanel VerticalAlignment="Center" Margin="10,0">
                             <TextBlock x:Name="ChannelName" FontSize="24"/>
-                            <TextBlock x:Name="SubscribersCount"/>
+                            <TextBlock x:Name="VideoCount" Foreground="#aaa"/>
                         </StackPanel>
                     </StackPanel>
-                    <Button x:Name="SubscribeButton" Background="#f22" BorderThickness="0" Content="Subscribe" Width="130" Height="40" HorizontalAlignment="Right" Style="{StaticResource RoundButtonStyle}" Click="SubscribeButton_Click"/>
+                    <Button x:Name="SubscribeButton" Background="#f22" BorderThickness="0" Content="Subscribe" Width="150" Height="50" HorizontalAlignment="Right" Style="{StaticResource RoundButtonStyle}" Click="SubscribeButton_Click"/>
                 </Grid>
-                <Pivot x:Name="rootPivot" Padding="30,0">
+                <Pivot x:Name="rootPivot" Margin="70,10,30,10">
                     <PivotItem x:Name="HomePivot" Header="Home">
-                        <StackPanel x:Name="HomeGridView">
-                            
-                        </StackPanel>
+                        <StackPanel x:Name="HomeGridView"></StackPanel>
                     </PivotItem>
                     <PivotItem x:Name="VideoPivot" Header="Videos">
-                        <GridView x:Name="VideosGridView" ItemsSource="{x:Bind VideosList, Mode=OneWay}" HorizontalContentAlignment="Center" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="PlayVideoEvent">
+                        <GridView x:Name="VideosGridView" ItemsSource="{x:Bind VideosList, Mode=OneWay}" HorizontalAlignment="Left" SelectionMode="None" IsItemClickEnabled="True" ItemClick="PlayVideoEvent">
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:YoutubeItemDataType">
                                     <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">

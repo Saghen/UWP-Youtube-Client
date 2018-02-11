@@ -62,11 +62,10 @@ namespace YTApp.Pages
             Grid.SetColumn(LikeDislike, 1);
 
             MainPageReference.contentFrame.Navigated += ContentFrame_Navigated;
-            if (Frame.Width == 640)
-            {
-                Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
-                MediaElementContainer.MaxHeight = 360;
-            }
+
+            //Make the player cover the entire frame
+            ChangePlayerSize(true);
+
             VideoID = result.ID;
             
             StartVideo(result.ID);
@@ -132,7 +131,7 @@ namespace YTApp.Pages
            
         }
 
-        public async void UpdatePageInfo(YouTubeService service)
+        public void UpdatePageInfo(YouTubeService service)
         {
             var methods = new YoutubeItemMethods();
 
@@ -188,9 +187,17 @@ namespace YTApp.Pages
             }
         }
 
-        public void ChangePlayerSize(bool MakeSmall)
+        public void ChangePlayerSize(bool MakeFullScreen)
         {
-            if (MakeSmall)
+            if (MakeFullScreen)
+            {
+                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
+                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                Frame.Width = Double.NaN;
+                Frame.Height = Double.NaN;
+                viewer.MaxHeight = 600;
+            }
+            else
             {
                 Scrollviewer.ChangeView(0, 0, 1, true);
                 Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
@@ -198,14 +205,6 @@ namespace YTApp.Pages
                 Frame.Width = 640;
                 Frame.Height = 360;
                 viewer.MaxHeight = 360;
-            }
-            else
-            {
-                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
-                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                Frame.Width = Double.NaN;
-                Frame.Height = Double.NaN;
-                viewer.MaxHeight = 600;
             }
         }
 

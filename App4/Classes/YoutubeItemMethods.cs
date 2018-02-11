@@ -40,6 +40,22 @@ namespace YTApp.Classes
             return VideoToAdd;
         }
 
+        public YoutubeItemDataType VideoToYoutubeItem(Activity video)
+        {
+            var VideoToAdd = new YoutubeItemDataType();
+            VideoToAdd.Author = video.Snippet.ChannelTitle;
+            VideoToAdd.Description = video.Snippet.Description;
+            try { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.Medium.Url; }
+            catch { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.High.Url; }
+            VideoToAdd.Title = video.Snippet.Title;
+            VideoToAdd.Id = video.ContentDetails.Upload.VideoId;
+            VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.ContentDetails.Upload.VideoId;
+            VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
+            VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
+            return VideoToAdd;
+        }
+
+
         public YoutubeChannelDataType ChannelToYoutubeChannel(SearchResult video, YouTubeService service)
         {
             var getChannelInfo = service.Channels.List("snippet, statistics");
@@ -79,7 +95,7 @@ namespace YTApp.Classes
 
             for (int i = 0; i < collection.Count; i++)
             {
-                collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
             }
         }
 
@@ -107,25 +123,9 @@ namespace YTApp.Classes
             {
                 try
                 {
-                    collection[i].ViewsAndDate = ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                    collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
                 }
                 catch { collection[i].ViewsAndDate = "Unknown" + collection[i].ViewsAndDate; }
-            }
-        }
-
-        public string ViewCountShortner(ulong? viewCount)
-        {
-            if (viewCount > 1000000)
-            {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000000), 1)) + "M";
-            }
-            else if (viewCount > 1000)
-            {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000), 1)) + "K";
-            }
-            else
-            {
-                return Convert.ToString(viewCount);
             }
         }
 

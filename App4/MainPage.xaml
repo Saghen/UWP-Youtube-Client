@@ -48,8 +48,8 @@
                     <FlyoutBase.AttachedFlyout>
                         <Flyout>
                             <ListView>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock x:Name="btnMyChannel" Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="20" Padding="0,0,20,0"/>
+                                <StackPanel x:Name="btnMyChannel" Orientation="Horizontal" Tapped="btnMyChannel_Tapped">
+                                    <TextBlock x:Name="iconMyChannel" Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="20" Padding="0,0,20,0"/>
                                     <TextBlock Text="My Channel"/>
                                 </StackPanel>
                                 <StackPanel x:Name="btnSettings" Orientation="Horizontal">
@@ -66,8 +66,6 @@
                 </Button>
             </StackPanel>
         </Grid>
-
-        
 
         <SplitView Grid.Row="1" x:Name="SideBarSplitView" DisplayMode="Overlay">
             <SplitView.Pane>
@@ -87,7 +85,7 @@
                         </ListView>
                         <MenuFlyoutSeparator/>
                         <TextBlock Text="LIBRARY" Margin="25,10" FontSize="20"/>
-                        <ListView Margin="0" SelectionMode="None" IsItemClickEnabled="True">
+                        <ListView ItemClick="PlaylistOptions_ItemClick" Margin="0" SelectionMode="None" IsItemClickEnabled="True">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:SplitViewItemDataType">
                                     <StackPanel Orientation="Horizontal">
@@ -96,6 +94,7 @@
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
+                            <classes:SplitViewItemDataType Text="Trending" Icon="&#xE945;"/>
                             <classes:SplitViewItemDataType Text="History" Icon="&#xE81C;"/>
                         </ListView>
                         <MenuFlyoutSeparator/>
@@ -135,7 +134,7 @@
         <Grid Grid.RowSpan="2" x:Name="MediaElementContainer" VerticalAlignment="Bottom" HorizontalAlignment="Right">
             <MediaElement x:Name="viewer" x:FieldModifier="public" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed">
                 <MediaElement.TransportControls>
-                    <local:CustomMediaTransportControls IsCompact="True" Background="#AA000000" SwitchedToFullSize="viewer_SwitchToFullSize">
+                    <local:CustomMediaTransportControls IsCompact="True" Background="#AA000000" SwitchedToFullSize="Viewer_SwitchToFullSize">
                         <FlyoutBase.AttachedFlyout>
                             <MenuFlyout>
                                 <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink"/>

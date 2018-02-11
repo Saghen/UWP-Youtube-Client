@@ -36,11 +36,11 @@ namespace YTApp.Classes
         {
             if (viewCount > 1000000)
             {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000000), 1)) + "M";
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000, 1)) + "M";
             }
             else if (viewCount > 1000)
             {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000), 1)) + "K";
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000, 1)) + "K";
             }
             else
             {
@@ -52,11 +52,11 @@ namespace YTApp.Classes
         {
             if (viewCount > 1000000)
             {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000000), 1)) + "M";
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000, 1)) + "M";
             }
             else if (viewCount > 1000)
             {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000), 1)) + "K";
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000, 1)) + "K";
             }
             else
             {
