@@ -29,9 +29,14 @@
     </Page.Resources>
 
     <ScrollViewer x:Name="Scrollviewer">
-        <StackPanel>
-            <Grid x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited">
-                <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Stretch" Stretch="Uniform" MaxHeight="600">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="MediaRow" Height="600"/>
+                <RowDefinition Height="11"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" Background="#1a1a1a">
+                <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Stretch" Stretch="Uniform">
                     <MediaElement.TransportControls>
                         <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" RightTapped="viewer_RightTapped" SwitchedToCompact="CustomMediaTransportControls_SwitchedToCompact" SwitchedToFullSize="CustomMediaTransportControls_SwitchedToFullSize">
                             <FlyoutBase.AttachedFlyout>
@@ -47,7 +52,17 @@
                 <Button x:Name='MinimizeMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="MinimizeMediaElement_Click"/>
                 <Button x:Name='CloseMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Click="CloseMediaElement_Click"/>
             </Grid>
-            <Grid Margin="10,0" MaxWidth="1400">
+            <toolkit:GridSplitter 
+            Foreground="#aaa"
+            Grid.Row="1"
+            ResizeBehavior="BasedOnAlignment"
+            ResizeDirection="Auto"
+            Background="#333"
+            HorizontalAlignment="Stretch" 
+            FontSize="13" Height="10">
+            </toolkit:GridSplitter>
+            
+            <Grid Grid.Row="2" Margin="10,0" MaxWidth="1400">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition MaxWidth="500"/>
@@ -98,6 +113,6 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
-        </StackPanel>
+        </Grid>
     </ScrollViewer>
 </Page>

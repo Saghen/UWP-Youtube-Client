@@ -175,7 +175,12 @@ namespace YTApp.Pages
                 Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 Frame.Width = 640;
                 Frame.Height = 360;
-                viewer.MaxHeight = 360;
+
+                //Saves the current Media Player height
+                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                localSettings.Values["MediaViewerHeight"] = MediaRow.Height.Value;
+
+                MediaRow.Height = new GridLength(360);
             }
             else
             {
@@ -183,10 +188,17 @@ namespace YTApp.Pages
                 Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 Frame.Width = Double.NaN;
                 Frame.Height = Double.NaN;
-                viewer.MaxHeight = 600;
+
+                //Set the media viewer to the previous height or to the default if a custom height is not found
+                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                if (localSettings.Values["MediaViewerHeight"] != null)
+                    MediaRow.Height = new GridLength(Convert.ToDouble(localSettings.Values["MediaViewerHeight"]));
+                else
+                    MediaRow.Height = new GridLength(600);
             }
         }
 
+        //Another version of the ChangePlayerSize that takes a bool allowing you to set it to fullscreen (true) or to a small view (false)
         public void ChangePlayerSize(bool MakeFullScreen)
         {
             if (MakeFullScreen)
@@ -195,7 +207,13 @@ namespace YTApp.Pages
                 Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 Frame.Width = Double.NaN;
                 Frame.Height = Double.NaN;
-                viewer.MaxHeight = 600;
+
+                //Set the media viewer to the previous height or to the default if a custom height is not found
+                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                if (localSettings.Values["MediaViewerHeight"] != null)
+                    MediaRow.Height = new GridLength(Convert.ToDouble(localSettings.Values["MediaViewerHeight"]));
+                else
+                    MediaRow.Height = new GridLength(600);
             }
             else
             {
@@ -204,7 +222,12 @@ namespace YTApp.Pages
                 Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 Frame.Width = 640;
                 Frame.Height = 360;
-                viewer.MaxHeight = 360;
+
+                //Saves the current Media Player height
+                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                localSettings.Values["MediaViewerHeight"] = MediaRow.Height.Value;
+
+                MediaRow.Height = new GridLength(360);
             }
         }
 
