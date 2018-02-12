@@ -215,7 +215,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="YouTube_icon_light.png" />
-    <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
@@ -292,6 +291,18 @@
     <PackageReference Include="Google.Apis">
       <Version>1.30.0-beta02</Version>
     </PackageReference>
+    <PackageReference Include="Google.Apis.Auth">
+      <Version>1.30.0-beta02</Version>
+    </PackageReference>
+    <PackageReference Include="Google.Apis.Core">
+      <Version>1.30.0-beta02</Version>
+    </PackageReference>
+    <PackageReference Include="Google.Apis.Oauth2.v2">
+      <Version>1.30.0.994</Version>
+    </PackageReference>
+    <PackageReference Include="Google.Apis.YouTube.v3">
+      <Version>1.30.0.1063</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.0.6</Version>
     </PackageReference>
@@ -300,33 +311,19 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Youtube App_StoreKey.pfx" />
-    <None Include="Youtube App_TemporaryKey.pfx" />
     <None Include="YoutubeAppKey.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Google.Apis.Auth, Version=1.30.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Desktop\Google.Apis.Auth.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Oauth2.v2, Version=1.29.0.949, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Desktop\Google.Apis.Oauth2.v2.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.YouTube.v3, Version=1.29.0.760, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Desktop\Google.Apis.YouTube.v3.dll</HintPath>
-    </Reference>
     <Reference Include="libvideo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Desktop\libvideo.dll</HintPath>
+      <HintPath>..\libvideo.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>YoutubeAppKey.snk</AssemblyOriginatorKeyFile>

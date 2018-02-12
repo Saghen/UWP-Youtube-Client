@@ -50,7 +50,7 @@ namespace YTApp.Pages
             NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);

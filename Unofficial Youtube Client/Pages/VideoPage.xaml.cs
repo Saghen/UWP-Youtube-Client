@@ -76,7 +76,7 @@ namespace YTApp.Pages
 
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
-            ChangePlayerSize(true);
+            ChangePlayerSize(false);
         }
 
         #region Methods
@@ -127,8 +127,6 @@ namespace YTApp.Pages
             UpdatePageInfo(service);
 
             UpdateRelatedVideos(service);
-
-           
         }
 
         public void UpdatePageInfo(YouTubeService service)
