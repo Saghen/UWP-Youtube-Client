@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Youtube App", "App4\Youtube App.csproj", "{F7D4F8C5-68AD-41C4-9AF8-DA32273C5BCB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Youtube App", "Unofficial Youtube Client\Youtube App.csproj", "{F7D4F8C5-68AD-41C4-9AF8-DA32273C5BCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
