@@ -20,10 +20,10 @@
     <PackageCertificateKeyFile>Youtube App_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <AppxPackageDir>C:\Users\megam\Music\</AppxPackageDir>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
-    <PackageCertificateThumbprint>54F139C8BCE4CD8DF65379AB8435E57DAC234172</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>8B17C0337E47C34A98EC5779CC4709C7C94CA7EB</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -214,6 +214,7 @@
     <Content Include="Icons\Thumbs_Up_NotPressed.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Package.StoreAssociation.xml" />
     <Content Include="YouTube_icon_light.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
@@ -316,6 +317,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Youtube App_StoreKey.pfx" />
     <None Include="YoutubeAppKey.snk" />
   </ItemGroup>
   <ItemGroup>

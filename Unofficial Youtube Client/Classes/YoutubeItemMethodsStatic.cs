@@ -14,6 +14,22 @@ namespace YTApp.Classes
 {
     static class YoutubeItemMethodsStatic
     {
+        static async public Task<YouTubeService> GetServiceAsync()
+        {
+            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            {
+                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+            }, new[] { YouTubeService.Scope.Youtube, Google.Apis.Oauth2.v2.Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
+
+            // Create the service.
+            return new YouTubeService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = "Youtube Viewer",
+            });
+        }
+
         static public void StartVideo(string ID, MainPage mainPageRef)
         {
             //Get instance of our media viewer
@@ -63,21 +79,5 @@ namespace YTApp.Classes
                 return Convert.ToString(viewCount);
             }
         }
-
-        /*static async public YouTubeService GetService()
-        {
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-
-            // Create the service.
-            return new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
-        }*/
     }
 }

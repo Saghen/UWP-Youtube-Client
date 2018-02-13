@@ -126,7 +126,7 @@
             <SplitView.Content>
                 <Grid>
                     <Frame x:Name="contentFrame" Background="#222" x:FieldModifier="public"/>
-                    <Frame x:Name="videoFrame" Background="#222" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                    <Frame x:Name="videoFrame" Background="#222" Visibility="Collapsed"/>
                 </Grid>
             </SplitView.Content>
         </SplitView>

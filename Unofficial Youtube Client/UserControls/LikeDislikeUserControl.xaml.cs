@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using YTApp.Classes;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -40,25 +41,18 @@ namespace YTApp.UserControls
 
         public async void UpdateData()
         {
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             //Set like and dislike counts
-            var videoStatsRequest = service.Videos.List("statistics");
-            videoStatsRequest.Id = VideoID;
-            var videoStats = await videoStatsRequest.ExecuteAsync();
-            LikeCountStr = Convert.ToInt64(videoStats.Items[0].Statistics.LikeCount);
-            DislikeCountStr = Convert.ToInt64(videoStats.Items[0].Statistics.DislikeCount);
+            try
+            {
+                var videoStatsRequest = service.Videos.List("statistics");
+                videoStatsRequest.Id = VideoID;
+                var videoStats = await videoStatsRequest.ExecuteAsync();
+                LikeCountStr = Convert.ToInt64(videoStats.Items[0].Statistics.LikeCount);
+                DislikeCountStr = Convert.ToInt64(videoStats.Items[0].Statistics.DislikeCount);
+            }
+            catch { }
 
             LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr);
             DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr);
@@ -85,18 +79,7 @@ namespace YTApp.UserControls
 
         private async void DislikeIcon_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var DislikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Dislike);
             DislikeVideo.ExecuteAsync();
@@ -112,18 +95,7 @@ namespace YTApp.UserControls
 
         private async void LikeIcon_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var LikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Like);
             LikeVideo.ExecuteAsync();

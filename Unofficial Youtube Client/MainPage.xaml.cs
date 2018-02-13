@@ -23,6 +23,7 @@ using YTApp.Classes.DataTypes;
 using System.Collections.ObjectModel;
 using Google.Apis.Auth.OAuth2.Requests;
 using Google.Apis.Util.Store;
+using System.Net.Http;
 
 namespace YTApp
 {
@@ -49,12 +50,33 @@ namespace YTApp
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
 
-            IsUserAuthenticated();
-
-            FirstStartupCheck();
+            Startup();
         }
 
-        private async void IsUserAuthenticated()
+        private async void Startup()
+        {
+            await FirstStartupCheck(await IsUserAuthenticated());
+            PlayClipboardYLink();
+        }
+
+        private async void PlayClipboardYLink()
+        {
+            try
+            {
+                var dataPackageView = await Clipboard.GetContent().GetTextAsync();
+                if (dataPackageView.Contains("https://www.youtube.com/watch?v="))
+                {
+                    StartVideo(dataPackageView.Remove(0, 32));
+                }
+                else if (dataPackageView.Contains("https://youtu.be/"))
+                {
+                    StartVideo(dataPackageView.Remove(0, 17));
+                }
+            }
+            catch { }
+        }
+
+        private async Task<bool> IsUserAuthenticated()
         {
             GoogleAuthorizationCodeFlow.Initializer initializer = new GoogleAuthorizationCodeFlow.Initializer();
             var secrets = new ClientSecrets
@@ -68,23 +90,19 @@ namespace YTApp
             var token = await test.LoadTokenAsync("user", CancellationToken.None);
             if (token == null)
             {
-                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-                localSettings.Values["FirstStartup"] = true;
+                return true;
             }
             else
             {
-                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-                localSettings.Values["FirstStartup"] = false;
+                return false;
             }
         }
 
-        public async void FirstStartupCheck()
+        public async Task FirstStartupCheck(bool IsFirstStartup)
         {
-            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            if (Convert.ToBoolean(localSettings.Values["FirstStartup"]) == true)
+            if (IsFirstStartup)
             {
                 contentFrame.Navigate(typeof(FirstStartupPage), new NavigateParams() { mainPageRef = this, Refresh = true });
-                localSettings.Values["FirstStartup"] = false;
             }
             else
             {
@@ -123,6 +141,12 @@ namespace YTApp
             {
                 HttpClientInitializer = credential,
                 ApplicationName = "Youtube Viewer",
+            });
+
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                ApiKey = "AIzaSyA4VfPxB0gsMtFRmOww8hPuOoRepPEv6W0",
+                ApplicationName = this.GetType().ToString()
             });
 
             string nextPageToken;
@@ -254,13 +278,7 @@ namespace YTApp
             {
                 if (Uri.IsWellFormedUriString(SearchBox.Text, UriKind.Absolute))
                 {
-                    try
-                    {
-                        var youTube = YouTube.Default;
-                        var video = youTube.GetVideo(SearchBox.Text);
-                        StartVideo(video.GetUri());
-                    }
-                    catch { }
+                    PlayClipboardYLink();
                 }
                 contentFrame.Navigate(typeof(SearchPage), new NavigateParams() { mainPageRef = this });
             }

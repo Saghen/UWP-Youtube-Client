@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -24,7 +25,7 @@ namespace YTApp
     public sealed partial class ChannelPlaylistGridView : UserControl
     {
         public event EventHandler<RoutedEventArgsWithID> ItemClicked;
-        private static int xTransform = 0;
+        public TransformModel transform = new TransformModel();
 
         public ChannelPlaylistGridView(List<YoutubeItemDataType> list, string header)
         {
@@ -38,6 +39,9 @@ namespace YTApp
                     Height = 250,
                     Width = 250
                 };
+
+                parent.Tapped += VideoItemGridView_ItemClick;
+                parent.Tag = item.Id;
 
                 var stkPanel = new StackPanel()
                 {
@@ -85,24 +89,47 @@ namespace YTApp
             }
         }
 
-        private void VideoItemGridView_ItemClick(object sender, ItemClickEventArgs e)
+        private void VideoItemGridView_ItemClick(object sender, TappedRoutedEventArgs e)
         {
-            var item = (YoutubeItemDataType)e.ClickedItem;
+            var item = (GridViewItem)sender;
             if (ItemClicked != null)
-                ItemClicked(this, new RoutedEventArgsWithID(item.Id));
+                ItemClicked(this, new RoutedEventArgsWithID((string)item.Tag));
         }
 
-        private void MoveRight_Tapped(object sender, TappedRoutedEventArgs e)
+        public class TransformModel : INotifyPropertyChanged
         {
-            xTransform += -500;
-            VideoItems.RenderTransform = new TranslateTransform() { X = xTransform };
+            public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+            private double _xTransform = 0;
+
+            public double XTransform
+            {
+                get { return _xTransform; }
+                set
+                {
+                    _xTransform = value;
+                    NotifyPropertyChanged();
+                }
+            }
+
+            private void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+            {
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                }
+            }
         }
 
-        private void MoveLeft_Tapped(object sender, TappedRoutedEventArgs e)
+        private void MoveRight_Click(object sender, RoutedEventArgs e)
         {
-            if (xTransform <= -500)
-                xTransform += 500;
-            VideoItems.RenderTransform = new TranslateTransform() { X = xTransform };
+            transform.XTransform += -500;
+        }
+
+        private void MoveLeft_Click(object sender, RoutedEventArgs e)
+        {
+            if (transform.XTransform <= -500)
+                transform.XTransform += 500;
         }
     }
 }

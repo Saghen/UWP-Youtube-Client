@@ -17,6 +17,7 @@ using Windows.Foundation.Collections;
 using Windows.Networking.BackgroundTransfer;
 using Windows.UI;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -46,6 +47,7 @@ namespace YTApp.Pages
 
         public VideoPage()
         {
+            this.InitializeComponent();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -54,8 +56,6 @@ namespace YTApp.Pages
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
 
-            this.InitializeComponent();
-
             var LikeDislike = new LikeDislikeUserControl(result.ID);
             
             TitleGrid.Children.Add(LikeDislike);
@@ -63,17 +63,16 @@ namespace YTApp.Pages
 
             MainPageReference.contentFrame.Navigated += ContentFrame_Navigated;
 
-            //Make the player cover the entire frame
-            ChangePlayerSize(true);
-
             VideoID = result.ID;
             
             StartVideo(result.ID);
             GetVideoInfo(result.ID);
 
             MainPageReference.SwitchToFullSize += CustomMediaTransportControls_SwitchedToFullSize;
-        }
 
+            //Make the player cover the entire frame
+            ChangePlayerSize(true);
+        }
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
             ChangePlayerSize(false);
@@ -95,18 +94,7 @@ namespace YTApp.Pages
 
         public async void GetVideoInfo(string ID)
         {
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var getVideoInfo = service.Videos.List("snippet, statistics, contentDetails");
             getVideoInfo.Id = ID;
@@ -164,60 +152,17 @@ namespace YTApp.Pages
             MainPageReference.StartVideo(item.Id);
         }
 
-        public void ChangePlayerSize()
-        {
-            if (Frame.Width != 640)
-            {
-                Scrollviewer.ChangeView(0, 0, 1, true);
-                Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
-                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                Frame.Width = 640;
-                Frame.Height = 360;
-
-                //Saves the current Media Player height
-                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-                localSettings.Values["MediaViewerHeight"] = MediaRow.Height.Value;
-
-                MediaRow.Height = new GridLength(360);
-            }
-            else
-            {
-                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
-                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                Frame.Width = Double.NaN;
-                Frame.Height = Double.NaN;
-
-                //Set the media viewer to the previous height or to the default if a custom height is not found
-                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-                if (localSettings.Values["MediaViewerHeight"] != null)
-                    MediaRow.Height = new GridLength(Convert.ToDouble(localSettings.Values["MediaViewerHeight"]));
-                else
-                    MediaRow.Height = new GridLength(600);
-            }
-        }
-
         //Another version of the ChangePlayerSize that takes a bool allowing you to set it to fullscreen (true) or to a small view (false)
         public void ChangePlayerSize(bool MakeFullScreen)
         {
-            if (MakeFullScreen)
-            {
-                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
-                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                Frame.Width = Double.NaN;
-                Frame.Height = Double.NaN;
-
-                //Set the media viewer to the previous height or to the default if a custom height is not found
-                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-                if (localSettings.Values["MediaViewerHeight"] != null)
-                    MediaRow.Height = new GridLength(Convert.ToDouble(localSettings.Values["MediaViewerHeight"]));
-                else
-                    MediaRow.Height = new GridLength(600);
-            }
-            else
+            if (!MakeFullScreen)
             {
                 Scrollviewer.ChangeView(0, 0, 1, true);
                 Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
                 Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+
+                Frame.HorizontalAlignment = HorizontalAlignment.Right;
+                Frame.VerticalAlignment = VerticalAlignment.Bottom;
                 Frame.Width = 640;
                 Frame.Height = 360;
 
@@ -226,6 +171,23 @@ namespace YTApp.Pages
                 localSettings.Values["MediaViewerHeight"] = MediaRow.Height.Value;
 
                 MediaRow.Height = new GridLength(360);
+            }
+            else
+            {
+                Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
+                Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+
+                Frame.HorizontalAlignment = HorizontalAlignment.Stretch;
+                Frame.VerticalAlignment = VerticalAlignment.Stretch;
+                Frame.Width = Double.NaN;
+                Frame.Height = Double.NaN;
+
+                //Set the media viewer to the previous height or to the default if a custom height is not found
+                Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                if (localSettings.Values["MediaViewerHeight"] != null && (double)localSettings.Values["MediaViewerHeight"] > 360)
+                    MediaRow.Height = new GridLength(Convert.ToDouble(localSettings.Values["MediaViewerHeight"]));
+                else
+                    MediaRow.Height = new GridLength(600);
             }
         }
 
@@ -236,7 +198,8 @@ namespace YTApp.Pages
 
         private void MinimizeMediaElement_Click(object sender, RoutedEventArgs e)
         {
-            ChangePlayerSize();
+            if (MediaRow.Height.Value == 360) { ChangePlayerSize(true); }
+            else { ChangePlayerSize(false); }
         }
 
         private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
@@ -248,40 +211,20 @@ namespace YTApp.Pages
         private void viewer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             viewer.IsFullWindow = !viewer.IsFullWindow;
-            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing)
-            {
-                viewer.Pause();
-            }
-            else
-            {
-                viewer.Play();
-            }
         }
 
-        private void Event_KeyDown(object sender, KeyEventArgs e)
+        private void viewer_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            if (viewer.IsFullWindow && e.VirtualKey == Windows.System.VirtualKey.Escape) { viewer.IsFullWindow = false; }
-            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing && e.VirtualKey == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
+            if (viewer.IsFullWindow && e.Key == Windows.System.VirtualKey.Escape) { viewer.IsFullWindow = false; }
+            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing && e.Key == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
             {
                 viewer.Pause();
                 e.Handled = true;
             }
-            else if (e.VirtualKey == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
+            else if (e.Key == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
             {
                 viewer.Play();
                 e.Handled = true;
-            }
-        }
-
-        private void viewer_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing)
-            {
-                viewer.Pause();
-            }
-            else
-            {
-                viewer.Play();
             }
         }
 

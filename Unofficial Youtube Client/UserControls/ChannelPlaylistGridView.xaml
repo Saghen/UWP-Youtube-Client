@@ -21,9 +21,13 @@
     
     <Grid>
         <controls:HeaderedContentControl x:Name="VideoItemHeader">
-            <StackPanel x:Name="VideoItems" Orientation="Horizontal"/>
+            <StackPanel x:Name="VideoItems" Orientation="Horizontal">
+                <StackPanel.RenderTransform>
+                    <TranslateTransform X="{x:Bind Path=transform.XTransform, Mode=OneWay}"/>
+                </StackPanel.RenderTransform>
+            </StackPanel>
         </controls:HeaderedContentControl>
-        <Button Background="#222" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Tapped="MoveLeft_Tapped"></Button>
-        <Button Background="#222" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Tapped="MoveRight_Tapped"></Button>
+        <Button Background="#222" Content="&#xE76;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="MoveLeft_Click"></Button>
+        <Button Background="#222" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="MoveRight_Click"></Button>
     </Grid>
 </UserControl>
