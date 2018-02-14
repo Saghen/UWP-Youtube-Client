@@ -25,12 +25,13 @@ namespace YTApp
     public sealed partial class ChannelPlaylistGridView : UserControl
     {
         public event EventHandler<RoutedEventArgsWithID> ItemClicked;
-        public TransformModel transform = new TransformModel();
+        public TransformModel transform = new TransformModel();  
 
         public ChannelPlaylistGridView(List<YoutubeItemDataType> list, string header)
         {
             this.InitializeComponent();
             VideoItemHeader.Header = header;
+            
 
             foreach (var item in list)
             {
@@ -43,7 +44,7 @@ namespace YTApp
                 parent.Tapped += VideoItemGridView_ItemClick;
                 parent.Tag = item.Id;
 
-                var stkPanel = new StackPanel()
+                StackPanel stkPanel = new StackPanel()
                 {
                     Margin = new Thickness(10)
                 };
@@ -123,13 +124,20 @@ namespace YTApp
 
         private void MoveRight_Click(object sender, RoutedEventArgs e)
         {
-            transform.XTransform += -500;
+            if (-(VideoItems.Children.Count * 250 - this.ActualWidth - 500) < transform.XTransform)
+                transform.XTransform += -500;
+            else if (-(VideoItems.Children.Count * 250 - this.ActualWidth - 250) < transform.XTransform)
+                transform.XTransform = -(VideoItems.Children.Count * 250 - this.ActualWidth - 230);
+            else if (-(VideoItems.Children.Count * 250 - this.ActualWidth) < transform.XTransform)
+                transform.XTransform += -50;
         }
 
         private void MoveLeft_Click(object sender, RoutedEventArgs e)
         {
             if (transform.XTransform <= -500)
                 transform.XTransform += 500;
+            else if (transform.XTransform < 0)
+                transform.XTransform = 0;
         }
     }
 }

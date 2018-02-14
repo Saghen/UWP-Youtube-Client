@@ -94,38 +94,37 @@ namespace YTApp.Pages
                         var tempList = tempService.Execute();
                         foreach (var video in tempList.Items)
                         {
+                            var methods = new YoutubeItemMethods();
                             if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
                             {
                                 DateTime now = DateTime.Now;
-                                if (video.Snippet.PublishedAt > now.AddHours(-24) && video.Snippet.PublishedAt <= now)
+                                var ytubeItem = methods.VideoToYoutubeItem(video);
+                                if (ytubeItem.Failed != true)
                                 {
-                                    var methods = new YoutubeItemMethods();
-                                    YTItemsListTemp.Add(methods.VideoToYoutubeItem(video));
-                                }
-                                else if (video.Snippet.PublishedAt > now.AddHours(-48) && video.Snippet.PublishedAt <= now)
-                                {
-                                    var methods = new YoutubeItemMethods();
-                                    YTItemsListTempYesterday.Add(methods.VideoToYoutubeItem(video));
-                                }
-                                else if (video.Snippet.PublishedAt > now.AddHours(-72) && video.Snippet.PublishedAt <= now)
-                                {
-                                    var methods = new YoutubeItemMethods();
-                                    YTItemsListTempTwoDays.Add(methods.VideoToYoutubeItem(video));
-                                }
-                                else if (video.Snippet.PublishedAt > now.AddHours(-96) && video.Snippet.PublishedAt <= now)
-                                {
-                                    var methods = new YoutubeItemMethods();
-                                    YTItemsListTempThreeDays.Add(methods.VideoToYoutubeItem(video));
-                                }
-                                else if (video.Snippet.PublishedAt > now.AddHours(-120) && video.Snippet.PublishedAt <= now)
-                                {
-                                    var methods = new YoutubeItemMethods();
-                                    YTItemsListTempFourDays.Add(methods.VideoToYoutubeItem(video));
-                                }
-                                else if (video.Snippet.PublishedAt > now.AddHours(-144) && video.Snippet.PublishedAt <= now)
-                                {
-                                    var methods = new YoutubeItemMethods();
-                                    YTItemsListTempFiveDays.Add(methods.VideoToYoutubeItem(video));
+                                    if (video.Snippet.PublishedAt > now.AddHours(-24) && video.Snippet.PublishedAt <= now)
+                                    {
+                                        YTItemsListTemp.Add(ytubeItem);
+                                    }
+                                    else if (video.Snippet.PublishedAt > now.AddHours(-48) && video.Snippet.PublishedAt <= now)
+                                    {
+                                        YTItemsListTempYesterday.Add(ytubeItem);
+                                    }
+                                    else if (video.Snippet.PublishedAt > now.AddHours(-72) && video.Snippet.PublishedAt <= now)
+                                    {
+                                        YTItemsListTempTwoDays.Add(ytubeItem);
+                                    }
+                                    else if (video.Snippet.PublishedAt > now.AddHours(-96) && video.Snippet.PublishedAt <= now)
+                                    {
+                                        YTItemsListTempThreeDays.Add(ytubeItem);
+                                    }
+                                    else if (video.Snippet.PublishedAt > now.AddHours(-120) && video.Snippet.PublishedAt <= now)
+                                    {
+                                        YTItemsListTempFourDays.Add(ytubeItem);
+                                    }
+                                    else if (video.Snippet.PublishedAt > now.AddHours(-144) && video.Snippet.PublishedAt <= now)
+                                    {
+                                        YTItemsListTempFiveDays.Add(ytubeItem);
+                                    }
                                 }
                             }
                         }

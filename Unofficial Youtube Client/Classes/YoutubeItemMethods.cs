@@ -14,6 +14,7 @@ namespace YTApp.Classes
         public YoutubeItemDataType VideoToYoutubeItem(SearchResult video)
         {
             var VideoToAdd = new YoutubeItemDataType();
+            if (video == null) { VideoToAdd.Failed = true; return VideoToAdd; }
             VideoToAdd.Author = video.Snippet.ChannelTitle;
             VideoToAdd.Description = video.Snippet.Description;
             try { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.Medium.Url; }
@@ -29,6 +30,7 @@ namespace YTApp.Classes
         public YoutubeItemDataType VideoToYoutubeItem(PlaylistItem video)
         {
             var VideoToAdd = new YoutubeItemDataType();
+            if (video == null) { VideoToAdd.Failed = true; return VideoToAdd; }
             VideoToAdd.Author = video.Snippet.ChannelTitle;
             VideoToAdd.Description = video.Snippet.Description;
             try { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.Medium.Url; }
@@ -44,6 +46,7 @@ namespace YTApp.Classes
         public YoutubeItemDataType VideoToYoutubeItem(Activity video)
         {
             var VideoToAdd = new YoutubeItemDataType();
+            if (video == null) { VideoToAdd.Failed = true; return VideoToAdd; }
             VideoToAdd.Author = video.Snippet.ChannelTitle;
             VideoToAdd.Description = video.Snippet.Description;
             try { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.Medium.Url; }
@@ -74,7 +77,7 @@ namespace YTApp.Classes
             return VideoToAdd;
         }
 
-        public void FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
+        public async Task FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
             int j = 0;
@@ -92,7 +95,7 @@ namespace YTApp.Classes
             var getViewsRequest = service.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
-            var videoListResponse = getViewsRequest.Execute();
+            var videoListResponse = await getViewsRequest.ExecuteAsync();
 
             for (int i = 0; i < collection.Count; i++)
             {
@@ -100,7 +103,7 @@ namespace YTApp.Classes
             }
         }
 
-        public void FillInViews(List<YoutubeItemDataType> collection, YouTubeService service)
+        public async Task FillInViews(List<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
 
@@ -118,7 +121,7 @@ namespace YTApp.Classes
             var getViewsRequest = service.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
-            var videoListResponse = getViewsRequest.Execute();
+            var videoListResponse = await getViewsRequest.ExecuteAsync();
 
             for (int i = 0; i < collection.Count; i++)
             {

@@ -109,8 +109,8 @@
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\YoutubeChannelDataType.cs" />
     <Compile Include="Classes\YoutubeItemMethodsStatic.cs" />
-    <Compile Include="Pages\FirstStartupPage.xaml.cs">
-      <DependentUpon>FirstStartupPage.xaml</DependentUpon>
+    <Compile Include="Pages\WelcomePage.xaml.cs">
+      <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\HistoryPage.xaml.cs">
       <DependentUpon>HistoryPage.xaml</DependentUpon>
@@ -228,7 +228,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Pages\FirstStartupPage.xaml">
+    <Page Include="Pages\WelcomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

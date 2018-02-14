@@ -53,9 +53,38 @@ namespace YTApp
             Startup();
         }
 
+        #region Main Events
+
+        private void MainPage_BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            if (contentFrame.CanGoBack && e.Handled == false)
+            {
+                e.Handled = true;
+                contentFrame.GoBack();
+            }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            SearchBox.Focus(FocusState.Keyboard);
+        }
+
+        #endregion
+
+        #region Startup
         private async void Startup()
         {
-            await FirstStartupCheck(await IsUserAuthenticated());
+            //Check if user is authenticated and show startup page if not
+            if (await IsUserAuthenticated())
+                contentFrame.Navigate(typeof(WelcomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
+            else
+            {
+                await LoadSubscriptions();
+                UpdateLoginDetails();
+                contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
+            }
+
+            //Plays Youtube link in clipboard
             PlayClipboardYLink();
         }
 
@@ -64,13 +93,19 @@ namespace YTApp
             try
             {
                 var dataPackageView = await Clipboard.GetContent().GetTextAsync();
-                if (dataPackageView.Contains("https://www.youtube.com/watch?v="))
+
+                Uri uriResult;
+                if (Uri.TryCreate(dataPackageView, UriKind.Absolute, out uriResult)
+                    && (uriResult.Scheme == "http" || uriResult.Scheme == "https"))
                 {
-                    StartVideo(dataPackageView.Remove(0, 32));
-                }
-                else if (dataPackageView.Contains("https://youtu.be/"))
-                {
-                    StartVideo(dataPackageView.Remove(0, 17));
+                    if (Uri.IsWellFormedUriString("https://www.youtube.com/watch?v=", UriKind.Absolute))
+                    {
+                        StartVideo(dataPackageView.Remove(0, 32));
+                    }
+                    else if (Uri.IsWellFormedUriString("https://youtu.be/", UriKind.Absolute))
+                    {
+                        StartVideo(dataPackageView.Remove(0, 17));
+                    }
                 }
             }
             catch { }
@@ -97,34 +132,7 @@ namespace YTApp
                 return false;
             }
         }
-
-        public async Task FirstStartupCheck(bool IsFirstStartup)
-        {
-            if (IsFirstStartup)
-            {
-                contentFrame.Navigate(typeof(FirstStartupPage), new NavigateParams() { mainPageRef = this, Refresh = true });
-            }
-            else
-            {
-                await LoadSubscriptions();
-                UpdateLoginDetails();
-                contentFrame.Navigate(typeof(HomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
-            }
-        }
-
-        private void MainPage_BackRequested(object sender, BackRequestedEventArgs e)
-        {
-            if (contentFrame.CanGoBack && e.Handled == false)
-            {
-                e.Handled = true;
-                contentFrame.GoBack();
-            }
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            SearchBox.Focus(FocusState.Keyboard);
-        }
+        #endregion
 
         #region Menu
 
@@ -361,14 +369,13 @@ namespace YTApp
             //Clear Subscriptions
             SubscriptionsList.ItemsSource = null;
 
-            contentFrame.Navigate(typeof(FirstStartupPage), new NavigateParams() { mainPageRef = this, Refresh = true });
+            contentFrame.Navigate(typeof(WelcomePage), new NavigateParams() { mainPageRef = this, Refresh = true });
         }
 
         private void btnLoginFlyout_Tapped(object sender, TappedRoutedEventArgs e)
         {
             FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
         }
-        #endregion
 
         private async void btnMyChannel_Tapped(object sender, TappedRoutedEventArgs e)
         {
@@ -390,7 +397,8 @@ namespace YTApp
             getMyChannel.Mine = true;
             var result = await getMyChannel.ExecuteAsync();
 
-            contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { mainPageRef = this, ID = result.Items[0].Id});
+            contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { mainPageRef = this, ID = result.Items[0].Id });
         }
+        #endregion
     }
 }

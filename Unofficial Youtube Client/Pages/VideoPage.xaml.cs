@@ -62,44 +62,46 @@ namespace YTApp.Pages
             Grid.SetColumn(LikeDislike, 1);
 
             MainPageReference.contentFrame.Navigated += ContentFrame_Navigated;
+            SystemNavigationManager.GetForCurrentView().BackRequested += VideoPage_BackRequested; ;
 
+            //Store the video ID for future use
             VideoID = result.ID;
             
+            //Get the video data and play it
             StartVideo(result.ID);
-            GetVideoInfo(result.ID);
 
             MainPageReference.SwitchToFullSize += CustomMediaTransportControls_SwitchedToFullSize;
-
-            //Make the player cover the entire frame
-            ChangePlayerSize(true);
         }
+
+        private void VideoPage_BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            ChangePlayerSize(false);
+        }
+
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
             ChangePlayerSize(false);
         }
 
         #region Methods
-        public void StartVideo(string ID)
+        public async void StartVideo(string ID)
         {
-            try
-            {
-                var youTube = YouTube.Default;
-                var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + ID);
-                viewer.Source = new Uri(video.GetUri());
-                viewer.Visibility = Visibility.Visible;
-                viewer.TransportControls.Focus(FocusState.Programmatic);
-            }
-            catch { }
-        }
+            //Make the player cover the entire frame
+            ChangePlayerSize(true);
 
-        public async void GetVideoInfo(string ID)
-        {
             var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var getVideoInfo = service.Videos.List("snippet, statistics, contentDetails");
             getVideoInfo.Id = ID;
             var videoList = await getVideoInfo.ExecuteAsync();
-            video = videoList.Items[0];
+
+            //Checks to see if video exists and sets the video variable if it does or returns if it doesn't
+            try { video = videoList.Items[0]; }
+            catch
+            {
+                InAppNotif.Show();
+                return;
+            }
 
             var getChannelInfo = service.Channels.List("snippet");
             getChannelInfo.Id = video.Snippet.ChannelId;
@@ -112,9 +114,30 @@ namespace YTApp.Pages
             getRelatedVideos.Type = "video";
             relatedVideos = await getRelatedVideos.ExecuteAsync();
 
+            try
+            {
+                var youTube = YouTube.Default;
+                var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + ID);
+                viewer.Source = new Uri(video.GetUri());
+                viewer.Visibility = Visibility.Visible;
+                viewer.TransportControls.Focus(FocusState.Programmatic);
+            }
+            catch { Frame.Visibility = Visibility.Collapsed; return; }
+
             UpdatePageInfo(service);
 
             UpdateRelatedVideos(service);
+        }
+
+        private async void InAppNotifButton_Click(object sender, RoutedEventArgs e)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("https://youtu.be/" + VideoID));
+            InAppNotif.Dismiss();
+        }
+
+        private void InAppNotifButton2_Click(object sender, RoutedEventArgs e)
+        {
+            InAppNotif.Dismiss();
         }
 
         public void UpdatePageInfo(YouTubeService service)
@@ -133,7 +156,7 @@ namespace YTApp.Pages
             ChannelProfileIcon.Fill = imageBrush;
         }
 
-        public void UpdateRelatedVideos(YouTubeService service)
+        public async void UpdateRelatedVideos(YouTubeService service)
         {
             List<YoutubeItemDataType> relatedVideosList = new List<YoutubeItemDataType>();
 
@@ -142,7 +165,7 @@ namespace YTApp.Pages
             {
                 relatedVideosList.Add(methods.VideoToYoutubeItem(video));
             }
-            methods.FillInViews(relatedVideosList, service);
+            await methods.FillInViews(relatedVideosList, service);
             RelatedVideosGridView.ItemsSource = relatedVideosList;
         }
 
