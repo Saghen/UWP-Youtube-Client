@@ -2,10 +2,14 @@
     x:Class="YTApp.Pages.ChannelPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:datatypes="using:YTApp.Classes.DataTypes"
     xmlns:local="using:YTApp.Pages"
     xmlns:classes="using:YTApp.Classes"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:lclctrls="using:YTApp.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userctrls="using:YTApp"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -13,6 +17,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Styles/RoundButton.xaml"/>
+                <ResourceDictionary Source="../Styles/CircularButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -37,7 +42,41 @@
                 </Grid>
                 <Pivot x:Name="rootPivot" Margin="70,10,30,10">
                     <PivotItem x:Name="HomePivot" Header="Home">
-                        <StackPanel x:Name="HomeGridView"></StackPanel>
+                        <ItemsControl ItemsSource="{x:Bind playlists, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="datatypes:PlaylistDataType">
+                                    <Grid>
+                                        <controls:HeaderedContentControl Header="{x:Bind Title}" SizeChanged="Playlist_SizeChanged">
+                                            <lclctrls:GridViewWithXProperty x:Name="Playlist" ItemsSource="{x:Bind Items, Mode=OneWay}" ItemClick="Playlist_ItemClick" XValue="0">
+                                                <lclctrls:GridViewWithXProperty.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel x:Name="VideoItems" Orientation="Horizontal" >
+                                                            <StackPanel.RenderTransform>
+                                                                <TranslateTransform  X="{Binding Path=XValue, Mode=OneWay, ElementName=Playlist}"/>
+                                                            </StackPanel.RenderTransform>
+                                                        </StackPanel>
+
+                                                    </ItemsPanelTemplate>
+                                                </lclctrls:GridViewWithXProperty.ItemsPanel>
+                                                <lclctrls:GridViewWithXProperty.ItemTemplate>
+                                                    <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                                                        <StackPanel Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
+                                                            <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                                                            <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                                                            <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
+                                                            <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </lclctrls:GridViewWithXProperty.ItemTemplate>
+                                            </lclctrls:GridViewWithXProperty>
+                                        </controls:HeaderedContentControl>
+                                        
+                                        <Button x:Name="btnMoveLeft" Background="#222" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="MoveLeft_Click"></Button>
+                                        <Button x:Name="btnMoveRight" Background="#222" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="MoveRight_Click"></Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </PivotItem>
                     <PivotItem x:Name="VideoPivot" Header="Videos">
                         <GridView x:Name="VideosGridView" ItemsSource="{x:Bind VideosList, Mode=OneWay}" HorizontalAlignment="Left" SelectionMode="None" IsItemClickEnabled="True" ItemClick="PlayVideoEvent">

@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
+using YTApp.Classes.DataTypes;
 using YTApp.Classes.EventsArgs;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
@@ -25,15 +26,24 @@ namespace YTApp
     public sealed partial class ChannelPlaylistGridView : UserControl
     {
         public event EventHandler<RoutedEventArgsWithID> ItemClicked;
-        public TransformModel transform = new TransformModel();  
+        public TransformModel transform = new TransformModel();
 
-        public ChannelPlaylistGridView(List<YoutubeItemDataType> list, string header)
+        private static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register("ItemsSource", typeof(List<YoutubeItemDataType>), typeof(ChannelPlaylistGridView), new PropertyMetadata(null, null));
+
+        public List<YoutubeItemDataType> ItemsSource
+        {
+            get { return (List<YoutubeItemDataType>)GetValue(ItemsSourceProperty); }
+            set { SetValue(ItemsSourceProperty, value); }
+        }
+
+        public ChannelPlaylistGridView()
         {
             this.InitializeComponent();
-            VideoItemHeader.Header = header;
-            
+            VideoItemHeader.Header = "Test";
 
-            foreach (var item in list)
+            if (ItemsSource == null)
+                return;
+            foreach (var item in ItemsSource)
             {
                 var parent = new GridViewItem()
                 {

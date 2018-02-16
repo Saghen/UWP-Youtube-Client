@@ -5,6 +5,7 @@ using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -38,6 +39,7 @@ namespace YTApp.Pages
         public bool isSubscribed;
         public string nextPageToken;
         ObservableCollection<YoutubeItemDataType> VideosList = new ObservableCollection<YoutubeItemDataType>();
+        ObservableCollection<PlaylistDataType> playlists = new ObservableCollection<PlaylistDataType>();
         public Channel channel;
         public bool addingVideos = false;
 
@@ -46,32 +48,21 @@ namespace YTApp.Pages
             this.InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
             ChannelID = result.ID;
-            UpdateChannel();
+            await UpdateChannel();
             UpdateChannelHome();
             UpdateVideos();
         }
 
-        #region Main Channel Area
-        public async void UpdateChannel()
+        #region Home
+        public async Task UpdateChannel()
         {
-            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", System.Threading.CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var GetChannelInfo = service.Channels.List("snippet, brandingSettings, statistics");
             GetChannelInfo.Id = ChannelID;
@@ -110,43 +101,15 @@ namespace YTApp.Pages
             SplashImage.Source = new BitmapImage(new Uri(channel.BrandingSettings.Image.BannerImageUrl));
         }
 
-        public async void UpdateChannelHome()
+        public async Task UpdateChannelHome()
         {
             var methods = new YoutubeItemMethods();
             List<YoutubeItemDataType> YoutubeItemsTemp = new List<YoutubeItemDataType>();
 
-            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube }, "user", System.Threading.CancellationToken.None);
-
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
-
-            #region Uploads
-            var GetChannelVideosUploads = service.Search.List("snippet");
-            GetChannelVideosUploads.ChannelId = ChannelID;
-            GetChannelVideosUploads.Order = SearchResource.ListRequest.OrderEnum.Date;
-            GetChannelVideosUploads.Type = "video";
-            GetChannelVideosUploads.MaxResults = 10;
-            var ChannelVideosResultUploads = await GetChannelVideosUploads.ExecuteAsync();
-            foreach (var video in ChannelVideosResultUploads.Items)
-            {
-                if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
-                    YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
-            }
-            methods.FillInViews(YoutubeItemsTemp, service);
-            var PlaylistUserControlUploads = new ChannelPlaylistGridView(YoutubeItemsTemp, "Uploads");
-            PlaylistUserControlUploads.ItemClicked += HomePageItemClicked;
-            HomeGridView.Children.Add(PlaylistUserControlUploads);
-            #endregion
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             #region Popular Uploads
+
             YoutubeItemsTemp.Clear();
             var GetChannelVideosPopular = service.Search.List("snippet");
             GetChannelVideosPopular.ChannelId = ChannelID;
@@ -159,39 +122,65 @@ namespace YTApp.Pages
                 if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
                     YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
             }
-            methods.FillInViews(YoutubeItemsTemp, service);
-            var PlaylistUserControlPopular = new ChannelPlaylistGridView(YoutubeItemsTemp, "Popular Uploads");
-            PlaylistUserControlPopular.ItemClicked += HomePageItemClicked;
-            HomeGridView.Children.Add(PlaylistUserControlPopular);
+            await methods.FillInViews(YoutubeItemsTemp, service);
+            playlists.Add(new PlaylistDataType() { Title = "Popular Uploads", Items=YoutubeItemsTemp });
+
             #endregion
 
             #region Playlists
             //Get the playlists for the channel
-            var GetChannelPlaylists = service.Playlists.List("snippet");
+            var GetChannelPlaylists = service.ChannelSections.List("snippet,contentDetails,localizations");
+            GetChannelPlaylists.Hl = "en_us";
             GetChannelPlaylists.ChannelId = ChannelID;
-            GetChannelPlaylists.MaxResults = 3;
-            var ChannelPlaylistsResult = GetChannelPlaylists.Execute();
+            var ChannelPlaylistsResult = await GetChannelPlaylists.ExecuteAsync();
 
+            //Check if there are no playlists to process
+            if (ChannelPlaylistsResult.Items.Count == 0)
+                return;
+
+            List<List<YoutubeItemDataType>> tempGridViews = new List<List<YoutubeItemDataType>>();
+            string tempPlaylistIds = "";
             //Go through each playlist and get all its items
-            foreach (var playlist in ChannelPlaylistsResult.Items)
+            Parallel.ForEach(ChannelPlaylistsResult.Items, playlist =>
+             {
+                 try
+                 {
+                     List<YoutubeItemDataType> tempPlaylistVideos = new List<YoutubeItemDataType>();
+                     tempPlaylistVideos.Clear();
+                     var GetPlaylistVideos = service.PlaylistItems.List("snippet,status");
+                     if (playlist.ContentDetails == null || playlist.ContentDetails.Playlists[0] == null || playlist.Snippet.Type != "singlePlaylist")
+                         return;
+                     GetPlaylistVideos.PlaylistId = playlist.ContentDetails.Playlists[0];
+                     GetPlaylistVideos.MaxResults = 10;
+                     var PlaylistVideosResult = GetPlaylistVideos.Execute();
+                     foreach (var video in PlaylistVideosResult.Items)
+                     {
+                         if (video.Status.PrivacyStatus != "private")
+                         {
+                             tempPlaylistVideos.Add(methods.VideoToYoutubeItem(video));
+                         }
+                     }
+                     methods.FillInViewsSync(tempPlaylistVideos, service);
+                     tempGridViews.Add(tempPlaylistVideos);
+
+                     //Add the playlist ID for getting the title later
+                     tempPlaylistIds += playlist.ContentDetails.Playlists[0] + ",";
+                 }
+                 catch { return; }
+             });
+
+            //Check if there are no playlists were outputed
+            if (tempPlaylistIds == "")
+                return;
+
+            //Gets the title of the playlists
+            var getPlaylistTitles = service.Playlists.List("snippet");
+            getPlaylistTitles.Id = tempPlaylistIds.Remove(tempPlaylistIds.Length - 1, 1);
+            var playlistTitlesList = await getPlaylistTitles.ExecuteAsync();
+
+            for (int i = 0; i < tempGridViews.Count; i++)
             {
-                YoutubeItemsTemp.Clear();
-                var GetPlaylistVideos = service.PlaylistItems.List("snippet,status");
-                GetPlaylistVideos.PlaylistId = playlist.Id;
-                GetPlaylistVideos.MaxResults = 10;
-                var PlaylistVideosResult = await GetPlaylistVideos.ExecuteAsync();
-                if (PlaylistVideosResult.Items.Count == 0) { break; }
-                foreach (var video in PlaylistVideosResult.Items)
-                {
-                    if (video.Status.PrivacyStatus != "private")
-                    {
-                        YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
-                    }
-                }
-                methods.FillInViews(YoutubeItemsTemp, service);
-                var PlaylistUserControlPlaylist = new ChannelPlaylistGridView(YoutubeItemsTemp, playlist.Snippet.Title);
-                PlaylistUserControlPlaylist.ItemClicked += HomePageItemClicked;
-                HomeGridView.Children.Add(PlaylistUserControlPlaylist);
+                playlists.Add(new PlaylistDataType() { Title = playlistTitlesList.Items[i].Snippet.Title, Items = tempGridViews[i] });
             }
             #endregion
         }
@@ -273,7 +262,7 @@ namespace YTApp.Pages
 
         #region Videos
 
-        public async void UpdateVideos()
+        public async Task UpdateVideos()
         {
             if (addingVideos == false)
             {
@@ -384,6 +373,60 @@ namespace YTApp.Pages
                 {
                     AddMoreVideos();
                 }
+            }
+        }
+
+        private void MoveRight_Click(object sender, RoutedEventArgs e)
+        {
+            var obj = (Button)e.OriginalSource;
+            var parent = (Grid)obj.Parent;
+            var gridView = (Controls.GridViewWithXProperty)parent.FindName("Playlist");
+
+            if (-(gridView.Items.Count * 250 - gridView.ActualWidth - 500) < gridView.XValue)
+                gridView.XValue += -500;
+
+            else 
+                gridView.XValue = -(gridView.Items.Count * 250 - gridView.ActualWidth + 50);
+        }
+
+        private void MoveLeft_Click(object sender, RoutedEventArgs e)
+        {
+            var obj = (Button)e.OriginalSource;
+            var parent = (Grid)obj.Parent;
+            var gridView = (Controls.GridViewWithXProperty)parent.FindName("Playlist");
+
+            if (gridView.XValue <= -500)
+                gridView.XValue += 500;
+            else if (gridView.XValue < 0)
+                gridView.XValue = 0;
+        }
+
+        private void Playlist_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+        }
+
+        private void Playlist_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var obj = (Microsoft.Toolkit.Uwp.UI.Controls.HeaderedContentControl)sender;
+            var parent = (Grid)obj.Parent;
+            var gridView = (Controls.GridViewWithXProperty)parent.FindName("Playlist");
+
+            if(gridView.ActualWidth > gridView.Items.Count * 250 && gridView.XValue == 0)
+            {
+                var btn1 = (Button)parent.FindName("btnMoveLeft");
+                btn1.Visibility = Visibility.Collapsed;
+
+                var btn2 = (Button)parent.FindName("btnMoveRight");
+                btn2.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                var btn1 = (Button)parent.FindName("btnMoveLeft");
+                btn1.Visibility = Visibility.Visible;
+
+                var btn2 = (Button)parent.FindName("btnMoveRight");
+                btn2.Visibility = Visibility.Visible;
             }
         }
     }

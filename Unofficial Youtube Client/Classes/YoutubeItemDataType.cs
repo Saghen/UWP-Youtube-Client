@@ -16,6 +16,7 @@ namespace YTApp.Classes
         private string _length;
         private string _ylink;
         private string _id;
+        private string _channeId;
         private DateTime _dateSubmitted;
         private bool failed = false;
 
@@ -29,5 +30,6 @@ namespace YTApp.Classes
         public DateTime DateSubmitted { get => _dateSubmitted; set => _dateSubmitted = value; }
         public string Id { get => _id; set => _id = value; }
         public bool Failed { get => failed; set => failed = value; }
+        public string ChanneId { get => _channeId; set => _channeId = value; }
     }
 }

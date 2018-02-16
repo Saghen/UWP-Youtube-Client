@@ -105,10 +105,13 @@
     </Compile>
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\DataTypes\NavigateParams.cs" />
+    <Compile Include="Classes\DataTypes\PlaylistDataType.cs" />
+    <Compile Include="Classes\DataTypes\PlayListDataTypeList.cs" />
     <Compile Include="Classes\EventsArgs\RoutedEventArgsWithID.cs" />
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\YoutubeChannelDataType.cs" />
     <Compile Include="Classes\YoutubeItemMethodsStatic.cs" />
+    <Compile Include="Controls\GridViewWithXProperty.cs" />
     <Compile Include="Pages\WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
@@ -308,6 +311,9 @@
     </PackageReference>
     <PackageReference Include="Google.Apis.YouTube.v3">
       <Version>1.30.0.1063</Version>
+    </PackageReference>
+    <PackageReference Include="HtmlAgilityPack">
+      <Version>1.6.17</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.0.6</Version>

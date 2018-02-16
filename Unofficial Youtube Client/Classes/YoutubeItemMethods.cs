@@ -24,6 +24,7 @@ namespace YTApp.Classes
             VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId;
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
             VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
+            VideoToAdd.ChanneId = video.Snippet.ChannelId;
             return VideoToAdd;
         }
 
@@ -40,6 +41,7 @@ namespace YTApp.Classes
             VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Snippet.ResourceId.VideoId;
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
             VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
+            VideoToAdd.ChanneId = video.Snippet.ChannelId;
             return VideoToAdd;
         }
 
@@ -56,6 +58,7 @@ namespace YTApp.Classes
             VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.ContentDetails.Upload.VideoId;
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
             VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
+            VideoToAdd.ChanneId = video.Snippet.ChannelId;
             return VideoToAdd;
         }
 
@@ -95,7 +98,7 @@ namespace YTApp.Classes
             var getViewsRequest = service.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
-            var videoListResponse = await getViewsRequest.ExecuteAsync();
+            var videoListResponse = getViewsRequest.Execute();
 
             for (int i = 0; i < collection.Count; i++)
             {
@@ -121,7 +124,37 @@ namespace YTApp.Classes
             var getViewsRequest = service.Videos.List("statistics");
             getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
-            var videoListResponse = await getViewsRequest.ExecuteAsync();
+            var videoListResponse = getViewsRequest.Execute();
+
+            for (int i = 0; i < collection.Count; i++)
+            {
+                try
+                {
+                    collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                }
+                catch { collection[i].ViewsAndDate = "Unknown" + collection[i].ViewsAndDate; }
+            }
+        }
+
+        public void FillInViewsSync(List<YoutubeItemDataType> collection, YouTubeService service)
+        {
+            if (collection.Count <= 0) return;
+
+            string VideoIDs = "";
+            int j = 0;
+            foreach (var video in collection)
+            {
+                if (video == null)
+                {
+                    collection.RemoveAt(j); break;
+                }
+                VideoIDs += video.Id + ",";
+                j++;
+            }
+            var getViewsRequest = service.Videos.List("statistics");
+            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
+
+            var videoListResponse = getViewsRequest.Execute();
 
             for (int i = 0; i < collection.Count; i++)
             {
