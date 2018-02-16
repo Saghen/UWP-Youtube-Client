@@ -80,7 +80,7 @@ namespace YTApp.Classes
             return VideoToAdd;
         }
 
-        public async Task FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
+        public async Task FillInViewsAsync(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
             int j = 0;
@@ -106,7 +106,7 @@ namespace YTApp.Classes
             }
         }
 
-        public async Task FillInViews(List<YoutubeItemDataType> collection, YouTubeService service)
+        public async Task FillInViewsAsync(List<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
 
@@ -136,7 +136,33 @@ namespace YTApp.Classes
             }
         }
 
-        public void FillInViewsSync(List<YoutubeItemDataType> collection, YouTubeService service)
+        public void FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
+        {
+            if (collection.Count <= 0) return;
+            int j = 0;
+
+            string VideoIDs = "";
+            foreach (var video in collection)
+            {
+                if (video == null)
+                {
+                    collection.RemoveAt(j); break;
+                }
+                VideoIDs += video.Id + ",";
+                j++;
+            }
+            var getViewsRequest = service.Videos.List("statistics");
+            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
+
+            var videoListResponse = getViewsRequest.Execute();
+
+            for (int i = 0; i < collection.Count; i++)
+            {
+                collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+            }
+        }
+
+        public void FillInViews(List<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
 

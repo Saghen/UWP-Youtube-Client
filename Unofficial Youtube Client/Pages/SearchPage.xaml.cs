@@ -103,7 +103,7 @@ namespace YTApp.Pages
                 }
             }
 
-            methods.FillInViews(ObservableSearchResponse, youtubeService);
+            methods.FillInViewsAsync(ObservableSearchResponse, youtubeService);
 
             ObservableCollection<object> FinalCollection = new ObservableCollection<object>();
 

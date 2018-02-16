@@ -54,13 +54,13 @@ namespace YTApp.Pages
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
             ChannelID = result.ID;
-            await UpdateChannel();
+            UpdateChannel();
             UpdateChannelHome();
             UpdateVideos();
         }
 
         #region Home
-        public async Task UpdateChannel()
+        public async void UpdateChannel()
         {
             var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
@@ -101,29 +101,32 @@ namespace YTApp.Pages
             SplashImage.Source = new BitmapImage(new Uri(channel.BrandingSettings.Image.BannerImageUrl));
         }
 
-        public async Task UpdateChannelHome()
+        public async void UpdateChannelHome()
         {
             var methods = new YoutubeItemMethods();
-            List<YoutubeItemDataType> YoutubeItemsTemp = new List<YoutubeItemDataType>();
+            ObservableCollection<YoutubeItemDataType> YoutubeItemsTemp = new ObservableCollection<YoutubeItemDataType>();
 
             var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             #region Popular Uploads
 
-            YoutubeItemsTemp.Clear();
-            var GetChannelVideosPopular = service.Search.List("snippet");
-            GetChannelVideosPopular.ChannelId = ChannelID;
-            GetChannelVideosPopular.Order = SearchResource.ListRequest.OrderEnum.ViewCount;
-            GetChannelVideosPopular.Type = "video";
-            GetChannelVideosPopular.MaxResults = 10;
-            var ChannelVideosResultPopular = await GetChannelVideosPopular.ExecuteAsync();
-            foreach (var video in ChannelVideosResultPopular.Items)
+            await Task.Run(() =>
             {
-                if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
-                    YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
-            }
-            await methods.FillInViews(YoutubeItemsTemp, service);
-            playlists.Add(new PlaylistDataType() { Title = "Popular Uploads", Items=YoutubeItemsTemp });
+                var GetChannelVideosPopular = service.Search.List("snippet");
+                GetChannelVideosPopular.ChannelId = ChannelID;
+                GetChannelVideosPopular.Order = SearchResource.ListRequest.OrderEnum.ViewCount;
+                GetChannelVideosPopular.Type = "video";
+                GetChannelVideosPopular.MaxResults = 10;
+                var ChannelVideosResultPopular = GetChannelVideosPopular.Execute();
+                foreach (var video in ChannelVideosResultPopular.Items)
+                {
+                    if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
+                        YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
+                }
+                methods.FillInViews(YoutubeItemsTemp, service);
+            });
+            playlists.Add(new PlaylistDataType() { Title = "Popular Uploads", Items = YoutubeItemsTemp });
+
 
             #endregion
 
@@ -138,36 +141,39 @@ namespace YTApp.Pages
             if (ChannelPlaylistsResult.Items.Count == 0)
                 return;
 
-            List<List<YoutubeItemDataType>> tempGridViews = new List<List<YoutubeItemDataType>>();
+            List<ObservableCollection<YoutubeItemDataType>> tempGridViews = new List<ObservableCollection<YoutubeItemDataType>>();
             string tempPlaylistIds = "";
             //Go through each playlist and get all its items
-            Parallel.ForEach(ChannelPlaylistsResult.Items, playlist =>
-             {
-                 try
-                 {
-                     List<YoutubeItemDataType> tempPlaylistVideos = new List<YoutubeItemDataType>();
-                     tempPlaylistVideos.Clear();
-                     var GetPlaylistVideos = service.PlaylistItems.List("snippet,status");
-                     if (playlist.ContentDetails == null || playlist.ContentDetails.Playlists[0] == null || playlist.Snippet.Type != "singlePlaylist")
-                         return;
-                     GetPlaylistVideos.PlaylistId = playlist.ContentDetails.Playlists[0];
-                     GetPlaylistVideos.MaxResults = 10;
-                     var PlaylistVideosResult = GetPlaylistVideos.Execute();
-                     foreach (var video in PlaylistVideosResult.Items)
-                     {
-                         if (video.Status.PrivacyStatus != "private")
-                         {
-                             tempPlaylistVideos.Add(methods.VideoToYoutubeItem(video));
-                         }
-                     }
-                     methods.FillInViewsSync(tempPlaylistVideos, service);
-                     tempGridViews.Add(tempPlaylistVideos);
+            await Task.Run(() =>
+            {
+                Parallel.ForEach(ChannelPlaylistsResult.Items, playlist =>
+                {
+                    try
+                    {
+                        ObservableCollection<YoutubeItemDataType> tempPlaylistVideos = new ObservableCollection<YoutubeItemDataType>();
+                        tempPlaylistVideos.Clear();
+                        var GetPlaylistVideos = service.PlaylistItems.List("snippet,status");
+                        if (playlist.ContentDetails == null || playlist.ContentDetails.Playlists[0] == null || playlist.Snippet.Type != "singlePlaylist")
+                            return;
+                        GetPlaylistVideos.PlaylistId = playlist.ContentDetails.Playlists[0];
+                        GetPlaylistVideos.MaxResults = 10;
+                        var PlaylistVideosResult = GetPlaylistVideos.Execute();
+                        foreach (var video in PlaylistVideosResult.Items)
+                        {
+                            if (video.Status.PrivacyStatus != "private")
+                            {
+                                tempPlaylistVideos.Add(methods.VideoToYoutubeItem(video));
+                            }
+                        }
+                        methods.FillInViews(tempPlaylistVideos, service);
+                        tempGridViews.Add(tempPlaylistVideos);
 
-                     //Add the playlist ID for getting the title later
-                     tempPlaylistIds += playlist.ContentDetails.Playlists[0] + ",";
-                 }
-                 catch { return; }
-             });
+                        //Add the playlist ID for getting the title later
+                        tempPlaylistIds += playlist.ContentDetails.Playlists[0] + ",";
+                    }
+                    catch { return; }
+                });
+            });
 
             //Check if there are no playlists were outputed
             if (tempPlaylistIds == "")
@@ -262,7 +268,7 @@ namespace YTApp.Pages
 
         #region Videos
 
-        public async Task UpdateVideos()
+        public async void UpdateVideos()
         {
             if (addingVideos == false)
             {
@@ -292,7 +298,7 @@ namespace YTApp.Pages
             {
                 tempList.Add(methods.VideoToYoutubeItem(video));
             }
-            methods.FillInViews(tempList, youtubeService);
+            methods.FillInViewsAsync(tempList, youtubeService);
 
             nextPageToken = searchListResponse.NextPageToken;
 
@@ -344,7 +350,7 @@ namespace YTApp.Pages
             {
                 tempList.Add(methods.VideoToYoutubeItem(video));
             }
-            methods.FillInViews(tempList, youtubeService);
+            methods.FillInViewsAsync(tempList, youtubeService);
             nextPageToken = searchListResponse.NextPageToken;
 
             foreach (var video in tempList)
@@ -385,7 +391,7 @@ namespace YTApp.Pages
             if (-(gridView.Items.Count * 250 - gridView.ActualWidth - 500) < gridView.XValue)
                 gridView.XValue += -500;
 
-            else 
+            else
                 gridView.XValue = -(gridView.Items.Count * 250 - gridView.ActualWidth + 50);
         }
 
@@ -412,7 +418,7 @@ namespace YTApp.Pages
             var parent = (Grid)obj.Parent;
             var gridView = (Controls.GridViewWithXProperty)parent.FindName("Playlist");
 
-            if(gridView.ActualWidth > gridView.Items.Count * 250 && gridView.XValue == 0)
+            if (gridView.ActualWidth > gridView.Items.Count * 250 && gridView.XValue == 0)
             {
                 var btn1 = (Button)parent.FindName("btnMoveLeft");
                 btn1.Visibility = Visibility.Collapsed;

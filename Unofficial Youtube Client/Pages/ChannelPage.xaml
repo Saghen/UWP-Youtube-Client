@@ -47,7 +47,7 @@
                                 <DataTemplate x:DataType="datatypes:PlaylistDataType">
                                     <Grid>
                                         <controls:HeaderedContentControl Header="{x:Bind Title}" SizeChanged="Playlist_SizeChanged">
-                                            <lclctrls:GridViewWithXProperty x:Name="Playlist" ItemsSource="{x:Bind Items, Mode=OneWay}" ItemClick="Playlist_ItemClick" XValue="0">
+                                            <lclctrls:GridViewWithXProperty x:Name="Playlist" ItemsSource="{x:Bind Items, Mode=OneWay}" ItemClick="Playlist_ItemClick" XValue="0" SelectionMode="None" IsItemClickEnabled="True" >
                                                 <lclctrls:GridViewWithXProperty.ItemsPanel>
                                                     <ItemsPanelTemplate>
                                                         <StackPanel x:Name="VideoItems" Orientation="Horizontal" >
@@ -61,7 +61,11 @@
                                                 <lclctrls:GridViewWithXProperty.ItemTemplate>
                                                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
                                                         <StackPanel Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
-                                                            <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                                                            <Image x:Name="ImageControl" Margin="5" HorizontalAlignment="Center">
+                                                                <Image.Source>
+                                                                    <BitmapImage DecodePixelWidth="240" DecodePixelHeight="135" UriSource="{x:Bind Thumbnail}"/>
+                                                                </Image.Source>
+                                                            </Image>
                                                             <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
                                                             <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
                                                             <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
@@ -83,7 +87,11 @@
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:YoutubeItemDataType">
                                     <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
-                                        <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" HorizontalAlignment="Center"/>
+                                        <Image x:Name="ImageControl" Margin="5" HorizontalAlignment="Center">
+                                            <Image.Source>
+                                                <BitmapImage DecodePixelWidth="240" DecodePixelHeight="135" UriSource="{x:Bind Thumbnail}"/>
+                                            </Image.Source>
+                                        </Image>
                                         <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
                                         <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
                                         <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>

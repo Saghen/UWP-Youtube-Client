@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -11,13 +12,13 @@ namespace YTApp.Classes.DataTypes
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        List<YoutubeItemDataType> _items = new List<YoutubeItemDataType>();
+        ObservableCollection<YoutubeItemDataType> _items = new ObservableCollection<YoutubeItemDataType>();
         double _x = 0;
         string _title = "";
 
         public PlaylistDataType() { }
 
-        public List<YoutubeItemDataType> Items
+        public ObservableCollection<YoutubeItemDataType> Items
         {
             get { return _items; }
             set

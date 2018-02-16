@@ -165,7 +165,7 @@ namespace YTApp.Pages
             {
                 relatedVideosList.Add(methods.VideoToYoutubeItem(video));
             }
-            await methods.FillInViews(relatedVideosList, service);
+            await methods.FillInViewsAsync(relatedVideosList, service);
             RelatedVideosGridView.ItemsSource = relatedVideosList;
         }
 
