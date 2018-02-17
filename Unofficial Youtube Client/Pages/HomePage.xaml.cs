@@ -143,13 +143,10 @@ namespace YTApp.Pages
             YTItems.Add(YTItemsListTempFourDays);
             YTItems.Add(YTItemsListTempFiveDays);
 
-            await Task.Run(() =>
+            Parallel.ForEach(YTItems, playlist =>
             {
-                Parallel.ForEach(YTItems, playlist =>
-                {
-                    var methodsLocal = new YoutubeItemMethods();
-                    methodsLocal.FillInViews(playlist.Items, service);
-                });
+                var methodsLocal = new YoutubeItemMethods();
+                methodsLocal.FillInViews(playlist.Items, service);
             });
 
             #endregion

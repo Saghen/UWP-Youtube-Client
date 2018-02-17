@@ -106,7 +106,6 @@
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\DataTypes\NavigateParams.cs" />
     <Compile Include="Classes\DataTypes\PlaylistDataType.cs" />
-    <Compile Include="Classes\DataTypes\PlayListDataTypeList.cs" />
     <Compile Include="Classes\EventsArgs\RoutedEventArgsWithID.cs" />
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\YoutubeChannelDataType.cs" />

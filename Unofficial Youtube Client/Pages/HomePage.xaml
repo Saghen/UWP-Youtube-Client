@@ -25,7 +25,7 @@
                                         </Image>
                                         <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
                                         <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" Foreground="#aaa" FontSize="12" HorizontalAlignment="Center"/>
-                                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" Foreground="#aaa" FontSize="12" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate, Mode=OneWay}" Foreground="#aaa" FontSize="12" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridView.ItemTemplate>
