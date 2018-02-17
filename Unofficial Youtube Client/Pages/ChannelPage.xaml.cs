@@ -409,7 +409,8 @@ namespace YTApp.Pages
 
         private void Playlist_ItemClick(object sender, ItemClickEventArgs e)
         {
-
+            var item = (YoutubeItemDataType)e.ClickedItem;
+            MainPageReference.StartVideo(item.Id);
         }
 
         private void Playlist_SizeChanged(object sender, SizeChangedEventArgs e)

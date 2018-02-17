@@ -32,12 +32,21 @@ namespace YTApp.Pages
     {
         public MainPage MainPageReference;
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        private string nextPageToken = "";
+        private string searchQuery = "";
+        private bool addingVideos = false;
+
+        ObservableCollection<object> SearchResultsList = new ObservableCollection<object>();
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
             MainPageReference = result.mainPageRef;
-            try { await Run(); } catch { }
+
+            searchQuery = MainPageReference.SearchBox.Text;
+
+            Search();
         }
 
         public SearchPage()
@@ -60,64 +69,91 @@ namespace YTApp.Pages
         }
 
         #region Search
-        private async Task Run()
+        private async void Search()
         {
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
-            {
-                ApiKey = Constants.APIKey,
-                ApplicationName = this.GetType().ToString()
-            });
+            SearchResultsList.Clear();
+
+            var youtubeService = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = MainPageReference.SearchBox.Text;
-            searchListRequest.MaxResults = 50;
+            searchListRequest.MaxResults = 25;
+
+            SearchListResponse searchListResponse = new SearchListResponse();
 
             // Call the search.list method to retrieve results matching the specified query term.
-            var searchListResponse = await searchListRequest.ExecuteAsync();
+            searchListResponse = await searchListRequest.ExecuteAsync();
 
-            string VideoIDs = "";
-            foreach (var searchResult in searchListResponse.Items) { VideoIDs += searchResult.Id.VideoId + ","; }
-            var getViewsRequest = youtubeService.Videos.List("statistics");
-            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
+            nextPageToken = searchListResponse.NextPageToken;
 
-            var videoListResponse = await getViewsRequest.ExecuteAsync();
-            List<string> VideoIDsSplit = VideoIDs.Split(new String[] { "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            YoutubeItemsGridView.Items.Clear();
-
-            ObservableCollection<YoutubeItemDataType> ObservableSearchResponse = new ObservableCollection<YoutubeItemDataType>();
-            ObservableCollection<YoutubeChannelDataType> ObservableSearchResponseChannels = new ObservableCollection<YoutubeChannelDataType>();
+            ObservableCollection<YoutubeItemDataType> tempList = new ObservableCollection<YoutubeItemDataType>();
 
             var methods = new YoutubeItemMethods();
+
             foreach (var searchResult in searchListResponse.Items)
             {
                 if (searchResult.Id.Kind == "youtube#video")
                 {
                     var data = methods.VideoToYoutubeItem(searchResult);
-                    ObservableSearchResponse.Add(data);
+                    tempList.Add(data);
                 }
                 else if (searchResult.Id.Kind == "youtube#channel")
                 {
                     var data = methods.ChannelToYoutubeChannel(searchResult, youtubeService);
-                    ObservableSearchResponseChannels.Add(data);
+                    SearchResultsList.Add(data);
                 }
             }
 
-            methods.FillInViewsAsync(ObservableSearchResponse, youtubeService);
+            methods.FillInViews(tempList, youtubeService);
 
-            ObservableCollection<object> FinalCollection = new ObservableCollection<object>();
+            foreach (var item in tempList)
+                SearchResultsList.Add(item);
+        }
 
-            FinalCollection.Add(ObservableSearchResponse);
-            FinalCollection.Add(ObservableSearchResponseChannels);
+        private async void SearchAddMore()
+        {
+            var youtubeService = await YoutubeItemMethodsStatic.GetServiceAsync();
 
-            foreach (var obj in ObservableSearchResponseChannels)
+            if (addingVideos == true)
+                return;
+
+            addingVideos = true;
+
+            var searchListRequest = youtubeService.Search.List("snippet");
+            searchListRequest.Q = MainPageReference.SearchBox.Text;
+            searchListRequest.PageToken = nextPageToken;
+            searchListRequest.MaxResults = 25;
+
+            // Call the search.list method to retrieve results matching the specified query term.
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+
+            nextPageToken = searchListResponse.NextPageToken;
+
+            ObservableCollection<YoutubeItemDataType> tempList = new ObservableCollection<YoutubeItemDataType>();
+
+            var methods = new YoutubeItemMethods();
+
+            foreach (var searchResult in searchListResponse.Items)
             {
-                YoutubeItemsGridView.Items.Add(obj);
+                if (searchResult.Id.Kind == "youtube#video")
+                {
+                    var data = methods.VideoToYoutubeItem(searchResult);
+                    tempList.Add(data);
+                    SearchResultsList.Add(data);
+                }
+                else if (searchResult.Id.Kind == "youtube#channel")
+                {
+                    var data = methods.ChannelToYoutubeChannel(searchResult, youtubeService);
+                    SearchResultsList.Add(data);
+                }
             }
-            foreach (var obj in ObservableSearchResponse)
-            {
-                YoutubeItemsGridView.Items.Add(obj);
-            }
+
+            methods.FillInViews(tempList, youtubeService);
+
+            foreach (var item in tempList)
+                SearchResultsList.Add(item);
+
+            addingVideos = false;
         }
 
         private string ViewCountShortner(ulong? viewCount)
@@ -158,5 +194,16 @@ namespace YTApp.Pages
         }
         #endregion
 
+        private void ScrollView_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            var verticalOffset = ScrollView.VerticalOffset;
+            var maxVerticalOffset = ScrollView.ScrollableHeight - 1000; //sv.ExtentHeight - sv.ViewportHeight;
+
+            if (maxVerticalOffset < 0 ||
+                verticalOffset >= maxVerticalOffset)
+            {
+                SearchAddMore();
+            }
+        }
     }
 }

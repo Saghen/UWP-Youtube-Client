@@ -43,7 +43,8 @@ namespace YTApp.Pages
         string VideoID;
         Google.Apis.YouTube.v3.Data.Video video;
         Channel channel;
-        SearchListResponse relatedVideos;
+
+        PlaylistDataType relatedVideos = new PlaylistDataType();
 
         public VideoPage()
         {
@@ -57,7 +58,7 @@ namespace YTApp.Pages
             MainPageReference = result.mainPageRef;
 
             var LikeDislike = new LikeDislikeUserControl(result.ID);
-            
+
             TitleGrid.Children.Add(LikeDislike);
             Grid.SetColumn(LikeDislike, 1);
 
@@ -66,7 +67,7 @@ namespace YTApp.Pages
 
             //Store the video ID for future use
             VideoID = result.ID;
-            
+
             //Get the video data and play it
             StartVideo(result.ID);
 
@@ -89,6 +90,20 @@ namespace YTApp.Pages
             //Make the player cover the entire frame
             ChangePlayerSize(true);
 
+            try
+            {
+                var youTube = YouTube.Default;
+                var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + ID);
+                viewer.Source = new Uri(video.GetUri());
+                viewer.Visibility = Visibility.Visible;
+                viewer.TransportControls.Focus(FocusState.Programmatic);
+            }
+            catch
+            {
+                InAppNotif.Show();
+                return;
+            }
+
             var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var getVideoInfo = service.Videos.List("snippet, statistics, contentDetails");
@@ -107,22 +122,6 @@ namespace YTApp.Pages
             getChannelInfo.Id = video.Snippet.ChannelId;
             var channelInfo = await getChannelInfo.ExecuteAsync();
             channel = channelInfo.Items[0];
-
-            var getRelatedVideos = service.Search.List("snippet");
-            getRelatedVideos.RelatedToVideoId = VideoID;
-            getRelatedVideos.MaxResults = 15;
-            getRelatedVideos.Type = "video";
-            relatedVideos = await getRelatedVideos.ExecuteAsync();
-
-            try
-            {
-                var youTube = YouTube.Default;
-                var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + ID);
-                viewer.Source = new Uri(video.GetUri());
-                viewer.Visibility = Visibility.Visible;
-                viewer.TransportControls.Focus(FocusState.Programmatic);
-            }
-            catch { Frame.Visibility = Visibility.Collapsed; return; }
 
             UpdatePageInfo(service);
 
@@ -154,19 +153,28 @@ namespace YTApp.Pages
             var imageBrush = new ImageBrush();
             imageBrush.ImageSource = image;
             ChannelProfileIcon.Fill = imageBrush;
+
         }
 
         public async void UpdateRelatedVideos(YouTubeService service)
         {
-            List<YoutubeItemDataType> relatedVideosList = new List<YoutubeItemDataType>();
-
-            var methods = new YoutubeItemMethods();
-            foreach (SearchResult video in relatedVideos.Items)
+            System.Collections.ObjectModel.ObservableCollection<YoutubeItemDataType> relatedVideosList = new System.Collections.ObjectModel.ObservableCollection<YoutubeItemDataType>();
+            await System.Threading.Tasks.Task.Run(() =>
             {
-                relatedVideosList.Add(methods.VideoToYoutubeItem(video));
-            }
-            await methods.FillInViewsAsync(relatedVideosList, service);
-            RelatedVideosGridView.ItemsSource = relatedVideosList;
+                var getRelatedVideos = service.Search.List("snippet");
+                getRelatedVideos.RelatedToVideoId = VideoID;
+                getRelatedVideos.MaxResults = 15;
+                getRelatedVideos.Type = "video";
+                var relatedVideosResponse = getRelatedVideos.Execute();
+
+                var methods = new YoutubeItemMethods();
+                foreach (SearchResult video in relatedVideosResponse.Items)
+                {
+                    relatedVideosList.Add(methods.VideoToYoutubeItem(video));
+                }
+                methods.FillInViews(relatedVideosList, service);
+            });
+            relatedVideos.Items = relatedVideosList;
         }
 
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)

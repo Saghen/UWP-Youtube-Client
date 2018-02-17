@@ -81,7 +81,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel MaxWidth="500" HorizontalAlignment="Left">
                                     <TextBlock x:Name="Title" Text="Title" FontSize="20" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock x:Name="Views" Text="Views" MaxHeight="200" FontSize="14"/>
+                                    <TextBlock x:Name="Views" Text="Views" MaxHeight="200" FontSize="14" Foreground="#aaa"/>
                                 </StackPanel>
                             </Grid>
                             <MenuFlyoutSeparator VerticalAlignment="Bottom"/>
@@ -99,11 +99,15 @@
                             </Grid>
                         </Grid>
                     </StackPanel>
-                    <ListView x:Name="RelatedVideosGridView" Grid.Column="1" Header="Related" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" Margin="0,10,0,0">
+                    <ListView x:Name="RelatedVideosGridView" Grid.Column="1" Header="Related" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" Margin="0,10,0,0" ItemsSource="{x:Bind relatedVideos.Items, Mode=OneWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="classes:YoutubeItemDataType">
                                 <StackPanel Orientation="Horizontal">
-                                    <Image x:Name="ImageControl" Source="{x:Bind Thumbnail}" Margin="10" Width="180" VerticalAlignment="Top"/>
+                                    <Image x:Name="ImageControl" Margin="10" VerticalAlignment="Center">
+                                        <Image.Source>
+                                            <BitmapImage UriSource="{Binding Thumbnail}" DecodePixelHeight="101" DecodePixelWidth="180"/>
+                                        </Image.Source>
+                                    </Image>
                                     <StackPanel>
                                         <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" Foreground="#fff" TextTrimming="CharacterEllipsis"/>
                                         <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" Foreground="#fff"/>
