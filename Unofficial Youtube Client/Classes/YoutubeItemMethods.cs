@@ -3,8 +3,6 @@ using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace YTApp.Classes
@@ -78,6 +76,18 @@ namespace YTApp.Classes
             VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId;
             VideoToAdd.SubscribersAndVideos = string.Format("{0:#,###0.#}", channelInfo.Items[0].Statistics.SubscriberCount) + " Subscribers • Videos " + Convert.ToString(channelInfo.Items[0].Statistics.VideoCount);
             return VideoToAdd;
+        }
+
+        public YoutubeChannelDataType ChannelToYoutubeChannel(Channel channel)
+        {
+            var ChannelToAdd = new YoutubeChannelDataType();
+            ChannelToAdd.Description = channel.Snippet.Description;
+            ChannelToAdd.Thumbnail = channel.Snippet.Thumbnails.Medium.Url;
+            ChannelToAdd.Title = channel.Snippet.Title;
+            ChannelToAdd.Id = channel.Id;
+            ChannelToAdd.Subscribers = string.Format("{0:#,###0.#}", channel.Statistics.SubscriberCount) + " Subscribers";
+            ChannelToAdd.Videos = Convert.ToString(channel.Statistics.VideoCount) + " Videos";
+            return ChannelToAdd;
         }
 
         public async Task FillInViewsAsync(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)

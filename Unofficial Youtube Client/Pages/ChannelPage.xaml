@@ -42,45 +42,83 @@
                 </Grid>
                 <Pivot x:Name="rootPivot" Margin="70,10,30,10">
                     <PivotItem x:Name="HomePivot" Header="Home">
-                        <ItemsControl ItemsSource="{x:Bind playlists, Mode=OneWay}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="datatypes:PlaylistDataType">
-                                    <Grid>
-                                        <controls:HeaderedContentControl Header="{x:Bind Title}" SizeChanged="Playlist_SizeChanged">
-                                            <lclctrls:GridViewWithXProperty x:Name="Playlist" ItemsSource="{x:Bind Items, Mode=OneWay}" ItemClick="Playlist_ItemClick" XValue="0" SelectionMode="None" IsItemClickEnabled="True" >
-                                                <lclctrls:GridViewWithXProperty.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel x:Name="VideoItems" Orientation="Horizontal" >
-                                                            <StackPanel.RenderTransform>
-                                                                <TranslateTransform  X="{Binding Path=XValue, Mode=OneWay, ElementName=Playlist}"/>
-                                                            </StackPanel.RenderTransform>
-                                                        </StackPanel>
+                        <StackPanel Margin="0,10">
+                            <ItemsControl ItemsSource="{x:Bind playlists, Mode=OneWay}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="datatypes:PlaylistDataType">
+                                        <Grid>
+                                            <controls:HeaderedContentControl Header="{x:Bind Title}" SizeChanged="Playlist_SizeChanged">
+                                                <lclctrls:GridViewWithXProperty x:Name="Playlist" ItemsSource="{x:Bind Items, Mode=OneWay}" ItemClick="Playlist_ItemClick" XValue="0" SelectionMode="None" IsItemClickEnabled="True" >
+                                                    <lclctrls:GridViewWithXProperty.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel x:Name="VideoItems" Orientation="Horizontal" >
+                                                                <StackPanel.RenderTransform>
+                                                                    <TranslateTransform  X="{Binding Path=XValue, Mode=OneWay, ElementName=Playlist}"/>
+                                                                </StackPanel.RenderTransform>
+                                                            </StackPanel>
 
-                                                    </ItemsPanelTemplate>
-                                                </lclctrls:GridViewWithXProperty.ItemsPanel>
-                                                <lclctrls:GridViewWithXProperty.ItemTemplate>
-                                                    <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                                                        <StackPanel Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
-                                                            <Image x:Name="ImageControl" Margin="5" HorizontalAlignment="Center">
-                                                                <Image.Source>
-                                                                    <BitmapImage DecodePixelWidth="240" DecodePixelHeight="135" UriSource="{x:Bind Thumbnail}"/>
-                                                                </Image.Source>
-                                                            </Image>
-                                                            <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
-                                                            <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
-                                                            <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </lclctrls:GridViewWithXProperty.ItemTemplate>
-                                            </lclctrls:GridViewWithXProperty>
-                                        </controls:HeaderedContentControl>
-                                        
-                                        <Button x:Name="btnMoveLeft" Background="#222" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="MoveLeft_Click"></Button>
-                                        <Button x:Name="btnMoveRight" Background="#222" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="MoveRight_Click"></Button>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                                        </ItemsPanelTemplate>
+                                                    </lclctrls:GridViewWithXProperty.ItemsPanel>
+                                                    <lclctrls:GridViewWithXProperty.ItemTemplate>
+                                                        <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                                                            <StackPanel Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
+                                                                <Image x:Name="ImageControl" Margin="5" HorizontalAlignment="Center">
+                                                                    <Image.Source>
+                                                                        <BitmapImage DecodePixelWidth="240" DecodePixelHeight="135" UriSource="{x:Bind Thumbnail}"/>
+                                                                    </Image.Source>
+                                                                </Image>
+                                                                <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                                                                <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
+                                                                <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </lclctrls:GridViewWithXProperty.ItemTemplate>
+                                                </lclctrls:GridViewWithXProperty>
+                                            </controls:HeaderedContentControl>
+
+                                            <Button x:Name="btnMoveLeft" Background="#222" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="PlaylistMoveLeft_Click"></Button>
+                                            <Button x:Name="btnMoveRight" Background="#222" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="PlaylistMoveRight_Click"></Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Grid>
+                                <controls:HeaderedContentControl Header="Featured Channels" SizeChanged="FeaturedChannels_SizeChanged">
+                                    <lclctrls:GridViewWithXProperty x:Name="featuredChannelsCtrl" ItemsSource="{x:Bind featuredChannels, Mode=OneWay}" ItemClick="FeaturedChannels_ItemClick" XValue="0" SelectionMode="None" IsItemClickEnabled="True" >
+                                        <lclctrls:GridViewWithXProperty.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel x:Name="VideoItems" Orientation="Horizontal" >
+                                                    <StackPanel.RenderTransform>
+                                                        <TranslateTransform  X="{Binding Path=XValue, Mode=OneWay, ElementName=featuredChannelsCtrl}"/>
+                                                    </StackPanel.RenderTransform>
+                                                </StackPanel>
+                                            </ItemsPanelTemplate>
+                                        </lclctrls:GridViewWithXProperty.ItemsPanel>
+                                        <lclctrls:GridViewWithXProperty.ItemTemplate>
+                                            <DataTemplate x:DataType="classes:YoutubeChannelDataType">
+                                                <StackPanel HorizontalAlignment="Center">
+                                                    <Ellipse Margin="10,10,10,20" Height="160" Width="160" HorizontalAlignment="Center">
+                                                        <Ellipse.Fill>
+                                                            <ImageBrush>
+                                                                <ImageBrush.ImageSource>
+                                                                    <BitmapImage UriSource="{x:Bind Thumbnail}" DecodePixelHeight="160" DecodePixelWidth="160"/>
+                                                                </ImageBrush.ImageSource>
+                                                            </ImageBrush>
+                                                        </Ellipse.Fill>
+                                                    </Ellipse>
+                                                    <TextBlock Text="{x:Bind Title}" FontSize="14" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{x:Bind Subscribers}" HorizontalAlignment="Center" Foreground="#aaa"/>
+                                                    <TextBlock Text="{x:Bind Videos}" HorizontalAlignment="Center" Foreground="#aaa"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </lclctrls:GridViewWithXProperty.ItemTemplate>
+                                    </lclctrls:GridViewWithXProperty>
+                                </controls:HeaderedContentControl>
+
+                                <Button x:Name="btnMoveLeft" Background="#222" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="FeaturedChannelsMoveLeft_Click"></Button>
+                                <Button x:Name="btnMoveRight" Background="#222" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="FeaturedChannelsMoveRight_Click"></Button>
+                            </Grid>
+                        </StackPanel>
                     </PivotItem>
                     <PivotItem x:Name="VideoPivot" Header="Videos">
                         <GridView x:Name="VideosGridView" ItemsSource="{x:Bind VideosList, Mode=OneWay}" HorizontalAlignment="Left" SelectionMode="None" IsItemClickEnabled="True" ItemClick="PlayVideoEvent">
@@ -100,9 +138,12 @@
                             </GridView.ItemTemplate>
                         </GridView>
                     </PivotItem>
+                    <PivotItem x:Name="AboutPivot" Header="About">
+                        <TextBlock x:Name="ChannelAboutText" Margin="10,20"/>
+                    </PivotItem>
                 </Pivot>
             </StackPanel>
-            
+
         </Grid>
     </ScrollViewer>
 </Page>

@@ -104,6 +104,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Constants.cs" />
+    <Compile Include="Classes\DataTypes\ChannelListDataType.cs" />
     <Compile Include="Classes\DataTypes\NavigateParams.cs" />
     <Compile Include="Classes\DataTypes\PlaylistDataType.cs" />
     <Compile Include="Classes\EventsArgs\RoutedEventArgsWithID.cs" />
