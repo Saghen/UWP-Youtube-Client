@@ -1,5 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Services;
+using Google.Apis.Util.Store;
 using Google.Apis.YouTube.v3;
 using System;
 using System.Collections.Generic;
@@ -28,6 +30,29 @@ namespace YTApp.Classes
                 HttpClientInitializer = credential,
                 ApplicationName = "Youtube Viewer",
             });
+        }
+
+        static public async Task<bool> IsUserAuthenticated()
+        {
+            GoogleAuthorizationCodeFlow.Initializer initializer = new GoogleAuthorizationCodeFlow.Initializer();
+            var secrets = new ClientSecrets
+            {
+                ClientSecret = Constants.ClientSecret,
+                ClientId = Constants.ClientID
+            };
+            initializer.ClientSecrets = secrets;
+            initializer.DataStore = new PasswordVaultDataStore();
+            var test = new AuthorizationCodeFlow(initializer);
+            var token = await test.LoadTokenAsync("user", CancellationToken.None);
+            if (token == null)
+            {
+                return false;
+            }
+            else
+            {
+                Constants.Token = token;
+                return true;
+            }
         }
 
         static public void StartVideo(string ID, MainPage mainPageRef)

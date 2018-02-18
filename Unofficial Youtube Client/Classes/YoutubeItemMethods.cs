@@ -90,9 +90,9 @@ namespace YTApp.Classes
             return ChannelToAdd;
         }
 
-        public async Task FillInViewsAsync(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
+        public Task FillInViewsAsync(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
-            if (collection.Count <= 0) return;
+            if (collection.Count <= 0) return null;
             int j = 0;
 
             string VideoIDs = "";
@@ -114,11 +114,12 @@ namespace YTApp.Classes
             {
                 collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
             }
+            return null;
         }
 
-        public async Task FillInViewsAsync(List<YoutubeItemDataType> collection, YouTubeService service)
+        public Task FillInViewsAsync(List<YoutubeItemDataType> collection, YouTubeService service)
         {
-            if (collection.Count <= 0) return;
+            if (collection.Count <= 0) return null;
 
             string VideoIDs = "";
             int j = 0;
@@ -144,6 +145,8 @@ namespace YTApp.Classes
                 }
                 catch { collection[i].ViewsAndDate = "Unknown" + collection[i].ViewsAndDate; }
             }
+
+            return null;
         }
 
         public void FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)

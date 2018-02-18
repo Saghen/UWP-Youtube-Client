@@ -42,7 +42,7 @@ namespace YTApp.Pages
         {
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
-            MainPageReference = result.mainPageRef;
+            MainPageReference = result.MainPageRef;
 
             searchQuery = MainPageReference.SearchBox.Text;
 
@@ -64,7 +64,7 @@ namespace YTApp.Pages
             else if (e.ClickedItem.GetType() == typeof(YoutubeChannelDataType))
             {
                 var item = (YoutubeChannelDataType)e.ClickedItem;
-                MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { mainPageRef = MainPageReference, ID = item.Id });
+                this.Frame.Navigate(typeof(ChannelPage), new NavigateParams() { MainPageRef = MainPageReference, ID = item.Id });
             }
         }
 

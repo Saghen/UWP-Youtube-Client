@@ -8,8 +8,7 @@ namespace YTApp.Classes.DataTypes
 {
     class NavigateParams
     {
-        public MainPage mainPageRef { get; set; }
+        public MainPage MainPageRef { get; set; }
         public string ID { get; set; }
-        public bool Refresh { get; set; }
     }
 }

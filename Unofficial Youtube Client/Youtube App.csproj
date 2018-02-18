@@ -24,6 +24,7 @@
     <AppxPackageDir>C:\Users\megam\Music\</AppxPackageDir>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <PackageCertificateThumbprint>8B17C0337E47C34A98EC5779CC4709C7C94CA7EB</PackageCertificateThumbprint>
+    <HockeyAppResourceId>b7521c5cde744a08831b27d83de35f13</HockeyAppResourceId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -217,8 +218,8 @@
     <Content Include="Icons\Thumbs_Up_NotPressed.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Connected Services\HockeyApp\ConnectedService.json" />
     <None Include="Package.StoreAssociation.xml" />
-    <Content Include="YouTube_icon_light.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
@@ -307,13 +308,16 @@
       <Version>1.30.0-beta02</Version>
     </PackageReference>
     <PackageReference Include="Google.Apis.Oauth2.v2">
-      <Version>1.30.0.994</Version>
+      <Version>1.29.2.994</Version>
     </PackageReference>
     <PackageReference Include="Google.Apis.YouTube.v3">
-      <Version>1.30.0.1063</Version>
+      <Version>1.29.2.1006</Version>
     </PackageReference>
-    <PackageReference Include="HtmlAgilityPack">
-      <Version>1.6.17</Version>
+    <PackageReference Include="HockeySDK.UWP">
+      <Version>4.1.6</Version>
+    </PackageReference>
+    <PackageReference Include="MetroLog">
+      <Version>1.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.0.6</Version>
@@ -331,6 +335,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libvideo.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

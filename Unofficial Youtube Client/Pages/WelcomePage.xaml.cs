@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MetroLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using YTApp.Classes;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -23,6 +25,7 @@ namespace YTApp.Pages
     public sealed partial class WelcomePage : Page
     {
         MainPage MainPageReference;
+        private ILogger Log = LogManagerFactory.DefaultLogManager.GetLogger<WelcomePage>();
 
         public WelcomePage()
         {
@@ -33,29 +36,42 @@ namespace YTApp.Pages
         {
             Classes.DataTypes.NavigateParams result = (Classes.DataTypes.NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
-            MainPageReference = result.mainPageRef;
+            MainPageReference = result.MainPageRef;
         }
 
-        private async void Button_Tapped(object sender, TappedRoutedEventArgs e)
+        private void Button_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            Google.Apis.Auth.OAuth2.UserCredential credential = await Google.Apis.Auth.OAuth2.GoogleWebAuthorizationBroker.AuthorizeAsync(new Google.Apis.Auth.OAuth2.ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { Google.Apis.YouTube.v3.YouTubeService.Scope.Youtube, Google.Apis.Oauth2.v2.Oauth2Service.Scope.UserinfoProfile }, "user", System.Threading.CancellationToken.None);
-            btnLogin.Visibility = Visibility.Collapsed;
-            btnContinue.Visibility = Visibility.Visible;
+            RunAuthentication();
         }
 
+        private async void RunAuthentication()
+        {
+            try
+            {
+                Google.Apis.Auth.OAuth2.UserCredential credential = await Google.Apis.Auth.OAuth2.GoogleWebAuthorizationBroker.AuthorizeAsync(new Google.Apis.Auth.OAuth2.ClientSecrets
+                {
+                    ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
+                    ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
+                }, new[] { Google.Apis.YouTube.v3.YouTubeService.Scope.Youtube, Google.Apis.Oauth2.v2.Oauth2Service.Scope.UserinfoProfile }, "user", System.Threading.CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Authentication did not complete successfully.");
+                Log.Error(ex.Message);
+            }
+            
+            if (await YoutubeItemMethodsStatic.IsUserAuthenticated())
+            {
+                btnLogin.Visibility = Visibility.Collapsed;
+                btnContinue.Visibility = Visibility.Visible;
+            }
+        }
         private void Continue_Tapped(object sender, TappedRoutedEventArgs e)
         {
             MainPageReference.LoadSubscriptions();
             MainPageReference.UpdateLoginDetails();
-            MainPageReference.contentFrame.Navigate(typeof(HomePage), new Classes.DataTypes.NavigateParams()
-            {
-                mainPageRef = MainPageReference,
-                Refresh = true
-            });
+
+            MainPageReference.contentFrame.Navigate(typeof(HomePage), new Classes.DataTypes.NavigateParams(){ MainPageRef = MainPageReference });
         }
     }
 }

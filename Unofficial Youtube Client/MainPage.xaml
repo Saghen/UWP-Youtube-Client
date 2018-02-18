@@ -10,8 +10,10 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
     extensions:TitleBar.BackgroundColor="#2a2a2a"
+    extensions:TitleBar.InactiveBackgroundColor="#333"
     extensions:TitleBar.ButtonBackgroundColor="#2a2a2a"
-    mc:Ignorable="d" Loaded="Page_Loaded" x:Name="MainWindowPage" >
+    extensions:TitleBar.ButtonInactiveBackgroundColor="#333"
+    mc:Ignorable="d" Loaded="Page_Loaded" x:Name="MainWindowPage">
 
     <Page.Resources>
         <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
@@ -45,11 +47,11 @@
             <StackPanel x:Name="stkpnlLoginInfo" Orientation="Horizontal" HorizontalAlignment="Right" Padding="10,0">
                 <TextBlock x:Name="txtLoginName" VerticalAlignment="Center" Padding="10,0"/>
                 <Ellipse x:Name="imgProfileIcon" Width="35" Height="35" VerticalAlignment="Center"/>
-                <Button x:Name="btnLoginFlyout" Content="&#xE712;" FontFamily="Segoe MDL2 Assets" FontSize="20" Margin="10,0" Style="{StaticResource TransparentButtonStyle}" Tapped="btnLoginFlyout_Tapped">
+                <Button x:Name="btnLoginFlyout" Content="&#xE712;" FontFamily="Segoe MDL2 Assets" FontSize="20" Margin="10,0" Style="{StaticResource TransparentButtonStyle}" Tapped="BtnLoginFlyout_Tapped">
                     <FlyoutBase.AttachedFlyout>
                         <Flyout>
                             <ListView>
-                                <StackPanel x:Name="btnMyChannel" Orientation="Horizontal" Tapped="btnMyChannel_Tapped">
+                                <StackPanel x:Name="btnMyChannel" Orientation="Horizontal" Tapped="BtnMyChannel_Tapped">
                                     <TextBlock x:Name="iconMyChannel" Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="20" Padding="0,0,20,0"/>
                                     <TextBlock Text="My Channel"/>
                                 </StackPanel>
@@ -57,7 +59,7 @@
                                     <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="20" Padding="0,0,20,0"/>
                                     <TextBlock Text="Settings"/>
                                 </StackPanel>
-                                <StackPanel x:Name="btnSignOut" Orientation="Horizontal" Tapped="btnSignOut_Tapped">
+                                <StackPanel x:Name="btnSignOut" Orientation="Horizontal" Tapped="BtnSignOut_Tapped">
                                     <TextBlock Text="&#xE830;" FontFamily="Segoe MDL2 Assets" FontSize="20" Padding="0,0,20,0"/>
                                     <TextBlock Text="Sign Out"/>
                                 </StackPanel>
@@ -100,7 +102,7 @@
                         </ListView>
                         <MenuFlyoutSeparator/>
                         <TextBlock Text="SUBSCRIPTIONS" Margin="25,10" FontSize="20"/>
-                        <ListView x:Name="SubscriptionsList" Margin="0" SelectionMode="None" IsItemClickEnabled="True" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" ItemClick="SubscriptionsList_ItemClick">
+                        <ListView x:Name="SubscriptionsList" Margin="0" SelectionMode="None" IsItemClickEnabled="True" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" ItemClick="SubscriptionsList_ItemClick" ItemsSource="{x:Bind subscriptionsList, Mode=OneWay}">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:SubscriptionDataType">
                                     <Grid Width="Auto">

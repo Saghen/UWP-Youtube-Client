@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MetroLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,6 +37,12 @@ namespace YTApp
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            //Log everything from Info to Fatal levels to a file.
+            LogManagerFactory.DefaultConfiguration.AddTarget(LogLevel.Info, LogLevel.Fatal, new MetroLog.Targets.StreamingFileTarget());
+
+            //Log any crashes that occur and their stack trace.
+            GlobalCrashHandler.Configure();
         }
 
         /// <summary>

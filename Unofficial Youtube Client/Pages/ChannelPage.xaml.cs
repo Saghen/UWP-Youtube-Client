@@ -2,6 +2,8 @@
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
+using MetroLog;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -41,6 +43,8 @@ namespace YTApp.Pages
         public string nextPageToken;
         YouTubeService service = new YouTubeService();
 
+        private ILogger Log = LogManagerFactory.DefaultLogManager.GetLogger<ChannelPage>();
+
         ObservableCollection<YoutubeItemDataType> VideosList = new ObservableCollection<YoutubeItemDataType>();
 
         ObservableCollection<PlaylistDataType> playlists = new ObservableCollection<PlaylistDataType>();
@@ -61,7 +65,7 @@ namespace YTApp.Pages
         {
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
-            MainPageReference = result.mainPageRef;
+            MainPageReference = result.MainPageRef;
             ChannelID = result.ID;
 
             service = await YoutubeItemMethodsStatic.GetServiceAsync();
@@ -120,10 +124,10 @@ namespace YTApp.Pages
         public async void UpdateChannelHome()
         {
             Task t1 = Task.Run(() => UpdatePopularUploads());
-            Task t2 = Task.Run(() => UpdateChannelSections());
-            Task t3 = Task.Run(() => UpdateFeaturedChannels());
+            Task t2 = Task.Run(() => UpdateFeaturedChannels());
+            Task t3 = Task.Run(() => UpdateChannelSections());
 
-            await Task.WhenAll(t1, t2, t3);
+            await Task.WhenAll(t1, t2);
 
             foreach (var playlist in playlistsTemp)
                 playlists.Add(playlist);
@@ -131,18 +135,14 @@ namespace YTApp.Pages
             foreach (var channel in featuredChannelsTemp)
                 featuredChannels.Add(channel);
 
-            #region Popular Uploads
+            await Task.WhenAll(t3);
 
-
-            #endregion
-
-            #region Playlists
-
-            #endregion
-
-            #region Featured Channels
-
-            #endregion
+            foreach (var playlist in playlistsTemp)
+            {
+                if (playlist.Title == "Popular Uploads")
+                    continue;
+                playlists.Add(playlist);
+            }
         }
 
         public void UpdatePopularUploads()
@@ -161,18 +161,16 @@ namespace YTApp.Pages
                 if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
                     YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
             }
-            methods.FillInViews(YoutubeItemsTemp, service);
+            //methods.FillInViews(YoutubeItemsTemp, service);
             playlistsTemp.Add(new PlaylistDataType() { Title = "Popular Uploads", Items = YoutubeItemsTemp });
         }
 
         public void UpdateChannelSections()
         {
             var methods = new YoutubeItemMethods();
-            
 
             //Get the playlists for the channel
-            var GetChannelPlaylists = service.ChannelSections.List("snippet,contentDetails,localizations");
-            GetChannelPlaylists.Hl = "en_us";
+            var GetChannelPlaylists = service.ChannelSections.List("snippet,contentDetails");
             GetChannelPlaylists.ChannelId = ChannelID;
             var ChannelPlaylistsResult = GetChannelPlaylists.Execute();
 
@@ -205,8 +203,8 @@ namespace YTApp.Pages
                     methods.FillInViews(tempPlaylistVideos, service);
                     tempGridViews.Add(tempPlaylistVideos);
 
-                        //Add the playlist ID for getting the title later
-                        tempPlaylistIds += playlist.ContentDetails.Playlists[0] + ",";
+                    //Add the playlist ID for getting the title later
+                    tempPlaylistIds += playlist.ContentDetails.Playlists[0] + ",";
                 }
                 catch { return; }
             });
@@ -229,18 +227,27 @@ namespace YTApp.Pages
 
         public void UpdateFeaturedChannels()
         {
-            var methods = new YoutubeItemMethods();
+            try
+            {
+                var methods = new YoutubeItemMethods();
 
-            string FeaturedChannelIds = "";
-            foreach (var Id in channel.BrandingSettings.Channel.FeaturedChannelsUrls)
-                FeaturedChannelIds += Id + ",";
+                string FeaturedChannelIds = "";
+                foreach (var Id in channel.BrandingSettings.Channel.FeaturedChannelsUrls)
+                    FeaturedChannelIds += Id + ",";
 
-            var getChannels = service.Channels.List("snippet,statistics");
-            getChannels.Id = FeaturedChannelIds.Remove(FeaturedChannelIds.Length - 1, 1);
-            var featuredChannelsResponse = getChannels.Execute();
+                var getChannels = service.Channels.List("snippet,statistics");
+                getChannels.Id = FeaturedChannelIds.Remove(FeaturedChannelIds.Length - 1, 1);
+                var featuredChannelsResponse = getChannels.Execute();
 
-            foreach (var featuredChannel in featuredChannelsResponse.Items)
-                featuredChannelsTemp.Add(methods.ChannelToYoutubeChannel(featuredChannel));
+                foreach (var featuredChannel in featuredChannelsResponse.Items)
+                    featuredChannelsTemp.Add(methods.ChannelToYoutubeChannel(featuredChannel));
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Featured channels failed to load");
+                Log.Error(JsonConvert.SerializeObject(channel));
+                Log.Error(ex.Message);
+            }
         }
 
         public void HomePageItemClicked(object sender, RoutedEventArgsWithID e)
@@ -272,7 +279,7 @@ namespace YTApp.Pages
                 var subscriptions = await getSubscription.ExecuteAsync();
                 Subscription subscription = new Subscription();
 
-                await MainPageReference.LoadSubscriptions();
+                MainPageReference.LoadSubscriptions();
                 try
                 {
                     var sub = MainPageReference.subscriptionsList.Single(x => x.Id == ChannelID);
@@ -322,94 +329,102 @@ namespace YTApp.Pages
 
         public async void UpdateVideos()
         {
-            if (addingVideos == false)
+            try
             {
-                addingVideos = true;
+                if (addingVideos == false)
+                {
+                    addingVideos = true;
+                }
+                else { return; }
+                List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
+
+                YoutubeItemMethods methods = new YoutubeItemMethods();
+
+                var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                {
+                    ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
+                    ApplicationName = this.GetType().ToString()
+                });
+
+                var searchListRequest = youtubeService.Search.List("snippet");
+                searchListRequest.ChannelId = ChannelID;
+                searchListRequest.Type = "video";
+                searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
+                searchListRequest.MaxResults = 25;
+
+                // Call the search.list method to retrieve results matching the specified query term.
+                var searchListResponse = await searchListRequest.ExecuteAsync();
+
+                foreach (var video in searchListResponse.Items)
+                {
+                    tempList.Add(methods.VideoToYoutubeItem(video));
+                }
+                methods.FillInViews(tempList, youtubeService);
+
+                nextPageToken = searchListResponse.NextPageToken;
+
+                foreach (var item in tempList)
+                {
+                    VideosList.Add(item);
+                }
+                addingVideos = false;
             }
-            else { return; }
-            List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
-
-            YoutubeItemMethods methods = new YoutubeItemMethods();
-
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            catch (Exception ex)
             {
-                ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
-                ApplicationName = this.GetType().ToString()
-            });
-
-            var searchListRequest = youtubeService.Search.List("snippet");
-            searchListRequest.ChannelId = ChannelID;
-            searchListRequest.Type = "video";
-            searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
-            searchListRequest.MaxResults = 50;
-
-            // Call the search.list method to retrieve results matching the specified query term.
-            var searchListResponse = await searchListRequest.ExecuteAsync();
-
-            foreach (var video in searchListResponse.Items)
-            {
-                tempList.Add(methods.VideoToYoutubeItem(video));
+                Log.Error(String.Format("An error occured while updating videos for the channel with the ID {0}", channel.Id));
+                Log.Error(ex.Message);
             }
-            methods.FillInViewsAsync(tempList, youtubeService);
-
-            nextPageToken = searchListResponse.NextPageToken;
-
-            foreach (var item in tempList)
-            {
-                VideosList.Add(item);
-            }
-            addingVideos = false;
         }
 
         public async void AddMoreVideos()
         {
-            if (addingVideos == false)
+            try
             {
-                addingVideos = true;
+                if (addingVideos == false && !(nextPageToken == null || nextPageToken == ""))
+                {
+                    addingVideos = true;
+                }
+                else { return; }
+
+                List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
+
+                YoutubeItemMethods methods = new YoutubeItemMethods();
+
+                var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                {
+                    ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
+                    ApplicationName = this.GetType().ToString()
+                });
+
+                var searchListRequest = youtubeService.Search.List("snippet");
+                searchListRequest.ChannelId = ChannelID;
+                searchListRequest.Type = "video";
+                searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
+                searchListRequest.PageToken = nextPageToken;
+                searchListRequest.MaxResults = 25;
+
+                // Call the search.list method to retrieve results matching the specified query term.
+                var searchListResponse = await searchListRequest.ExecuteAsync();
+
+                foreach (var video in searchListResponse.Items)
+                {
+                    tempList.Add(methods.VideoToYoutubeItem(video));
+                }
+                methods.FillInViews(tempList, youtubeService);
+                nextPageToken = searchListResponse.NextPageToken;
+
+                foreach (var video in tempList)
+                {
+                    VideosList.Add(video);
+                }
+                addingVideos = false;
+
             }
-            else { return; }
-
-            List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
-            if (VideosGridView.ItemsSource != null && nextPageToken != null && nextPageToken != "")
+            catch (Exception ex)
             {
-
+                Log.Error(String.Format("An error occured while adding more videos to the channel page with the ID {0}", channel.Id));
+                Log.Error(ex.Message);
             }
-            else
-            {
-                UpdateVideos();
-                return;
-            }
-
-            YoutubeItemMethods methods = new YoutubeItemMethods();
-
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
-            {
-                ApiKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0",
-                ApplicationName = this.GetType().ToString()
-            });
-
-            var searchListRequest = youtubeService.Search.List("snippet");
-            searchListRequest.ChannelId = ChannelID;
-            searchListRequest.Type = "video";
-            searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
-            searchListRequest.PageToken = nextPageToken;
-            searchListRequest.MaxResults = 25;
-
-            // Call the search.list method to retrieve results matching the specified query term.
-            var searchListResponse = await searchListRequest.ExecuteAsync();
-
-            foreach (var video in searchListResponse.Items)
-            {
-                tempList.Add(methods.VideoToYoutubeItem(video));
-            }
-            methods.FillInViewsAsync(tempList, youtubeService);
-            nextPageToken = searchListResponse.NextPageToken;
-
-            foreach (var video in tempList)
-            {
-                VideosList.Add(video);
-            }
-            addingVideos = false;
         }
 
         private void PlayVideoEvent(object sender, ItemClickEventArgs e)
@@ -522,7 +537,7 @@ namespace YTApp.Pages
         private void FeaturedChannels_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeChannelDataType)e.ClickedItem;
-            MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { mainPageRef = MainPageReference, ID = item.Id });
+            MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { MainPageRef = MainPageReference, ID = item.Id });
         }
 
         private void FeaturedChannels_SizeChanged(object sender, SizeChangedEventArgs e)

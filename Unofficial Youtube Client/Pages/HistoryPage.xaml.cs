@@ -41,7 +41,7 @@ namespace YTApp.Pages
         {
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
-            MainPageReference = result.mainPageRef;
+            MainPageReference = result.MainPageRef;
             UpdateVideos();
         }
 

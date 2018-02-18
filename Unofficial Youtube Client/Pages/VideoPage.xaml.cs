@@ -55,7 +55,7 @@ namespace YTApp.Pages
         {
             NavigateParams result = (NavigateParams)e.Parameter;
             base.OnNavigatedTo(e);
-            MainPageReference = result.mainPageRef;
+            MainPageReference = result.MainPageRef;
 
             var LikeDislike = new LikeDislikeUserControl(result.ID);
 
@@ -319,7 +319,7 @@ namespace YTApp.Pages
                 // write to file
                 BackgroundDownloader downloader = new BackgroundDownloader();
                 DownloadOperation download = downloader.CreateDownload(viewer.Source, file);
-                download.StartAsync();
+                await download.StartAsync();
             }
         }
 
@@ -330,6 +330,8 @@ namespace YTApp.Pages
             MainPageReference.viewer.Source = viewer.Source;
             MainPageReference.viewer.Visibility = Visibility.Visible;
             MainPageReference.viewer.MediaOpened += MainPageViewer_MediaOpened;
+            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
         }
 
         private void MainPageViewer_MediaOpened(object sender, RoutedEventArgs e)
@@ -343,6 +345,8 @@ namespace YTApp.Pages
             viewer.Source = MainPageReference.viewer.Source;
             MainPageReference.viewer.Visibility = Visibility.Collapsed;
             viewer.MediaOpened += Viewer_MediaOpened;
+            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = false;
         }
 
         private void Viewer_MediaOpened(object sender, RoutedEventArgs e)
@@ -353,7 +357,7 @@ namespace YTApp.Pages
 
         private void OpenChannel(object sender, TappedRoutedEventArgs e)
         {
-            MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { mainPageRef = MainPageReference, Refresh = true, ID = video.Snippet.ChannelId });
+            MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { MainPageRef = MainPageReference, ID = video.Snippet.ChannelId });
         }
 
         private void ChannelProfileIcon_PointerEntered(object sender, PointerRoutedEventArgs e)
