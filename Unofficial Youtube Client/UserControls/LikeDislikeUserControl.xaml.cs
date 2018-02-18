@@ -81,32 +81,65 @@ namespace YTApp.UserControls
         {
             var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
-            var DislikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Dislike);
-            await DislikeVideo.ExecuteAsync();
+            if (CurrentSelection == "like")
+            {
+                var UnLikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.None);
+                await UnLikeVideo.ExecuteAsync();
 
-            CurrentSelection = "dislike";
+                CurrentSelection = "none";
 
-            LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
-            DislikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush;
+                LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
+                DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
 
-            LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr);
-            DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr + 1);
+                LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr);
+                DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr);
+            }
+            else
+            {
+                var DislikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Dislike);
+                await DislikeVideo.ExecuteAsync();
+
+                CurrentSelection = "dislike";
+
+                LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
+                DislikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush;
+
+                LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr);
+                DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr);
+            }          
         }
 
         private async void LikeIcon_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
-            var LikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Like);
-            await LikeVideo.ExecuteAsync();
+            if (CurrentSelection == "like")
+            {
+                var UnLikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.None);
+                await UnLikeVideo.ExecuteAsync();
 
-            CurrentSelection = "like";
+                CurrentSelection = "none";
 
-            LikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush;
-            DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
+                LikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
+                DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
 
-            LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr + 1);
-            DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr);
+                LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr);
+                DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr);
+            }
+            else
+            {
+                var LikeVideo = service.Videos.Rate(VideoID, VideosResource.RateRequest.RatingEnum.Like);
+                await LikeVideo.ExecuteAsync();
+
+                CurrentSelection = "like";
+
+                LikeIcon.Fill = Application.Current.Resources["SystemControlHighlightAccentBrush"] as SolidColorBrush;
+                DislikeIcon.Fill = new SolidColorBrush(Color.FromArgb(255, 136, 136, 136));
+
+                LikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(LikeCountStr + 1);
+                DislikeCount.Text = Classes.YoutubeItemMethodsStatic.ViewCountShortner(DislikeCountStr);
+            }
+            
         }
 
         private void DislikeIcon_Entered(object sender, PointerRoutedEventArgs e)

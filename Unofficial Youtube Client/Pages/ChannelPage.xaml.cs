@@ -161,7 +161,7 @@ namespace YTApp.Pages
                 if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
                     YoutubeItemsTemp.Add(methods.VideoToYoutubeItem(video));
             }
-            //methods.FillInViews(YoutubeItemsTemp, service);
+            methods.FillInViews(YoutubeItemsTemp, service);
             playlistsTemp.Add(new PlaylistDataType() { Title = "Popular Uploads", Items = YoutubeItemsTemp });
         }
 
@@ -401,7 +401,7 @@ namespace YTApp.Pages
                 searchListRequest.Type = "video";
                 searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
                 searchListRequest.PageToken = nextPageToken;
-                searchListRequest.MaxResults = 25;
+                searchListRequest.MaxResults = 50;
 
                 // Call the search.list method to retrieve results matching the specified query term.
                 var searchListResponse = await searchListRequest.ExecuteAsync();

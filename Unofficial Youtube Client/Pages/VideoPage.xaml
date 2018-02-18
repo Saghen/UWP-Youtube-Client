@@ -77,7 +77,7 @@
                             <Grid x:Name="TitleGrid" VerticalAlignment="Center" Margin="20">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
-                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="220"/>
                                 </Grid.ColumnDefinitions>
                                 <StackPanel MaxWidth="500" HorizontalAlignment="Left">
                                     <TextBlock x:Name="Title" Text="Title" FontSize="20" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="CharacterEllipsis"/>
