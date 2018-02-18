@@ -60,6 +60,23 @@ namespace YTApp.Classes
             return VideoToAdd;
         }
 
+        public YoutubeItemDataType VideoToYoutubeItem(Video video)
+        {
+            var VideoToAdd = new YoutubeItemDataType();
+            if (video == null) { VideoToAdd.Failed = true; return VideoToAdd; }
+            VideoToAdd.Author = video.Snippet.ChannelTitle;
+            VideoToAdd.Description = video.Snippet.Description;
+            try { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.Medium.Url; }
+            catch { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.High.Url; }
+            VideoToAdd.Title = video.Snippet.Title;
+            VideoToAdd.Id = video.Id;
+            VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id;
+            VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
+            VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
+            VideoToAdd.ChanneId = video.Snippet.ChannelId;
+            return VideoToAdd;
+        }
+
 
         public YoutubeChannelDataType ChannelToYoutubeChannel(SearchResult video, YouTubeService service)
         {

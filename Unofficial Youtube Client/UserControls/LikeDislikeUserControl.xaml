@@ -10,7 +10,7 @@
     d:DesignWidth="250">
 
     <StackPanel VerticalAlignment="Bottom" Grid.Column="1">
-        <Grid Margin="10,3">
+        <Grid Margin="5,3">
             <StackPanel Orientation="Horizontal">
                 <Grid Tapped="LikeIcon_Tapped" PointerEntered="LikeIcon_Entered" PointerExited="LikeIcon_Exited" Padding="5">
                     <Viewbox Width="25" Margin="0,0,0,5">

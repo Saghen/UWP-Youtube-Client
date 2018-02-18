@@ -5,5 +5,13 @@
     xmlns:local="using:YTApp"
     RequestedTheme="Dark">
 
+    <Application.Resources>
+        <Style TargetType="ListView">
+            <Setter Property="ScrollViewer.VerticalScrollMode" Value="Disabled"/>
+        </Style>
+        <Style TargetType="GridView">
+            <Setter Property="ScrollViewer.VerticalScrollMode" Value="Disabled"/>
+        </Style>
+    </Application.Resources>
     
 </Application>

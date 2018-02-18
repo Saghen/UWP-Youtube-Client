@@ -24,6 +24,7 @@ using YTApp.Classes;
 using YTApp.Classes.DataTypes;
 using MetroLog;
 using Newtonsoft.Json;
+using Windows.UI.Xaml.Media.Animation;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -46,7 +47,18 @@ namespace YTApp.Pages
 
         public HomePage()
         {
+            //Use custom page transition
+            TransitionCollection collection = new TransitionCollection();
+            NavigationThemeTransition theme = new NavigationThemeTransition();
+            var info = new EntranceNavigationTransitionInfo();
+            theme.DefaultNavigationTransitionInfo = info;
+            collection.Add(theme);
+            this.Transitions = collection;
+
+            //Initialize page
             this.InitializeComponent();
+
+            //Keep the page in memory so we don't have to reload it everytime
             NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 

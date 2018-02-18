@@ -95,6 +95,13 @@
                                     <TextBlock x:Name="ChannelTitle" Tapped="OpenChannel" PointerEntered="ChannelProfileIcon_PointerEntered" PointerExited="ChannelProfileIcon_PointerExited"/>
                                     <TextBlock x:Name="DatePosted" Foreground="#aaa" Margin="0,5,0,20"/>
                                     <TextBlock x:Name="Description" MaxLines="6" TextTrimming="CharacterEllipsis" TextWrapping="WrapWholeWords"/>
+                                    <HyperlinkButton x:Name="DescriptionShowMore" Content="Show more" Click="DescriptionShowMore_Click" Visibility="Collapsed">
+                                        <HyperlinkButton.ContentTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" />
+                                            </DataTemplate>
+                                        </HyperlinkButton.ContentTemplate>
+                                    </HyperlinkButton>
                                 </StackPanel>
                             </Grid>
                         </Grid>

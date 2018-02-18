@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
+using System.Threading.Tasks;
 using VideoLibrary;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
@@ -93,8 +94,9 @@ namespace YTApp.Pages
             try
             {
                 var youTube = YouTube.Default;
-                var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + ID);
-                viewer.Source = new Uri(video.GetUri());
+                var videos = await youTube.GetAllVideosAsync("https://www.youtube.com/watch?v=" + ID);
+                var maxRes = videos.OrderByDescending(v => v.Resolution).FirstOrDefault();
+                viewer.Source = new Uri(maxRes.GetUri());
                 viewer.Visibility = Visibility.Visible;
                 viewer.TransportControls.Focus(FocusState.Programmatic);
             }
@@ -118,14 +120,19 @@ namespace YTApp.Pages
                 return;
             }
 
-            var getChannelInfo = service.Channels.List("snippet");
-            getChannelInfo.Id = video.Snippet.ChannelId;
-            var channelInfo = await getChannelInfo.ExecuteAsync();
-            channel = channelInfo.Items[0];
+            //Channel Info
+            await Task.Run(() =>
+            {
+                var getChannelInfo = service.Channels.List("snippet");
+                getChannelInfo.Id = video.Snippet.ChannelId;
+                var channelInfo = getChannelInfo.Execute();
+                channel = channelInfo.Items[0];
+            });
 
             UpdatePageInfo(service);
 
             UpdateRelatedVideos(service);
+
         }
 
         private async void InAppNotifButton_Click(object sender, RoutedEventArgs e)
@@ -149,6 +156,7 @@ namespace YTApp.Pages
             ChannelTitle.Text = channel.Snippet.Title;
             DatePosted.Text = video.Snippet.PublishedAt.Value.ToString("MMMM d, yyyy");
             Description.Text = video.Snippet.Description;
+            DescriptionShowMore.Visibility = Visibility.Visible;
             var image = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url));
             var imageBrush = new ImageBrush();
             imageBrush.ImageSource = image;
@@ -368,6 +376,20 @@ namespace YTApp.Pages
         private void ChannelProfileIcon_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 2);
+        }
+
+        private void DescriptionShowMore_Click(object sender, RoutedEventArgs e)
+        {
+            if ((string)DescriptionShowMore.Content == "Show less")
+            {
+                Description.MaxLines = 6;
+                DescriptionShowMore.Content = "Show more";
+            }
+            else
+            {
+                Description.MaxLines = 400;
+                DescriptionShowMore.Content = "Show less";
+            }
         }
     }
 }

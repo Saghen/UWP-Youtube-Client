@@ -96,8 +96,8 @@
                                         </lclctrls:GridViewWithXProperty.ItemsPanel>
                                         <lclctrls:GridViewWithXProperty.ItemTemplate>
                                             <DataTemplate x:DataType="classes:YoutubeChannelDataType">
-                                                <StackPanel HorizontalAlignment="Center">
-                                                    <Ellipse Margin="10,10,10,20" Height="160" Width="160" HorizontalAlignment="Center">
+                                                <StackPanel HorizontalAlignment="Center" Padding="15">
+                                                    <Ellipse Margin="0,0,0,20" Height="160" Width="160" HorizontalAlignment="Center">
                                                         <Ellipse.Fill>
                                                             <ImageBrush>
                                                                 <ImageBrush.ImageSource>

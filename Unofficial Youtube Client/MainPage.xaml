@@ -49,22 +49,23 @@
                 <Ellipse x:Name="imgProfileIcon" Width="35" Height="35" VerticalAlignment="Center"/>
                 <Button x:Name="btnLoginFlyout" Content="&#xE712;" FontFamily="Segoe MDL2 Assets" FontSize="20" Margin="10,0" Style="{StaticResource TransparentButtonStyle}" Tapped="BtnLoginFlyout_Tapped">
                     <FlyoutBase.AttachedFlyout>
-                        <Flyout>
-                            <ListView>
-                                <StackPanel x:Name="btnMyChannel" Orientation="Horizontal" Tapped="BtnMyChannel_Tapped">
-                                    <TextBlock x:Name="iconMyChannel" Text="&#xE716;" FontFamily="Segoe MDL2 Assets" FontSize="20" Padding="0,0,20,0"/>
-                                    <TextBlock Text="My Channel"/>
-                                </StackPanel>
-                                <StackPanel x:Name="btnSettings" Orientation="Horizontal">
-                                    <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="20" Padding="0,0,20,0"/>
-                                    <TextBlock Text="Settings"/>
-                                </StackPanel>
-                                <StackPanel x:Name="btnSignOut" Orientation="Horizontal" Tapped="BtnSignOut_Tapped">
-                                    <TextBlock Text="&#xE830;" FontFamily="Segoe MDL2 Assets" FontSize="20" Padding="0,0,20,0"/>
-                                    <TextBlock Text="Sign Out"/>
-                                </StackPanel>
-                            </ListView>
-                        </Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem x:Name="btnMyChannel" Tapped="BtnMyChannel_Tapped" Text="My Channel" Height="50">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE716;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem x:Name="btnSettings" Text="Settings" Height="50">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE713;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem x:Name="btnSignOut" Tapped="BtnSignOut_Tapped" Text="Sign Out" Height="50">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE830;"/>
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                        </MenuFlyout>
                     </FlyoutBase.AttachedFlyout>
                 </Button>
             </StackPanel>

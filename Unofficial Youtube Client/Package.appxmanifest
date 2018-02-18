@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="22754Saghen.UnofficialYoutubeClient" Publisher="CN=D05EC8F6-6F5F-4A1F-9604-8EE80B9D0412" Version="0.3.1.0" />
+  <Identity Name="22754Saghen.UnofficialYoutubeClient" Publisher="CN=D05EC8F6-6F5F-4A1F-9604-8EE80B9D0412" Version="0.3.2.0" />
   <mp:PhoneIdentity PhoneProductId="a25545f6-aefb-4fd4-8675-f9284408de39" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Unofficial Youtube Client</DisplayName>

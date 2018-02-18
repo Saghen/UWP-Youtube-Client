@@ -10,7 +10,7 @@
 
     <ScrollViewer>
         <Grid>
-            <ListView x:Name="YoutubeItemsGridView" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick">
+            <ListView x:Name="YoutubeItemsGridView" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" ItemsSource="{x:Bind videosList, Mode=OneWay}">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="classes:YoutubeItemDataType">
                         <StackPanel Margin="10" Height="200" Orientation="Horizontal" HorizontalAlignment="Stretch">
@@ -18,8 +18,8 @@
                             <StackPanel>
                                 <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="18" Foreground="#fff" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="14" Foreground="#aaa"/>
-                                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="14" Foreground="#aaa" Margin="10,0,0,0"/>
+                                    <TextBlock x:Name="Author" Text="{x:Bind Author}" FontSize="14" Foreground="#aaa"/>
+                                    <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="14" Foreground="#aaa" Margin="5,0"/>
                                 </StackPanel>
                                 <TextBlock x:Name="DescriptionControl" FontSize="14" Foreground="#aaa" MaxWidth="1000" Height="50" Text="{x:Bind Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis"/>
                             </StackPanel>

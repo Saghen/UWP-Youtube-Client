@@ -29,6 +29,8 @@ namespace YTApp.Pages
     {
         MainPage MainPageReference;
 
+        System.Collections.ObjectModel.ObservableCollection<YoutubeItemDataType> videosList = new System.Collections.ObjectModel.ObservableCollection<YoutubeItemDataType>();
+
         public TrendingPage()
         {
             this.InitializeComponent();
@@ -44,34 +46,21 @@ namespace YTApp.Pages
 
         public async void UpdateVideos()
         {
-            List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
-
             YoutubeItemMethods methods = new YoutubeItemMethods();
 
-            UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
-            {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm",
-            }, new[] { YouTubeService.Scope.Youtube }, "user", System.Threading.CancellationToken.None);
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
-            // Create the service.
-            var service = new YouTubeService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
-            });
-
-            var recommendations = service.Activities.List("snippet, contentDetails");
-            recommendations.Home = true;
+            var recommendations = service.Videos.List("snippet, contentDetails");
+            recommendations.Chart = VideosResource.ListRequest.ChartEnum.MostPopular;
             recommendations.MaxResults = 25;
             var result = await recommendations.ExecuteAsync();
 
             foreach(var video in result.Items)
             {
-                tempList.Add(methods.VideoToYoutubeItem(video));
+                videosList.Add(methods.VideoToYoutubeItem(video));
             }
 
-            YoutubeItemsGridView.ItemsSource = tempList;
+            methods.FillInViews(videosList, service);
         }
 
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)

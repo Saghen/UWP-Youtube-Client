@@ -104,6 +104,8 @@ namespace YTApp
 
         private async void PlayClipboardYLink()
         {
+            if (Constants.Token == null)
+                return;
             try
             {
                 var dataPackageView = await Clipboard.GetContent().GetTextAsync();
