@@ -1,22 +1,7 @@
-﻿using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
+﻿using Google.Apis.YouTube.v3.Data;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using VideoLibrary;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
 using YTApp.Classes.DataTypes;
@@ -30,8 +15,6 @@ namespace YTApp.Pages
     /// </summary>
     public sealed partial class SearchPage : Page
     {
-        public MainPage MainPageReference;
-
         private string nextPageToken = "";
         private string searchQuery = "";
         private bool addingVideos = false;
@@ -40,11 +23,7 @@ namespace YTApp.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            NavigateParams result = (NavigateParams)e.Parameter;
-            base.OnNavigatedTo(e);
-            MainPageReference = result.MainPageRef;
-
-            searchQuery = MainPageReference.SearchBox.Text;
+            searchQuery = Constants.MainPageRef.SearchBox.Text;
 
             Search();
         }
@@ -59,12 +38,14 @@ namespace YTApp.Pages
             if (e.ClickedItem.GetType() == typeof(YoutubeItemDataType))
             {
                 var item = (YoutubeItemDataType)e.ClickedItem;
-                MainPageReference.StartVideo(item.Id);
+                var listView = (ListView)sender;
+                listView.PrepareConnectedAnimation("videoThumb", item, "ImageControl");
+                Constants.MainPageRef.StartVideo(item.Id);
             }
             else if (e.ClickedItem.GetType() == typeof(YoutubeChannelDataType))
             {
                 var item = (YoutubeChannelDataType)e.ClickedItem;
-                this.Frame.Navigate(typeof(ChannelPage), new NavigateParams() { MainPageRef = MainPageReference, ID = item.Id });
+                this.Frame.Navigate(typeof(ChannelPage));
             }
         }
 
@@ -76,7 +57,7 @@ namespace YTApp.Pages
             var youtubeService = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var searchListRequest = youtubeService.Search.List("snippet");
-            searchListRequest.Q = MainPageReference.SearchBox.Text;
+            searchListRequest.Q = Constants.MainPageRef.SearchBox.Text;
             searchListRequest.MaxResults = 25;
 
             SearchListResponse searchListResponse = new SearchListResponse();
@@ -120,7 +101,7 @@ namespace YTApp.Pages
             addingVideos = true;
 
             var searchListRequest = youtubeService.Search.List("snippet");
-            searchListRequest.Q = MainPageReference.SearchBox.Text;
+            searchListRequest.Q = Constants.MainPageRef.SearchBox.Text;
             searchListRequest.PageToken = nextPageToken;
             searchListRequest.MaxResults = 25;
 

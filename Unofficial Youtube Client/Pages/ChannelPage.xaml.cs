@@ -13,7 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using VideoLibrary;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -37,11 +36,8 @@ namespace YTApp.Pages
     /// </summary>
     public sealed partial class ChannelPage : Page
     {
-        public MainPage MainPageReference;
-        public string ChannelID;
         public bool isSubscribed;
         public string nextPageToken;
-        YouTubeService service = new YouTubeService();
 
         private ILogger Log = LogManagerFactory.DefaultLogManager.GetLogger<ChannelPage>();
 
@@ -61,25 +57,18 @@ namespace YTApp.Pages
             this.InitializeComponent();
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            NavigateParams result = (NavigateParams)e.Parameter;
-            base.OnNavigatedTo(e);
-            MainPageReference = result.MainPageRef;
-            ChannelID = result.ID;
-
-            service = await YoutubeItemMethodsStatic.GetServiceAsync();
-
             UpdateChannel();
             UpdateChannelHome();
             UpdateVideos();
         }
 
         #region Home
-        public void UpdateChannel()
+        public async void UpdateChannel()
         {
-            var GetChannelInfo = service.Channels.List("snippet, brandingSettings, statistics");
-            GetChannelInfo.Id = ChannelID;
+            var GetChannelInfo = (await YoutubeItemMethodsStatic.GetServiceAsync()).Channels.List("snippet, brandingSettings, statistics");
+            GetChannelInfo.Id = Constants.activeChannelID;
             var ChannelInfoResults = GetChannelInfo.Execute();
             channel = ChannelInfoResults.Items[0];
 
@@ -87,17 +76,16 @@ namespace YTApp.Pages
             VideoCount.Text = channel.Statistics.VideoCount + " videos";
 
             //Profile Image
-            var ProfileImageBrush = new ImageBrush();
-            ProfileImageBrush.ImageSource = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url));
+            var ProfileImageBrush = new ImageBrush{ ImageSource = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url)) };
             ProfileImage.Fill = ProfileImageBrush;
 
             //Channel Name
             ChannelName.Text = channel.Snippet.Title;
 
             //Subscribe Button
-            var CheckIfSubscribed = service.Subscriptions.List("snippet");
+            var CheckIfSubscribed = (await YoutubeItemMethodsStatic.GetServiceAsync()).Subscriptions.List("snippet");
             CheckIfSubscribed.Mine = true;
-            CheckIfSubscribed.ForChannelId = ChannelID;
+            CheckIfSubscribed.ForChannelId = Constants.activeChannelID;
             var IsSubscribed = CheckIfSubscribed.Execute();
 
             if (IsSubscribed.Items.Count == 0)
@@ -145,13 +133,15 @@ namespace YTApp.Pages
             }
         }
 
-        public void UpdatePopularUploads()
+        public async void UpdatePopularUploads()
         {
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+
             var methods = new YoutubeItemMethods();
             ObservableCollection<YoutubeItemDataType> YoutubeItemsTemp = new ObservableCollection<YoutubeItemDataType>();
 
             var GetChannelVideosPopular = service.Search.List("snippet");
-            GetChannelVideosPopular.ChannelId = ChannelID;
+            GetChannelVideosPopular.ChannelId = Constants.activeChannelID;
             GetChannelVideosPopular.Order = SearchResource.ListRequest.OrderEnum.ViewCount;
             GetChannelVideosPopular.Type = "video";
             GetChannelVideosPopular.MaxResults = 10;
@@ -165,13 +155,15 @@ namespace YTApp.Pages
             playlistsTemp.Add(new PlaylistDataType() { Title = "Popular Uploads", Items = YoutubeItemsTemp });
         }
 
-        public void UpdateChannelSections()
+        public async void UpdateChannelSections()
         {
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+
             var methods = new YoutubeItemMethods();
 
             //Get the playlists for the channel
             var GetChannelPlaylists = service.ChannelSections.List("snippet,contentDetails");
-            GetChannelPlaylists.ChannelId = ChannelID;
+            GetChannelPlaylists.ChannelId = Constants.activeChannelID;
             var ChannelPlaylistsResult = GetChannelPlaylists.Execute();
 
             //Check if there are no playlists to process
@@ -225,8 +217,10 @@ namespace YTApp.Pages
             }
         }
 
-        public void UpdateFeaturedChannels()
+        public async void UpdateFeaturedChannels()
         {
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+
             try
             {
                 var methods = new YoutubeItemMethods();
@@ -252,7 +246,7 @@ namespace YTApp.Pages
 
         public void HomePageItemClicked(object sender, RoutedEventArgsWithID e)
         {
-            MainPageReference.StartVideo(e.ID);
+            Constants.MainPageRef.StartVideo(e.ID);
         }
 
         private async void SubscribeButton_Click(object sender, RoutedEventArgs e)
@@ -279,10 +273,10 @@ namespace YTApp.Pages
                 var subscriptions = await getSubscription.ExecuteAsync();
                 Subscription subscription = new Subscription();
 
-                MainPageReference.LoadSubscriptions();
+                Constants.MainPageRef.LoadSubscriptions();
                 try
                 {
-                    var sub = MainPageReference.subscriptionsList.Single(x => x.Id == ChannelID);
+                    var sub = Constants.MainPageRef.subscriptionsList.Single(x => x.Id == Constants.activeChannelID);
                     try
                     {
                         var unsubscribe = service.Subscriptions.Delete(sub.SubscriptionID);
@@ -307,10 +301,7 @@ namespace YTApp.Pages
             {
                 Subscription subscription = new Subscription();
                 SubscriptionSnippet snippet = new SubscriptionSnippet();
-                ResourceId resourceId = new ResourceId();
-
-                resourceId.ChannelId = ChannelID;
-                resourceId.Kind = "youtube#channel";
+                ResourceId resourceId = new ResourceId { ChannelId = Constants.activeChannelID, Kind = "youtube#channel" };
 
                 snippet.ResourceId = resourceId;
                 subscription.Snippet = snippet;
@@ -347,7 +338,7 @@ namespace YTApp.Pages
                 });
 
                 var searchListRequest = youtubeService.Search.List("snippet");
-                searchListRequest.ChannelId = ChannelID;
+                searchListRequest.ChannelId = Constants.activeChannelID;
                 searchListRequest.Type = "video";
                 searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
                 searchListRequest.MaxResults = 25;
@@ -397,7 +388,7 @@ namespace YTApp.Pages
                 });
 
                 var searchListRequest = youtubeService.Search.List("snippet");
-                searchListRequest.ChannelId = ChannelID;
+                searchListRequest.ChannelId = Constants.activeChannelID;
                 searchListRequest.Type = "video";
                 searchListRequest.Order = SearchResource.ListRequest.OrderEnum.Date;
                 searchListRequest.PageToken = nextPageToken;
@@ -430,7 +421,9 @@ namespace YTApp.Pages
         private void PlayVideoEvent(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeItemDataType)e.ClickedItem;
-            MainPageReference.StartVideo(item.Id);
+            var gridView = (GridView)sender;
+            gridView.PrepareConnectedAnimation("videoThumb", item, "ImageControl");
+            Constants.MainPageRef.StartVideo(item.Id);
         }
 
         private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
@@ -479,7 +472,9 @@ namespace YTApp.Pages
         private void Playlist_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeItemDataType)e.ClickedItem;
-            MainPageReference.StartVideo(item.Id);
+            var gridView = (Controls.GridViewWithXProperty)sender;
+            gridView.PrepareConnectedAnimation("videoThumb", item, "ImageControl");
+            Constants.MainPageRef.StartVideo(item.Id);
         }
 
         private void Playlist_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -537,7 +532,7 @@ namespace YTApp.Pages
         private void FeaturedChannels_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeChannelDataType)e.ClickedItem;
-            MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { MainPageRef = MainPageReference, ID = item.Id });
+            Constants.MainPageRef.contentFrame.Navigate(typeof(ChannelPage));
         }
 
         private void FeaturedChannels_SizeChanged(object sender, SizeChangedEventArgs e)

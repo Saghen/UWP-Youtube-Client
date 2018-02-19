@@ -24,19 +24,11 @@ namespace YTApp.Pages
     /// </summary>
     public sealed partial class WelcomePage : Page
     {
-        MainPage MainPageReference;
         private ILogger Log = LogManagerFactory.DefaultLogManager.GetLogger<WelcomePage>();
 
         public WelcomePage()
         {
             this.InitializeComponent();
-        }
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            Classes.DataTypes.NavigateParams result = (Classes.DataTypes.NavigateParams)e.Parameter;
-            base.OnNavigatedTo(e);
-            MainPageReference = result.MainPageRef;
         }
 
         private void Button_Tapped(object sender, TappedRoutedEventArgs e)
@@ -68,10 +60,10 @@ namespace YTApp.Pages
         }
         private void Continue_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            MainPageReference.LoadSubscriptions();
-            MainPageReference.UpdateLoginDetails();
-
-            MainPageReference.contentFrame.Navigate(typeof(HomePage), new Classes.DataTypes.NavigateParams(){ MainPageRef = MainPageReference });
+            Frame.Navigate(typeof(MainPage));
+            Constants.MainPageRef.contentFrame.Navigate(typeof(HomePage));
+            Constants.MainPageRef.LoadSubscriptions();
+            Constants.MainPageRef.UpdateLoginDetails();
         }
     }
 }

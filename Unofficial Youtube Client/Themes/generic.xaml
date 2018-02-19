@@ -237,7 +237,7 @@
                                 Grid.Row="0"
                                 Grid.RowSpan="3"
                                 Grid.Column="1"
-                                AutomationProperties.AccessibilityView="Raw" />
+                                AutomationProperties.AccessibilityView="Raw"/>
                                                     </Grid>
 
                                                     <Grid x:Name="VerticalTemplate" MinWidth="44" Visibility="Collapsed">

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Google.Apis.YouTube.v3;
+using Google.Apis.YouTube.v3.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +14,13 @@ namespace YTApp.Classes
         static public readonly string ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm";
         static public readonly string APIKey = "AIzaSyCXOZJH2GUbdqwxZwsjTU93lFvgdnMOVD0";
         static public Google.Apis.Auth.OAuth2.Responses.TokenResponse Token;
+
+        static public MainPage MainPageRef;
+
+        static public Video activeVideo = new Video();
+        static public string activeVideoID = "";
+
+        static public Channel activeChannel = new Channel();
+        static public string activeChannelID = "";
     }
 }

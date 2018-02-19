@@ -69,6 +69,7 @@
                     </FlyoutBase.AttachedFlyout>
                 </Button>
             </StackPanel>
+            <ProgressBar x:Name="DownloadProgress" VerticalAlignment="Bottom" Visibility="Collapsed"/>
         </Grid>
 
         <SplitView Grid.Row="1" x:Name="SideBarSplitView" DisplayMode="Overlay">

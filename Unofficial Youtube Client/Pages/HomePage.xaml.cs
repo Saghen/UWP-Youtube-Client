@@ -1,24 +1,11 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
+﻿using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
-using Google.Apis.Oauth2.v2;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
 using System.Threading.Tasks;
-using VideoLibrary;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
 using YTApp.Classes.DataTypes;
@@ -35,10 +22,6 @@ namespace YTApp.Pages
     /// </summary>
     public sealed partial class HomePage : Page
     {
-        public MainPage MainPageReference;
-
-        private YouTubeService service;
-
         private ILogger Log = LogManagerFactory.DefaultLogManager.GetLogger<MainPage>();
 
         private ObservableCollection<PlaylistDataType> YTItems = new ObservableCollection<PlaylistDataType>();
@@ -62,16 +45,11 @@ namespace YTApp.Pages
             NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            NavigateParams result = (NavigateParams)e.Parameter;
-            base.OnNavigatedTo(e);
-            MainPageReference = result.MainPageRef;
-
             //Check if we need to update 
             if (isLoaded == false)
             {
-                service = await YoutubeItemMethodsStatic.GetServiceAsync();
                 UpdateHomeItems();
             }
             isLoaded = true;
@@ -80,7 +58,9 @@ namespace YTApp.Pages
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeItemDataType)e.ClickedItem;
-            MainPageReference.StartVideo(item.Id);
+            var gridView = (GridView)sender;
+            gridView.PrepareConnectedAnimation("videoThumb", item, "ImageControl");
+            Constants.MainPageRef.StartVideo(item.Id);
         }
 
         private async void UpdateHomeItems()
@@ -98,9 +78,11 @@ namespace YTApp.Pages
 
             System.Collections.Concurrent.BlockingCollection<Google.Apis.YouTube.v3.Data.SearchResult> searchResponseList = new System.Collections.Concurrent.BlockingCollection<Google.Apis.YouTube.v3.Data.SearchResult>();
 
+            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+
             await Task.Run(() =>
             {
-                Parallel.ForEach(MainPageReference.subscriptionsList, subscription =>
+                Parallel.ForEach(Constants.MainPageRef.subscriptionsList, subscription =>
                 {
                     try
                     {
@@ -117,6 +99,7 @@ namespace YTApp.Pages
                     catch (Exception ex)
                     {
                         Log.Error("A subscription's videos failed to load.");
+                        subscription.Thumbnail = null;
                         Log.Error(JsonConvert.SerializeObject(subscription));
                         Log.Error(ex.Message);
                     }

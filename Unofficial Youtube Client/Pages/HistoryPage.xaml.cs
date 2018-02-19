@@ -30,8 +30,6 @@ namespace YTApp.Pages
     /// </summary>
     public sealed partial class HistoryPage : Page
     {
-        MainPage MainPageReference;
-
         public HistoryPage()
         {
             this.InitializeComponent();
@@ -39,9 +37,6 @@ namespace YTApp.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            NavigateParams result = (NavigateParams)e.Parameter;
-            base.OnNavigatedTo(e);
-            MainPageReference = result.MainPageRef;
             UpdateVideos();
         }
 
@@ -75,23 +70,6 @@ namespace YTApp.Pages
             getWatchHistoryItems.MaxResults = 50;
 
             var watchHistory = await getWatchHistoryItems.ExecuteAsync();
-
-
-            // Call the search.list method to retrieve results matching the specified query term.
-            /*var searchListResponse = await searchListRequest.ExecuteAsync();
-
-            foreach (var video in searchListResponse.Items)
-            {
-                tempList.Add(methods.VideoToYoutubeItem(video));
-            }
-            methods.FillInViews(tempList, youtubeService);
-
-            nextPageToken = searchListResponse.NextPageToken;
-
-            foreach (var item in tempList)
-            {
-                VideosList.Add(item);
-            }*/
         }
     }
 }

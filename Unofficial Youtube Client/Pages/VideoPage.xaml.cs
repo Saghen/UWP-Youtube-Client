@@ -1,32 +1,25 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
+﻿using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
 using System.Threading.Tasks;
-using VideoLibrary;
-using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Media;
+using Windows.Media.Core;
+using Windows.Media.Editing;
+using Windows.Media.Playback;
 using Windows.Networking.BackgroundTransfer;
-using Windows.UI;
 using Windows.UI.Core;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using YoutubeExplode;
 using YTApp.Classes;
 using YTApp.Classes.DataTypes;
 using YTApp.UserControls;
@@ -40,9 +33,8 @@ namespace YTApp.Pages
     /// </summary>
     public sealed partial class VideoPage : Page
     {
-        MainPage MainPageReference;
-        string VideoID;
-        Google.Apis.YouTube.v3.Data.Video video;
+        YoutubeExplode.Models.MediaStreams.MediaStreamInfoSet videoStreams;
+
         Channel channel;
 
         PlaylistDataType relatedVideos = new PlaylistDataType();
@@ -50,29 +42,30 @@ namespace YTApp.Pages
         public VideoPage()
         {
             this.InitializeComponent();
+
+            //Keep the page in memory so we don't have to reload it everytime
+            NavigationCacheMode = NavigationCacheMode.Enabled;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            NavigateParams result = (NavigateParams)e.Parameter;
-            base.OnNavigatedTo(e);
-            MainPageReference = result.MainPageRef;
+            ConnectedAnimation imageAnimation = ConnectedAnimationService.GetForCurrentView().GetAnimation("videoThumb");
 
-            var LikeDislike = new LikeDislikeUserControl(result.ID);
+            if (imageAnimation != null)
+            {
+                imageAnimation.TryStart(MediaElementContainer);
+            }
 
-            TitleGrid.Children.Add(LikeDislike);
-            Grid.SetColumn(LikeDislike, 1);
-
-            MainPageReference.contentFrame.Navigated += ContentFrame_Navigated;
-            SystemNavigationManager.GetForCurrentView().BackRequested += VideoPage_BackRequested; ;
-
-            //Store the video ID for future use
-            VideoID = result.ID;
+            Constants.MainPageRef.contentFrame.Navigated += ContentFrame_Navigated;
+            SystemNavigationManager.GetForCurrentView().BackRequested += VideoPage_BackRequested;
 
             //Get the video data and play it
-            StartVideo(result.ID);
+            StartVideo(Constants.activeVideoID);
 
-            MainPageReference.SwitchToFullSize += CustomMediaTransportControls_SwitchedToFullSize;
+            //Update likes/dislikes
+            LikeDislikeControl.UpdateData();
+
+            Constants.MainPageRef.SwitchToFullSize += CustomMediaTransportControls_SwitchedToFullSize;
         }
 
         private void VideoPage_BackRequested(object sender, BackRequestedEventArgs e)
@@ -93,12 +86,7 @@ namespace YTApp.Pages
 
             try
             {
-                var youTube = YouTube.Default;
-                var videos = await youTube.GetAllVideosAsync("https://www.youtube.com/watch?v=" + ID);
-                var maxRes = videos.OrderByDescending(v => v.Resolution).FirstOrDefault();
-                viewer.Source = new Uri(maxRes.GetUri());
-                viewer.Visibility = Visibility.Visible;
-                viewer.TransportControls.Focus(FocusState.Programmatic);
+                viewer.Source = Constants.activeVideoID;
             }
             catch
             {
@@ -113,7 +101,7 @@ namespace YTApp.Pages
             var videoList = await getVideoInfo.ExecuteAsync();
 
             //Checks to see if video exists and sets the video variable if it does or returns if it doesn't
-            try { video = videoList.Items[0]; }
+            try { Constants.activeVideo = videoList.Items[0]; }
             catch
             {
                 InAppNotif.Show();
@@ -124,7 +112,7 @@ namespace YTApp.Pages
             await Task.Run(() =>
             {
                 var getChannelInfo = service.Channels.List("snippet");
-                getChannelInfo.Id = video.Snippet.ChannelId;
+                getChannelInfo.Id = Constants.activeVideo.Snippet.ChannelId;
                 var channelInfo = getChannelInfo.Execute();
                 channel = channelInfo.Items[0];
             });
@@ -137,7 +125,7 @@ namespace YTApp.Pages
 
         private async void InAppNotifButton_Click(object sender, RoutedEventArgs e)
         {
-            await Windows.System.Launcher.LaunchUriAsync(new Uri("https://youtu.be/" + VideoID));
+            await Windows.System.Launcher.LaunchUriAsync(new Uri("https://youtu.be/" + Constants.activeVideoID));
             InAppNotif.Dismiss();
         }
 
@@ -150,27 +138,25 @@ namespace YTApp.Pages
         {
             var methods = new YoutubeItemMethods();
 
-            Title.Text = video.Snippet.Title;
-            Views.Text = string.Format("{0:#,###0.#}", video.Statistics.ViewCount) + " Views";
+            Title.Text = Constants.activeVideo.Snippet.Title;
+            Views.Text = string.Format("{0:#,###0.#}", Constants.activeVideo.Statistics.ViewCount) + " Views";
 
             ChannelTitle.Text = channel.Snippet.Title;
-            DatePosted.Text = video.Snippet.PublishedAt.Value.ToString("MMMM d, yyyy");
-            Description.Text = video.Snippet.Description;
+            DatePosted.Text = Constants.activeVideo.Snippet.PublishedAt.Value.ToString("MMMM d, yyyy");
+            Description.Text = Constants.activeVideo.Snippet.Description;
             DescriptionShowMore.Visibility = Visibility.Visible;
             var image = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url));
-            var imageBrush = new ImageBrush();
-            imageBrush.ImageSource = image;
+            var imageBrush = new ImageBrush{ ImageSource = image };
             ChannelProfileIcon.Fill = imageBrush;
-
         }
 
         public async void UpdateRelatedVideos(YouTubeService service)
         {
             System.Collections.ObjectModel.ObservableCollection<YoutubeItemDataType> relatedVideosList = new System.Collections.ObjectModel.ObservableCollection<YoutubeItemDataType>();
-            await System.Threading.Tasks.Task.Run(() =>
+            await Task.Run(() =>
             {
                 var getRelatedVideos = service.Search.List("snippet");
-                getRelatedVideos.RelatedToVideoId = VideoID;
+                getRelatedVideos.RelatedToVideoId = Constants.activeVideoID;
                 getRelatedVideos.MaxResults = 15;
                 getRelatedVideos.Type = "video";
                 var relatedVideosResponse = getRelatedVideos.Execute();
@@ -188,7 +174,7 @@ namespace YTApp.Pages
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeItemDataType)e.ClickedItem;
-            MainPageReference.StartVideo(item.Id);
+            Constants.MainPageRef.StartVideo(item.Id);
         }
 
         //Another version of the ChangePlayerSize that takes a bool allowing you to set it to fullscreen (true) or to a small view (false)
@@ -234,7 +220,6 @@ namespace YTApp.Pages
 
         #region Events
 
-
         private void MinimizeMediaElement_Click(object sender, RoutedEventArgs e)
         {
             if (MediaRow.Height.Value == 360) { ChangePlayerSize(true); }
@@ -243,129 +228,50 @@ namespace YTApp.Pages
 
         private void CloseMediaElement_Click(object sender, RoutedEventArgs e)
         {
-            viewer.Stop();
+            viewer.StopVideo();
             Frame.Visibility = Visibility.Collapsed;
-        }
-
-        private void viewer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
-        {
-            viewer.IsFullWindow = !viewer.IsFullWindow;
-        }
-
-        private void viewer_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (viewer.IsFullWindow && e.Key == Windows.System.VirtualKey.Escape) { viewer.IsFullWindow = false; }
-            if (viewer.CurrentState == Windows.UI.Xaml.Media.MediaElementState.Playing && e.Key == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
-            {
-                viewer.Pause();
-                e.Handled = true;
-            }
-            else if (e.Key == Windows.System.VirtualKey.Space && viewer.Visibility == Visibility.Visible)
-            {
-                viewer.Play();
-                e.Handled = true;
-            }
-        }
-
-        private void viewer_RightTapped(object sender, RightTappedRoutedEventArgs e)
-        {
-            var tappedItem = (UIElement)e.OriginalSource;
-            var attachedFlyout = (MenuFlyout)FlyoutBase.GetAttachedFlyout(viewer.TransportControls);
-
-            attachedFlyout.ShowAt(tappedItem, e.GetPosition(tappedItem));
         }
         #endregion
 
         #region MediaElementButton Management
-        private void viewer_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private void Viewer_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            MinimizeMediaElement.Visibility = Visibility.Visible;
             FadeIn.Begin();
         }
 
-        private void viewer_PointerExited(object sender, PointerRoutedEventArgs e)
+        private void Viewer_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            FadeOut.Completed += MediaButtonCompleted;
             FadeOut.Begin();
         }
-
-        private void MediaButtonCompleted(object sender, object e)
-        {
-            if (MinimizeMediaElement.Opacity == 0) { MinimizeMediaElement.Visibility = Visibility.Collapsed; }
-        }
-        #endregion
-
-        #region Flyout
-
-        private void Flyout_CopyLink(object sender, RoutedEventArgs e)
-        {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText("https://youtu.be/" + VideoID);
-            Clipboard.SetContent(dataPackage);
-        }
-
-        private void Flyout_CopyLinkAtTime(object sender, RoutedEventArgs e)
-        {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText("https://youtu.be/" + VideoID + "?t=" + Convert.ToInt32(viewer.Position.TotalSeconds) + "s");
-            Clipboard.SetContent(dataPackage);
-        }
-
-        private async void Flyout_DownloadVideo(object sender, RoutedEventArgs e)
-        {
-            var savePicker = new Windows.Storage.Pickers.FileSavePicker();
-            savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
-            savePicker.FileTypeChoices.Add("Video File", new List<string>() { ".mp4" });
-            savePicker.SuggestedFileName = video.Snippet.Title;
-
-            Windows.Storage.StorageFile file = await savePicker.PickSaveFileAsync();
-            if (file != null)
-            {
-                // Prevent updates to the remote version of the file until
-                // we finish making changes and call CompleteUpdatesAsync.
-                Windows.Storage.CachedFileManager.DeferUpdates(file);
-                // write to file
-                BackgroundDownloader downloader = new BackgroundDownloader();
-                DownloadOperation download = downloader.CreateDownload(viewer.Source, file);
-                await download.StartAsync();
-            }
-        }
-
         #endregion
 
         private void CustomMediaTransportControls_SwitchedToCompact(object sender, EventArgs e)
         {
-            MainPageReference.viewer.Source = viewer.Source;
-            MainPageReference.viewer.Visibility = Visibility.Visible;
-            MainPageReference.viewer.MediaOpened += MainPageViewer_MediaOpened;
+            Constants.MainPageRef.viewer.Source = new Uri(videoStreams.Muxed[0].Url);
+            Constants.MainPageRef.viewer.Visibility = Visibility.Visible;
+            Constants.MainPageRef.viewer.MediaOpened += MainPageViewer_MediaOpened;
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = true;
         }
 
         private void MainPageViewer_MediaOpened(object sender, RoutedEventArgs e)
         {
-            MainPageReference.viewer.Position = viewer.Position;
-            viewer.Source = new Uri("about:blank");
+            throw new NotImplementedException();
         }
 
         private void CustomMediaTransportControls_SwitchedToFullSize(object sender, EventArgs e)
         {
-            viewer.Source = MainPageReference.viewer.Source;
-            MainPageReference.viewer.Visibility = Visibility.Collapsed;
-            viewer.MediaOpened += Viewer_MediaOpened;
+            Constants.MainPageRef.viewer.Visibility = Visibility.Collapsed;
+
+            //Reset title to bar to it's normal state
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = false;
         }
 
-        private void Viewer_MediaOpened(object sender, RoutedEventArgs e)
-        {
-            viewer.Position = MainPageReference.viewer.Position;
-            MainPageReference.viewer.Source = new Uri("about:blank");
-        }
-
         private void OpenChannel(object sender, TappedRoutedEventArgs e)
         {
-            MainPageReference.contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { MainPageRef = MainPageReference, ID = video.Snippet.ChannelId });
+            Constants.activeChannelID = channel.Id;
+            Constants.MainPageRef.contentFrame.Navigate(typeof(ChannelPage));
         }
 
         private void ChannelProfileIcon_PointerEntered(object sender, PointerRoutedEventArgs e)

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -10,25 +8,20 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.ApplicationModel.DataTransfer;
-using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.YouTube.v3;
 using Google.Apis.Services;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.YouTube.v3.Data;
 using Google.Apis.Oauth2.v2;
-using VideoLibrary;
 using YTApp.Classes;
 using YTApp.Pages;
 using YTApp.Classes.DataTypes;
 using System.Collections.ObjectModel;
-using Google.Apis.Auth.OAuth2.Requests;
-using Google.Apis.Util.Store;
-using System.Net.Http;
-using System.Net;
-using System.Text;
 using MetroLog;
-using MetroLog.Targets;
 using Newtonsoft.Json;
+using YoutubeExplode;
+using System.Threading.Tasks;
+using Windows.UI.Xaml.Media.Animation;
 
 namespace YTApp
 {
@@ -48,7 +41,9 @@ namespace YTApp
 
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+
+            Constants.MainPageRef = this;
 
             //Reset Title Bar
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
@@ -87,14 +82,14 @@ namespace YTApp
             if (!(await YoutubeItemMethodsStatic.IsUserAuthenticated()))
             {
                 Log.Info("The user is not authenticated");
-                contentFrame.Navigate(typeof(WelcomePage), new NavigateParams() { MainPageRef = this });
+                Frame.Navigate(typeof(WelcomePage));
             }
             else
             {
                 Log.Info("The user is authenticated");
                 Log.Info("Loading subscriptions");
                 LoadSubscriptions();
-                contentFrame.Navigate(typeof(HomePage), new NavigateParams() { MainPageRef = this });
+                contentFrame.Navigate(typeof(HomePage));
                 UpdateLoginDetails();
             }
 
@@ -104,26 +99,11 @@ namespace YTApp
 
         private async void PlayClipboardYLink()
         {
-            if (Constants.Token == null)
-                return;
             try
             {
-                var dataPackageView = await Clipboard.GetContent().GetTextAsync();
-
-                if (Uri.TryCreate(dataPackageView, UriKind.Absolute, out Uri uriResult)
-                    && (uriResult.Scheme == "http" || uriResult.Scheme == "https"))
-                {
-                    if (Uri.IsWellFormedUriString("https://www.youtube.com/watch?v=", UriKind.Absolute))
-                    {
-                        Log.Info("Loading video found in clipboard");
-                        StartVideo(dataPackageView.Remove(0, 32));
-                    }
-                    else if (Uri.IsWellFormedUriString("https://youtu.be/", UriKind.Absolute))
-                    {
-                        Log.Info("Loading video found in clipboard");
-                        StartVideo(dataPackageView.Remove(0, 17));
-                    }
-                }
+                var clipboardText = await Clipboard.GetContent().GetTextAsync();
+                var videoID = YoutubeClient.ParseVideoId(clipboardText);
+                StartVideo(videoID);
             }
             catch { Log.Error("Exception thrown while loading video from clipboard"); }
         }
@@ -225,11 +205,8 @@ namespace YTApp
         private void SubscriptionsList_ItemClick(object sender, ItemClickEventArgs e)
         {
             var temp = (SubscriptionDataType)e.ClickedItem;
-            contentFrame.Navigate(typeof(ChannelPage), new NavigateParams()
-            {
-                MainPageRef = this,
-                ID = temp.Id
-            });
+            Constants.activeChannelID = temp.Id;
+            contentFrame.Navigate(typeof(ChannelPage));
         }
 
         #endregion
@@ -275,7 +252,7 @@ namespace YTApp
         {
             var item = (SplitViewItemDataType)e.ClickedItem;
             if (item.Text == "Home" && Constants.Token != null)
-                contentFrame.Navigate(typeof(HomePage), new NavigateParams() { MainPageRef = this });
+                contentFrame.Navigate(typeof(HomePage));
         }
 
         private void PlaylistOptions_ItemClick(object sender, ItemClickEventArgs e)
@@ -284,9 +261,9 @@ namespace YTApp
             {
                 var item = (SplitViewItemDataType)e.ClickedItem;
                 if (item.Text == "Trending")
-                    contentFrame.Navigate(typeof(TrendingPage), new NavigateParams() { MainPageRef = this });
+                    contentFrame.Navigate(typeof(TrendingPage));
                 else if (item.Text == "History")
-                    contentFrame.Navigate(typeof(HistoryPage), new NavigateParams() { MainPageRef = this});
+                    contentFrame.Navigate(typeof(HistoryPage));
             }
         }
 
@@ -303,8 +280,7 @@ namespace YTApp
 
         private void Search_Click(object sender, RoutedEventArgs e)
         {
-            if (Constants.Token != null)
-                contentFrame.Navigate(typeof(SearchPage), new NavigateParams() { MainPageRef = this });
+            contentFrame.Navigate(typeof(SearchPage));
         }
 
         private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -315,7 +291,7 @@ namespace YTApp
                 {
                     PlayClipboardYLink();
                 }
-                contentFrame.Navigate(typeof(SearchPage), new NavigateParams() { MainPageRef = this });
+                contentFrame.Navigate(typeof(SearchPage));
             }
         }
 
@@ -330,7 +306,8 @@ namespace YTApp
         public void StartVideo(string Id)
         {
             videoFrame.Visibility = Visibility.Visible;
-            videoFrame.Navigate(typeof(VideoPage), new NavigateParams() { MainPageRef = this, ID = Id });
+            Constants.activeVideoID = Id;
+            videoFrame.Navigate(typeof(VideoPage));
         }
 
         #endregion
@@ -368,10 +345,6 @@ namespace YTApp
         #region Login Region
         private async void BtnSignOut_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            //Check that the user is logged in
-            if (Constants.Token == null)
-                return;
-
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
@@ -387,7 +360,7 @@ namespace YTApp
             //Clear Subscriptions
             SubscriptionsList.ItemsSource = null;
 
-            contentFrame.Navigate(typeof(WelcomePage), new NavigateParams() { MainPageRef = this });
+            Frame.Navigate(typeof(WelcomePage));
         }
 
         private void BtnLoginFlyout_Tapped(object sender, TappedRoutedEventArgs e)
@@ -397,17 +370,68 @@ namespace YTApp
 
         private async void BtnMyChannel_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (Constants.Token == null)
-                return;
-
             var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var getMyChannel = service.Channels.List("snippet");
             getMyChannel.Mine = true;
             var result = await getMyChannel.ExecuteAsync();
 
-            contentFrame.Navigate(typeof(ChannelPage), new NavigateParams() { MainPageRef = this, ID = result.Items[0].Id });
+            Constants.activeChannelID = result.Items[0].Id;
+            contentFrame.Navigate(typeof(ChannelPage));
         }
+        #endregion
+
+        #region Video Functions
+        public async void DownloadVideo()
+        {
+            var client = new YoutubeClient();
+            var videoUrl = (await client.GetVideoMediaStreamInfosAsync(Constants.activeVideoID)).Muxed[0].Url;
+
+            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+
+            var picker = new Windows.Storage.Pickers.FileOpenPicker
+            {
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Unspecified,
+                CommitButtonText = "Save that bich"
+            };
+
+            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+
+            if (file != null)
+            {
+                try
+                {
+                    Windows.Networking.BackgroundTransfer.BackgroundDownloader downloader = new Windows.Networking.BackgroundTransfer.BackgroundDownloader();
+                    Windows.Networking.BackgroundTransfer.DownloadOperation download = downloader.CreateDownload(new Uri(videoUrl), file);
+
+                    HandleDownloadAsync(download);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Download Error", ex);
+                    Log.Error(videoUrl);
+                }
+            }
+            else
+            {
+                Log.Info("Download operation was cancelled.");
+            }
+        }
+
+        private async void HandleDownloadAsync(Windows.Networking.BackgroundTransfer.DownloadOperation download)
+        {
+            await Task.Factory.StartNew(() => download.StartAsync());
+
+            while (download.Progress.BytesReceived / download.Progress.TotalBytesToReceive < 1)
+            {
+                DownloadProgress.Value = download.Progress.BytesReceived / download.Progress.TotalBytesToReceive;
+                await Task.Delay(16);
+            }
+            DownloadProgress.Value = 1;
+            await Task.Delay(200);
+            DownloadProgress.Visibility = Visibility.Collapsed;
+        }
+
         #endregion
     }
 }

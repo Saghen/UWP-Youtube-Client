@@ -27,8 +27,6 @@ namespace YTApp.Pages
     /// </summary>
     public sealed partial class TrendingPage : Page
     {
-        MainPage MainPageReference;
-
         System.Collections.ObjectModel.ObservableCollection<YoutubeItemDataType> videosList = new System.Collections.ObjectModel.ObservableCollection<YoutubeItemDataType>();
 
         public TrendingPage()
@@ -38,9 +36,6 @@ namespace YTApp.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            NavigateParams result = (NavigateParams)e.Parameter;
-            base.OnNavigatedTo(e);
-            MainPageReference = result.MainPageRef;
             UpdateVideos();
         }
 
@@ -66,7 +61,9 @@ namespace YTApp.Pages
         private void YoutubeItemsGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = (YoutubeItemDataType)e.ClickedItem;
-            MainPageReference.StartVideo(item.Id);
+            var listView = (ListView)sender;
+            listView.PrepareConnectedAnimation("videoThumb", item, "ImageControl");
+            Constants.MainPageRef.StartVideo(item.Id);
         }
     }
 }

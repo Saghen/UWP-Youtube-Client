@@ -9,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using VideoLibrary;
 using Windows.UI.Xaml;
 
 namespace YTApp.Classes
@@ -55,48 +54,26 @@ namespace YTApp.Classes
             }
         }
 
-        static public void StartVideo(string ID, MainPage mainPageRef)
-        {
-            //Get instance of our media viewer
-            var viewer = mainPageRef.viewer;
-            try
-            {
-                var youTube = YouTube.Default;
-                var video = youTube.GetVideo("https://www.youtube.com/watch?v=" + ID);
-                viewer.Source = new Uri(video.GetUri());
-                viewer.Visibility = Visibility.Visible;
-                viewer.TransportControls.Focus(FocusState.Programmatic);
-            }
-            catch { }
-
-            //Set the video id for the flyout menu when right clicking on the video
-            mainPageRef.VideoID = ID;
-        }
-
-        static public string ViewCountShortner(long viewCount)
-        {
-            if (viewCount > 1000000)
-            {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000, 1)) + "M";
-            }
-            else if (viewCount > 1000)
-            {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000, 1)) + "K";
-            }
-            else
-            {
-                return Convert.ToString(viewCount);
-            }
-        }
-
-        static public string ViewCountShortner(ulong? viewCount)
+        static public string ViewCountShortner(long viewCount, int decimals = 1)
         {
             if (viewCount > 1000000000)
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000000, 1)) + "B";
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000000, decimals)) + "B";
             else if (viewCount > 1000000)
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000, 1)) + "M";
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000, decimals)) + "M";
             else if (viewCount > 1000)
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000, 1)) + "K";
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000, decimals)) + "K";
+            else
+                return Convert.ToString(viewCount);
+        }
+
+        static public string ViewCountShortner(ulong? viewCount, int decimals = 1)
+        {
+            if (viewCount > 1000000000)
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000000, decimals)) + "B";
+            else if (viewCount > 1000000)
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000000, decimals)) + "M";
+            else if (viewCount > 1000)
+                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000, decimals)) + "K";
             else
                 return Convert.ToString(viewCount);
         }

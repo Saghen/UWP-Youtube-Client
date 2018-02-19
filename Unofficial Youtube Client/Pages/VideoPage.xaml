@@ -36,20 +36,8 @@
                     <RowDefinition Height="11"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <Grid x:Name="MediaElementContainer" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" Background="#1a1a1a">
-                    <MediaElement x:Name="viewer" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Stretch" Stretch="Uniform">
-                        <MediaElement.TransportControls>
-                            <local:CustomMediaTransportControls Background="#AA000000" DoubleTapped="viewer_DoubleTapped" RightTapped="viewer_RightTapped" KeyDown="viewer_KeyDown" SwitchedToCompact="CustomMediaTransportControls_SwitchedToCompact" SwitchedToFullSize="CustomMediaTransportControls_SwitchedToFullSize">
-                                <FlyoutBase.AttachedFlyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink"/>
-                                        <MenuFlyoutItem Text="Copy link at current time" Click="Flyout_CopyLinkAtTime"/>
-                                        <MenuFlyoutItem Text="Download Video" Click="Flyout_DownloadVideo"/>
-                                    </MenuFlyout>
-                                </FlyoutBase.AttachedFlyout>
-                            </local:CustomMediaTransportControls>
-                        </MediaElement.TransportControls>
-                    </MediaElement>
+                <Grid x:Name="MediaElementContainer" PointerEntered="Viewer_PointerEntered" PointerExited="Viewer_PointerExited" Background="#1a1a1a">
+                    <userctrls:VideoViewer x:Name="viewer" Source=""/>
                     <Button x:Name='MinimizeMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="MinimizeMediaElement_Click"/>
                     <Button x:Name='CloseMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Click="CloseMediaElement_Click"/>
                 </Grid>
@@ -77,12 +65,13 @@
                             <Grid x:Name="TitleGrid" VerticalAlignment="Center" Margin="20">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
-                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
                                 <StackPanel MaxWidth="500" HorizontalAlignment="Left">
                                     <TextBlock x:Name="Title" Text="Title" FontSize="20" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="CharacterEllipsis"/>
                                     <TextBlock x:Name="Views" Text="Views" MaxHeight="200" FontSize="14" Foreground="#aaa"/>
                                 </StackPanel>
+                                <userctrls:LikeDislikeUserControl x:Name="LikeDislikeControl" Grid.Column="1"/>
                             </Grid>
                             <MenuFlyoutSeparator VerticalAlignment="Bottom"/>
                             <Grid Grid.Row="1">
@@ -109,8 +98,8 @@
                     <ListView x:Name="RelatedVideosGridView" Grid.Column="1" Header="Related" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" Margin="0,10,0,0" ItemsSource="{x:Bind relatedVideos.Items, Mode=OneWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="classes:YoutubeItemDataType">
-                                <StackPanel Orientation="Horizontal">
-                                    <Image x:Name="ImageControl" Margin="10" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal"  Margin="10" >
+                                    <Image x:Name="ImageControl" Margin="0,0,10,0" VerticalAlignment="Center">
                                         <Image.Source>
                                             <BitmapImage UriSource="{Binding Thumbnail}" DecodePixelHeight="101" DecodePixelWidth="180"/>
                                         </Image.Source>

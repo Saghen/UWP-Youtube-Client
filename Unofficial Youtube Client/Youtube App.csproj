@@ -106,7 +106,6 @@
     </Compile>
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\DataTypes\ChannelListDataType.cs" />
-    <Compile Include="Classes\DataTypes\NavigateParams.cs" />
     <Compile Include="Classes\DataTypes\PlaylistDataType.cs" />
     <Compile Include="Classes\EventsArgs\RoutedEventArgsWithID.cs" />
     <Compile Include="Classes\SearchTemplateSelector.cs" />
@@ -131,7 +130,7 @@
     <Compile Include="Classes\SplitViewItemDataType.cs" />
     <Compile Include="Classes\SubscriptionDataType.cs" />
     <Compile Include="Classes\YoutubeItemMethods.cs" />
-    <Compile Include="CustomMediaTransportControls.cs" />
+    <Compile Include="Controls\CustomMediaTransportControls.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -148,6 +147,9 @@
     <Compile Include="Classes\YoutubeItemDataType.cs" />
     <Compile Include="UserControls\LikeDislikeUserControl.xaml.cs">
       <DependentUpon>LikeDislikeUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\VideoViewer.xaml.cs">
+      <DependentUpon>VideoViewer.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -296,6 +298,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\VideoViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Google.Apis">
@@ -331,13 +337,12 @@
     <None Include="YoutubeAppKey.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="libvideo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\libvideo.dll</HintPath>
-    </Reference>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
+    <Reference Include="YoutubeExplode">
+      <HintPath>..\YoutubeExplode.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

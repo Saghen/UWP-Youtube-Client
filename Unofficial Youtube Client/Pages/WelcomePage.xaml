@@ -5,6 +5,11 @@
     xmlns:local="using:YTApp.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
+    extensions:TitleBar.BackgroundColor="#222"
+    extensions:TitleBar.InactiveBackgroundColor="#333"
+    extensions:TitleBar.ButtonBackgroundColor="#222"
+    extensions:TitleBar.ButtonInactiveBackgroundColor="#333"
     mc:Ignorable="d">
 
     <Page.Resources>
