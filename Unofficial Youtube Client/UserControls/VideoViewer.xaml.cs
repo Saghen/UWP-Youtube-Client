@@ -32,18 +32,21 @@ namespace YTApp.UserControls
         public event EventHandler EnteringFullscreen;
         public event EventHandler ExitingFullscren;
 
-        private static readonly DependencyProperty SourceProperty = DependencyProperty.Register( "Source", typeof(string), typeof(VideoViewer), null );
+        private static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(string), typeof(VideoViewer), null);
 
         MediaStreamInfoSet videoStreams;
 
-        MediaPlayer audioPlayer = new MediaPlayer();
-        MediaPlayer videoPlayer = new MediaPlayer();
+        public MediaPlayer audioPlayer = new MediaPlayer();
+        public MediaPlayer videoPlayer = new MediaPlayer();
         public MediaTimelineController timelineController = new MediaTimelineController();
 
         //Timer that will update our progress slider on our custom controls
         DispatcherTimer timer = new DispatcherTimer();
 
-        bool OverViewer = false;
+        //Data used for control fading
+        Point previousMouseLocation;
+        int mouseHasntMoved = 0;
+        DispatcherTimer pointerCheckTimer = new DispatcherTimer();
 
         public string Source
         {
@@ -60,6 +63,44 @@ namespace YTApp.UserControls
             //Update progress bar 30 times per second
             timer.Interval = new TimeSpan(0, 0, 0, 0, 32);
             timer.Tick += Timer_Tick;
+
+            //Check if the mouse is over the viewer and control the transport controls accordingly
+            pointerCheckTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            pointerCheckTimer.Tick += PointerCheckTimer_Tick;
+
+
+            videoPlayer.CurrentStateChanged += VideoPlayer_CurrentStateChanged;
+            //timelineController.StateChanged += TimelineController_StateChanged;
+        }
+
+
+        #region Loading Ring
+        private async void VideoPlayer_CurrentStateChanged(MediaPlayer sender, object args)
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                if (videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Buffering)
+                    LoadingRing.IsActive = true;
+                else
+                    LoadingRing.IsActive = false;
+            });
+        }
+        #endregion
+
+        private void PointerCheckTimer_Tick(object sender, object e)
+        {
+            if (previousMouseLocation != Window.Current.CoreWindow.PointerPosition)
+            {
+                mouseHasntMoved = 0;
+                if (transportControls.Opacity == 0)
+                    FadeIn.Begin();
+            }
+            else if (mouseHasntMoved == 20 && transportControls.Opacity == 1)
+            {
+                FadeOut.Begin();
+            }
+            mouseHasntMoved += 1;
+            previousMouseLocation = Window.Current.CoreWindow.PointerPosition;
         }
 
         #region Transport Control Management
@@ -76,7 +117,7 @@ namespace YTApp.UserControls
 
         private void ButtonPlay_Click(object sender, RoutedEventArgs e)
         {
-            if(timelineController.State == MediaTimelineControllerState.Running)
+            if (timelineController.State == MediaTimelineControllerState.Running || timelineController.State == MediaTimelineControllerState.Stalled)
             {
                 timelineController.Pause();
                 ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Play };
@@ -129,7 +170,7 @@ namespace YTApp.UserControls
             {
                 view.ExitFullScreenMode();
                 ExitingFullscren.Invoke(this, new EventArgs());
-            } 
+            }
             else
             {
                 view.TryEnterFullScreenMode();
@@ -137,7 +178,16 @@ namespace YTApp.UserControls
             }
         }
 
-        private async void MediaViewerParent_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private void ButtonCopy_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var link = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            link.SetText("https://youtu.be/" + Constants.activeVideoID);
+            Constants.MainPageRef.ShowNotifcation("Link copied to clipboard.");
+        }
+
+        #region Manage Transport Control Fading
+
+        private void MediaViewerParent_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             FadeIn.Begin();
         }
@@ -147,24 +197,17 @@ namespace YTApp.UserControls
             FadeOut.Begin();
         }
 
-        private async void viewer_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private void viewer_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            OverViewer = true;
-            await Task.Delay(2000);
-            if (transportControls.Opacity == 1 && OverViewer)
-                FadeOut.Begin();
+            pointerCheckTimer.Start();
         }
 
         private void viewer_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            OverViewer = false;
+            pointerCheckTimer.Stop();
         }
 
-        private void transportControls_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            if (transportControls.Opacity == 0)
-                FadeIn.Begin();
-        }
+        #endregion
 
         private void viewerProgress_SliderOnComplete(object sender, PointerRoutedEventArgs e)
         {
@@ -181,7 +224,7 @@ namespace YTApp.UserControls
         #region Volume Button
         private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-            audioPlayer.Volume = ((Slider)sender).Value/1000;
+            audioPlayer.Volume = ((Slider)sender).Value / 1000;
         }
 
 
@@ -226,32 +269,12 @@ namespace YTApp.UserControls
         #endregion
 
         #region Download Video Event
-        private async void DownloadVideo_Tapped(object sender, TappedRoutedEventArgs e)
+        private void DownloadVideo_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var client = new YoutubeClient();
-            var videoUrl = Constants.videoInfo.Muxed[0].Url;
-
-            var savePicker = new Windows.Storage.Pickers.FileSavePicker();
-            savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
-            savePicker.FileTypeChoices.Add("Video File", new List<string>() { ".mp4" });
-
-            Windows.Storage.StorageFile file = await savePicker.PickSaveFileAsync();
-            if (file != null)
-            {
-                // Prevent updates to the remote version of the file until
-                // we finish making changes and call CompleteUpdatesAsync.
-                Windows.Storage.CachedFileManager.DeferUpdates(file);
-                // write to file
-                BackgroundDownloader downloader = new BackgroundDownloader();
-                DownloadOperation download = downloader.CreateDownload(new Uri(videoUrl), file);
-                download.StartAsync();
-            }
-            else
-            {
-                //Log.Info("Download operation was cancelled.");
-            }
+            Constants.MainPageRef.DownloadVideo();
         }
         #endregion
+
         #endregion
 
         #region Video Source Management
@@ -279,7 +302,6 @@ namespace YTApp.UserControls
         {
             if (!(await GetVideoData()))
                 return;
-
 
             //We use this method so that we can synchronize the audio and video streams
             audioPlayer.Source = MediaSource.CreateFromUri(new Uri(Constants.videoInfo.Audio[0].Url));
@@ -316,9 +338,8 @@ namespace YTApp.UserControls
             //Stop updating the progress bar
             timer.Stop();
 
-            //Remove the players from memory
-            audioPlayer.Dispose();
-            videoPlayer.Dispose();
+            //Pause the player (It's a good idea to figure out a way to clear it from memory)
+            timelineController.Pause();
         }
         #endregion
     }

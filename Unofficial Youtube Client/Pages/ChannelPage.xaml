@@ -22,7 +22,7 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <ScrollViewer x:Name="MainScrollViewer" Background="#1a1a1a" ViewChanged="ScrollViewer_ViewChanged">
+    <ScrollViewer x:Name="MainScrollViewer" ViewChanged="ScrollViewer_ViewChanged">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="258"/>

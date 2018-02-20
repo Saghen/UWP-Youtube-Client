@@ -25,8 +25,9 @@
 
     <Grid x:Name="MediaViewerParent">
         <MediaPlayerElement x:Name="viewer" Tapped="viewer_Tapped" DoubleTapped="viewer_DoubleTapped" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited"/>
-        <StackPanel x:Name="transportControls" x:FieldModifier="public" VerticalAlignment="Bottom" Background="#88000000" PointerEntered="transportControls_PointerEntered">
-            <Slider x:Name="viewerProgress" Style="{StaticResource MediaControlSliderStyle}" IsThumbToolTipEnabled="False" PointerCaptureLost="viewerProgress_SliderOnComplete"/>
+        <ProgressRing x:Name="LoadingRing" IsActive="False" Width="50" Height="50"/>
+        <StackPanel x:Name="transportControls" x:FieldModifier="public" VerticalAlignment="Bottom" Background="#88000000">
+            <Slider x:Name="viewerProgress" Style="{StaticResource MediaControlSliderStyle}" IsThumbToolTipEnabled="False" PointerCaptureLost="viewerProgress_SliderOnComplete" Margin="10,0"/>
             <Grid>
                 <CommandBar Background="Transparent" HorizontalAlignment="Left" OverflowButtonVisibility="Collapsed">
                     <AppBarButton x:Name="ButtonPlay" Icon="Pause" Click="ButtonPlay_Click"/>
@@ -47,7 +48,7 @@
                         </AppBarButton.Template>
                     </AppBarButton>
                     <AppBarButton x:Name="ButtonDownload" Icon="Download" Tapped="DownloadVideo_Tapped"/>
-                    <AppBarButton x:Name="ButtonCopy" Icon="Copy"/>
+                    <AppBarButton x:Name="ButtonCopy" Icon="Copy" Tapped="ButtonCopy_Tapped"/>
                 </CommandBar>
                 <CommandBar Background="Transparent" HorizontalAlignment="Right" OverflowButtonVisibility="Collapsed">
                     <AppBarButton x:Name="ButtonPiP" Icon="DockBottom" Click="ButtonPiP_Click"/>

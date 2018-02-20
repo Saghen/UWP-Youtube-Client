@@ -78,24 +78,12 @@ namespace YTApp
         #endregion
 
         #region Startup
-        private async void Startup()
+        private void Startup()
         {
-            Log.Info("Checking if the user is authenticated");
-            //Check if user is authenticated and show startup page if not
-            if (!(await YoutubeItemMethodsStatic.IsUserAuthenticated()))
-            {
-                Log.Info("The user is not authenticated");
-                Frame.Navigate(typeof(WelcomePage));
-            }
-            else
-            {
-                Log.Info("The user is authenticated");
-                Log.Info("Loading subscriptions");
-                LoadSubscriptions();
-                contentFrame.Navigate(typeof(HomePage));
-                UpdateLoginDetails();
-            }
-
+            Log.Info("Loading subscriptions");
+            LoadSubscriptions();
+            contentFrame.Navigate(typeof(HomePage));
+            UpdateLoginDetails();
             //Plays Youtube link in clipboard
             PlayClipboardYLink();
         }
@@ -403,7 +391,12 @@ namespace YTApp
                 // write to file
                 BackgroundDownloader downloader = new BackgroundDownloader();
                 DownloadOperation download = downloader.CreateDownload(new Uri(videoUrl), file);
-                download.StartAsync();
+
+                DownloadProgress.Visibility = Visibility.Visible;
+
+                Progress<DownloadOperation> progress = new Progress<DownloadOperation>();
+                progress.ProgressChanged += Progress_ProgressChanged;
+                await download.StartAsync().AsTask(CancellationToken.None, progress);
             }
             else
             {
@@ -411,15 +404,24 @@ namespace YTApp
             }
         }
 
-        private void Progress_ProgressChanged(object sender, HttpProgress e)
+        private void Progress_ProgressChanged(object sender, DownloadOperation e)
         {
-            if(e.TotalBytesToReceive == null) { return; }
-            DownloadProgress.Value = ((double)e.BytesReceived / (double)e.TotalBytesToReceive) * 1000;
+            DownloadProgress.Value = (e.Progress.BytesReceived / (double)e.Progress.TotalBytesToReceive) * 1000;
 
-            if (e.BytesReceived == e.TotalBytesToReceive && e.TotalBytesToReceive != 0)
+            if (e.Progress.BytesReceived == e.Progress.TotalBytesToReceive && e.Progress.TotalBytesToReceive != 0)
             {
                 DownloadProgress.Visibility = Visibility.Collapsed;
             }
+        }
+
+        #endregion
+
+        #region Notifications
+
+        public void ShowNotifcation(string Text)
+        {
+            InAppNotif.Content = Text;
+            InAppNotif.Show();
         }
 
         #endregion

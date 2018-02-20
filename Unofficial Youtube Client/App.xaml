@@ -23,15 +23,6 @@
             <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundChromeHighBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="MinWidth" Value="{ThemeResource FlyoutThemeMinWidth}"/>
-            <Setter Property="MaxWidth" Value="{ThemeResource FlyoutThemeMaxWidth}"/>
-            <Setter Property="MinHeight" Value="{ThemeResource FlyoutThemeMinHeight}"/>
-            <Setter Property="MaxHeight" Value="{ThemeResource FlyoutThemeMaxHeight}"/>
-            <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Auto" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
-            <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto" />
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-            <Setter Property="ScrollViewer.ZoomMode" Value="Disabled" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="FlyoutPresenter">
@@ -57,6 +48,15 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <!-- Brushes -->
+        <SolidColorBrush x:Key="AppBackgroundDark" Color="#222"/>
+        <SolidColorBrush x:Key="AppBackground" Color="#252525"/>
+        <SolidColorBrush x:Key="AppBackgroundLighter" Color="#2a2a2a"/>
+        <SolidColorBrush x:Key="AppBackgroundLightest" Color="#333"/>
+        <SolidColorBrush x:Key="AppText" Color="#fff"/>
+        <SolidColorBrush x:Key="AppTextSecondary" Color="#aaa"/>
+        <SolidColorBrush x:Key="ButtonBackground" Color="#666"/>
     </Application.Resources>
     
 

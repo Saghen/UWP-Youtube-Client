@@ -89,7 +89,8 @@
                             </Grid>
                         </Grid>
                     </StackPanel>
-                    <ListView x:Name="RelatedVideosGridView" Grid.Column="1" Header="Related" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" Margin="0,10,0,0" ItemsSource="{x:Bind relatedVideos.Items, Mode=OneWay}">
+                    <ToggleSwitch x:Name="SwitchAutoplay" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20" OffContent="Autoplay Off" OnContent="Autoplay On" Toggled="SwitchAutoplay_Toggled"/>
+                    <ListView x:Name="RelatedVideosGridView" Grid.Column="1" Header="Related" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" Margin="0,30" ItemsSource="{x:Bind relatedVideos.Items, Mode=OneWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="classes:YoutubeItemDataType">
                                 <StackPanel Orientation="Horizontal" Margin="10" >
@@ -110,24 +111,6 @@
                 </Grid>
             </Grid>
         </ScrollViewer>
-        <toolkit:InAppNotification x:Name="InAppNotif">
-            <toolkit:InAppNotification.ContentTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock x:Name="InAppNotifText" Text="Something went wrong. Would you like to open it in your browser?" VerticalAlignment="Center" />
-
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button x:Name="InAppNotifButton" Content="Open in Browser" MinWidth="150" Height="30" Click="InAppNotifButton_Click"/>
-                            <Button x:Name="InAppNotifButton2" Content="Dismiss" MinWidth="150" Height="30" Margin="10 0 0 0" Click="InAppNotifButton2_Click"/>
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </toolkit:InAppNotification.ContentTemplate>
-        </toolkit:InAppNotification>
+        
     </Grid>
 </Page>

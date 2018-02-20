@@ -33,7 +33,7 @@ namespace YTApp.Pages
     /// </summary>
     public sealed partial class VideoPage : Page
     {
-        YoutubeExplode.Models.MediaStreams.MediaStreamInfoSet videoStreams;
+        Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
 
         Channel channel;
 
@@ -45,6 +45,13 @@ namespace YTApp.Pages
 
             //Keep the page in memory so we don't have to reload it everytime
             NavigationCacheMode = NavigationCacheMode.Enabled;
+
+            //Link to the video complete event
+            viewer.videoPlayer.MediaEnded += VideoPlayer_MediaEnded;
+
+            //Set autoplay value
+            try { SwitchAutoplay.IsOn = (bool)localSettings.Values["Autoplay"]; } catch { }
+
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -64,8 +71,6 @@ namespace YTApp.Pages
 
             //Update likes/dislikes
             LikeDislikeControl.UpdateData();
-
-            Constants.MainPageRef.SwitchToFullSize += CustomMediaTransportControls_SwitchedToFullSize;
         }
 
         private void VideoPage_BackRequested(object sender, BackRequestedEventArgs e)
@@ -84,29 +89,15 @@ namespace YTApp.Pages
             //Make the player cover the entire frame
             ChangePlayerSize(true);
 
-            try
-            {
-                viewer.Source = Constants.activeVideoID;
-            }
-            catch
-            {
-                InAppNotif.Show();
-                return;
-            }
+            //Set the ID of our viewer to the new ID
+            viewer.Source = ID;
 
             var service = await YoutubeItemMethodsStatic.GetServiceAsync();
 
             var getVideoInfo = service.Videos.List("snippet, statistics, contentDetails");
             getVideoInfo.Id = ID;
             var videoList = await getVideoInfo.ExecuteAsync();
-
-            //Checks to see if video exists and sets the video variable if it does or returns if it doesn't
-            try { Constants.activeVideo = videoList.Items[0]; }
-            catch
-            {
-                InAppNotif.Show();
-                return;
-            }
+            Constants.activeVideo = videoList.Items[0];
 
             //Channel Info
             await Task.Run(() =>
@@ -121,17 +112,11 @@ namespace YTApp.Pages
 
             UpdateRelatedVideos(service);
 
-        }
-
-        private async void InAppNotifButton_Click(object sender, RoutedEventArgs e)
-        {
-            await Windows.System.Launcher.LaunchUriAsync(new Uri("https://youtu.be/" + Constants.activeVideoID));
-            InAppNotif.Dismiss();
-        }
-
-        private void InAppNotifButton2_Click(object sender, RoutedEventArgs e)
-        {
-            InAppNotif.Dismiss();
+            //Store the video id
+            if (localSettings.Values["History"] != null)
+                ((List<string>)localSettings.Values["History"]).Add(Constants.activeVideoID);
+            else
+                localSettings.Values["History"] = new List<string>() { Constants.activeVideoID };
         }
 
         public void UpdatePageInfo(YouTubeService service)
@@ -146,7 +131,7 @@ namespace YTApp.Pages
             Description.Text = Constants.activeVideo.Snippet.Description;
             DescriptionShowMore.Visibility = Visibility.Visible;
             var image = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url));
-            var imageBrush = new ImageBrush{ ImageSource = image };
+            var imageBrush = new ImageBrush { ImageSource = image };
             ChannelProfileIcon.Fill = imageBrush;
         }
 
@@ -249,27 +234,6 @@ namespace YTApp.Pages
         }
         #endregion
 
-        private void CustomMediaTransportControls_SwitchedToCompact(object sender, EventArgs e)
-        {
-            Constants.MainPageRef.viewer.Source = new Uri(videoStreams.Muxed[0].Url);
-            Constants.MainPageRef.viewer.Visibility = Visibility.Visible;
-            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = true;
-        }
-
-        private void CustomMediaTransportControls_SwitchedToFullSize(object sender, EventArgs e)
-        {
-            Constants.MainPageRef.viewer.Visibility = Visibility.Collapsed;
-
-            //Reset title to bar to it's normal state
-            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = false;
-
-            //Set the position of this video page's viewer to the position of the compact view's one
-            viewer.timelineController.Position = Constants.MainPageRef.viewer.Position;
-            viewer.timelineController.Start();
-        }
-
         private void OpenChannel(object sender, TappedRoutedEventArgs e)
         {
             Constants.activeChannelID = channel.Id;
@@ -300,6 +264,8 @@ namespace YTApp.Pages
             }
         }
 
+        #region Fullscreen
+
         private void viewer_EnteringFullscreen(object sender, EventArgs e)
         {
             Constants.MainPageRef.Toolbar.Visibility = Visibility.Collapsed;
@@ -322,5 +288,37 @@ namespace YTApp.Pages
             else
                 MediaRow.Height = new GridLength(600);
         }
+
+        #endregion
+
+        #region Autoplay
+        private void SwitchAutoplay_Toggled(object sender, RoutedEventArgs e)
+        {
+            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            localSettings.Values["Autoplay"] = SwitchAutoplay.IsOn;
+        }
+
+        private async void VideoPlayer_MediaEnded(MediaPlayer sender, object args)
+        {
+            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            try
+            {
+                if ((bool)localSettings.Values["Autoplay"])
+                {
+                    Constants.activeVideoID = ((YoutubeItemDataType)RelatedVideosGridView.Items[0]).Id;
+
+                    //Reload the page
+                    await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                        //Get the video data and play it
+                        StartVideo(Constants.activeVideoID);
+
+                        //Update likes/dislikes
+                        LikeDislikeControl.UpdateData();
+                    });
+                }
+            }
+            catch { }
+        }
+        #endregion
     }
 }

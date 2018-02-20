@@ -16,7 +16,6 @@
     mc:Ignorable="d" Loaded="Page_Loaded" x:Name="MainWindowPage">
 
     <Page.Resources>
-        <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
         <ResourceDictionary>
             <Storyboard x:Name="FadeOut">
                 <DoubleAnimation Storyboard.TargetName="CloseMediaElement" EnableDependentAnimation="True"  Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.2"/>
@@ -38,7 +37,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Grid x:FieldModifier="public" x:Name="Toolbar" Background="#2a2a2a" Height="56">
+        <Grid x:FieldModifier="public" x:Name="Toolbar" Background="{StaticResource AppBackgroundLighter}" Height="56">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button x:Name="HamburgerButton" FontFamily="Segoe MDL2 Assets" Content="&#xE700;" FontSize="18" Margin="20,0" Background="Transparent" Click="HamburgerButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
                 <TextBox x:Name="SearchBox" Width="500px" VerticalAlignment="Center" PlaceholderText="Search" KeyDown="SearchBox_KeyDown" BorderThickness="1" Style="{StaticResource TextBoxCleanStyle}" Background="#151515" BorderBrush="#2a2a2a" x:FieldModifier="public"/>
@@ -74,7 +73,7 @@
 
         <SplitView Grid.Row="1" x:Name="SideBarSplitView" DisplayMode="Overlay">
             <SplitView.Pane>
-                <ScrollViewer Background="#252525" VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
+                <ScrollViewer Background="{StaticResource AppBackground}" VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Disabled">
                     <StackPanel>
                         <ListView ItemClick="PageMenuControls_ItemClick" SelectionMode="None" IsItemClickEnabled="True">
                             <ListView.ItemTemplate>
@@ -130,8 +129,9 @@
             </SplitView.Pane>
             <SplitView.Content>
                 <Grid>
-                    <Frame x:Name="contentFrame" Background="#222" x:FieldModifier="public"/>
-                    <Frame x:Name="videoFrame" Background="#222" Visibility="Collapsed"/>
+                    <Frame x:Name="contentFrame" Background="{StaticResource AppBackgroundDark}" x:FieldModifier="public"/>
+                    <Frame x:Name="videoFrame" Background="{StaticResource AppBackgroundDark}" Visibility="Collapsed"/>
+                    <controls:InAppNotification Name="InAppNotif"/>
                 </Grid>
             </SplitView.Content>
         </SplitView>
