@@ -45,6 +45,7 @@ namespace YTApp.Pages
             else if (e.ClickedItem.GetType() == typeof(YoutubeChannelDataType))
             {
                 var item = (YoutubeChannelDataType)e.ClickedItem;
+                Constants.activeChannelID = item.Id;
                 this.Frame.Navigate(typeof(ChannelPage));
             }
         }

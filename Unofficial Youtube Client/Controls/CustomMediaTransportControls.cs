@@ -49,19 +49,15 @@ namespace YTApp
             SeekCompletedFast.Invoke(this, new EventArgs());
         }
 
-        private async void CompactButton_Click(object sender, RoutedEventArgs e)
+        private void CompactButton_Click(object sender, RoutedEventArgs e)
         {
             // Raise an event on the custom control when 'like' is clicked.
             if (IsCompact == true)
             {
-                await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
                 SwitchedToFullSize.Invoke(this, new EventArgs());
             }
             else
             {
-                ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
-                compactOptions.CustomSize = new Windows.Foundation.Size(500, 281);
-                await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions);
                 SwitchedToCompact.Invoke(this, new EventArgs());
             }
         }

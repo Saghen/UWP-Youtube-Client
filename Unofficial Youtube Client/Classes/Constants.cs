@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeExplode.Models.MediaStreams;
 
 namespace YTApp.Classes
 {
@@ -22,5 +23,7 @@ namespace YTApp.Classes
 
         static public Channel activeChannel = new Channel();
         static public string activeChannelID = "";
+
+        static public MediaStreamInfoSet videoInfo;
     }
 }

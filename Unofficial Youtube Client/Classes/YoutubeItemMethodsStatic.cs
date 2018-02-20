@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
+using YoutubeExplode.Models.MediaStreams;
 
 namespace YTApp.Classes
 {
@@ -76,6 +77,35 @@ namespace YTApp.Classes
                 return Convert.ToString(Math.Round(Convert.ToDouble(viewCount) / 1000, decimals)) + "K";
             else
                 return Convert.ToString(viewCount);
+        }
+
+        static public string GetVideoQuality(VideoQuality quality, bool GetMuxed)
+        {
+            if (GetMuxed)
+            {
+                foreach (var video in Constants.videoInfo.Muxed)
+                {
+                    if (video.VideoQuality == quality)
+                        return video.Url;
+                }
+            }
+            else
+            {
+                foreach (var video in Constants.videoInfo.Video)
+                {
+                    if (video.VideoQuality == quality)
+                        return video.Url;
+                }
+            }
+
+            return null;
+        }
+
+        static public List<VideoQuality> GetVideoQualityList()
+        {
+            var qualitiesString = Constants.videoInfo.GetAllVideoQualities().ToList();
+            qualitiesString.Sort();
+            return qualitiesString;
         }
     }
 }

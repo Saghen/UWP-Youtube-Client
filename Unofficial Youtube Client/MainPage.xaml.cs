@@ -22,6 +22,9 @@ using Newtonsoft.Json;
 using YoutubeExplode;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Animation;
+using Windows.Web.Http;
+using Windows.Networking.BackgroundTransfer;
+using System.IO;
 
 namespace YTApp
 {
@@ -385,32 +388,22 @@ namespace YTApp
         public async void DownloadVideo()
         {
             var client = new YoutubeClient();
-            var videoUrl = (await client.GetVideoMediaStreamInfosAsync(Constants.activeVideoID)).Muxed[0].Url;
+            var videoUrl = Constants.videoInfo.Muxed[0].Url;
 
-            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            var savePicker = new Windows.Storage.Pickers.FileSavePicker();
+            savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
+            savePicker.FileTypeChoices.Add("Video File", new List<string>() { ".mp4" });
 
-            var picker = new Windows.Storage.Pickers.FileOpenPicker
-            {
-                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Unspecified,
-                CommitButtonText = "Save that bich"
-            };
-
-            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
-
+            Windows.Storage.StorageFile file = await savePicker.PickSaveFileAsync();
             if (file != null)
             {
-                try
-                {
-                    Windows.Networking.BackgroundTransfer.BackgroundDownloader downloader = new Windows.Networking.BackgroundTransfer.BackgroundDownloader();
-                    Windows.Networking.BackgroundTransfer.DownloadOperation download = downloader.CreateDownload(new Uri(videoUrl), file);
-
-                    HandleDownloadAsync(download);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("Download Error", ex);
-                    Log.Error(videoUrl);
-                }
+                // Prevent updates to the remote version of the file until
+                // we finish making changes and call CompleteUpdatesAsync.
+                Windows.Storage.CachedFileManager.DeferUpdates(file);
+                // write to file
+                BackgroundDownloader downloader = new BackgroundDownloader();
+                DownloadOperation download = downloader.CreateDownload(new Uri(videoUrl), file);
+                download.StartAsync();
             }
             else
             {
@@ -418,18 +411,15 @@ namespace YTApp
             }
         }
 
-        private async void HandleDownloadAsync(Windows.Networking.BackgroundTransfer.DownloadOperation download)
+        private void Progress_ProgressChanged(object sender, HttpProgress e)
         {
-            await Task.Factory.StartNew(() => download.StartAsync());
+            if(e.TotalBytesToReceive == null) { return; }
+            DownloadProgress.Value = ((double)e.BytesReceived / (double)e.TotalBytesToReceive) * 1000;
 
-            while (download.Progress.BytesReceived / download.Progress.TotalBytesToReceive < 1)
+            if (e.BytesReceived == e.TotalBytesToReceive && e.TotalBytesToReceive != 0)
             {
-                DownloadProgress.Value = download.Progress.BytesReceived / download.Progress.TotalBytesToReceive;
-                await Task.Delay(16);
+                DownloadProgress.Visibility = Visibility.Collapsed;
             }
-            DownloadProgress.Value = 1;
-            await Task.Delay(200);
-            DownloadProgress.Visibility = Visibility.Collapsed;
         }
 
         #endregion

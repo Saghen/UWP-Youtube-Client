@@ -109,8 +109,9 @@
     <Compile Include="Classes\DataTypes\PlaylistDataType.cs" />
     <Compile Include="Classes\EventsArgs\RoutedEventArgsWithID.cs" />
     <Compile Include="Classes\SearchTemplateSelector.cs" />
-    <Compile Include="Classes\YoutubeChannelDataType.cs" />
+    <Compile Include="Classes\DataTypes\YoutubeChannelDataType.cs" />
     <Compile Include="Classes\YoutubeItemMethodsStatic.cs" />
+    <Compile Include="Controls\ExtendedSlider.cs" />
     <Compile Include="Controls\GridViewWithXProperty.cs" />
     <Compile Include="Pages\WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
@@ -127,8 +128,8 @@
     <Compile Include="UserControls\ChannelPlaylistGridView.xaml.cs">
       <DependentUpon>ChannelPlaylistGridView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\SplitViewItemDataType.cs" />
-    <Compile Include="Classes\SubscriptionDataType.cs" />
+    <Compile Include="Classes\DataTypes\SplitViewItemDataType.cs" />
+    <Compile Include="Classes\DataTypes\SubscriptionDataType.cs" />
     <Compile Include="Classes\YoutubeItemMethods.cs" />
     <Compile Include="Controls\CustomMediaTransportControls.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -144,7 +145,7 @@
       <DependentUpon>SearchPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Classes\YoutubeItemDataType.cs" />
+    <Compile Include="Classes\DataTypes\YoutubeItemDataType.cs" />
     <Compile Include="UserControls\LikeDislikeUserControl.xaml.cs">
       <DependentUpon>LikeDislikeUserControl.xaml</DependentUpon>
     </Compile>
@@ -251,6 +252,11 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles\CircularButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Styles\MediaControlSliderStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

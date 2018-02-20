@@ -177,11 +177,13 @@ namespace YTApp.Pages
             Constants.MainPageRef.StartVideo(item.Id);
         }
 
-        //Another version of the ChangePlayerSize that takes a bool allowing you to set it to fullscreen (true) or to a small view (false)
+        //AChangePlayerSize takes a bool allowing you to set it to fullscreen (true) or to a small view (false)
         public void ChangePlayerSize(bool MakeFullScreen)
         {
             if (!MakeFullScreen)
             {
+                viewer.transportControls.Visibility = Visibility.Collapsed;
+
                 Scrollviewer.ChangeView(0, 0, 1, true);
                 Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
                 Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
@@ -199,6 +201,8 @@ namespace YTApp.Pages
             }
             else
             {
+                viewer.transportControls.Visibility = Visibility.Visible;
+
                 Scrollviewer.VerticalScrollMode = ScrollMode.Auto;
                 Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 
@@ -249,14 +253,8 @@ namespace YTApp.Pages
         {
             Constants.MainPageRef.viewer.Source = new Uri(videoStreams.Muxed[0].Url);
             Constants.MainPageRef.viewer.Visibility = Visibility.Visible;
-            Constants.MainPageRef.viewer.MediaOpened += MainPageViewer_MediaOpened;
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = true;
-        }
-
-        private void MainPageViewer_MediaOpened(object sender, RoutedEventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         private void CustomMediaTransportControls_SwitchedToFullSize(object sender, EventArgs e)
@@ -266,6 +264,10 @@ namespace YTApp.Pages
             //Reset title to bar to it's normal state
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = false;
+
+            //Set the position of this video page's viewer to the position of the compact view's one
+            viewer.timelineController.Position = Constants.MainPageRef.viewer.Position;
+            viewer.timelineController.Start();
         }
 
         private void OpenChannel(object sender, TappedRoutedEventArgs e)
@@ -296,6 +298,29 @@ namespace YTApp.Pages
                 Description.MaxLines = 400;
                 DescriptionShowMore.Content = "Show less";
             }
+        }
+
+        private void viewer_EnteringFullscreen(object sender, EventArgs e)
+        {
+            Constants.MainPageRef.Toolbar.Visibility = Visibility.Collapsed;
+            MediaRow.Height = new GridLength();
+            Scrollviewer.ChangeView(0, 0, 1, true);
+            Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
+            Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+        }
+
+        private void viewer_ExitingFullscren(object sender, EventArgs e)
+        {
+            Constants.MainPageRef.Toolbar.Visibility = Visibility.Visible;
+
+            Scrollviewer.VerticalScrollMode = ScrollMode.Enabled;
+            Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+
+            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+            if (localSettings.Values["MediaViewerHeight"] != null && (double)localSettings.Values["MediaViewerHeight"] > 360)
+                MediaRow.Height = new GridLength(Convert.ToDouble(localSettings.Values["MediaViewerHeight"]));
+            else
+                MediaRow.Height = new GridLength(600);
         }
     }
 }

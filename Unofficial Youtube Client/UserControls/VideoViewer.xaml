@@ -2,28 +2,65 @@
     x:Class="YTApp.UserControls.VideoViewer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:YTApp"
+    xmlns:local="using:YTApp.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignWidth="400" PointerEntered="MediaViewerParent_PointerEntered" PointerExited="MediaViewerParent_PointerExited">
 
-    <Grid>
-        <MediaPlayerElement x:Name="viewerAudio"/>
-        <MediaElement x:Name="viewer" AreTransportControlsEnabled="True">
-            <FlyoutBase.AttachedFlyout>
-                <Flyout>
-                    <StackPanel>
-                        <MenuFlyoutItem Text="Download video"/>
-                        <MenuFlyoutItem Text="Copy video link"/>
-                        <MenuFlyoutItem Text="Copy video link at current time"/>
-                    </StackPanel>
-                </Flyout>
-            </FlyoutBase.AttachedFlyout>
-            <MediaElement.TransportControls>
-                <local:CustomMediaTransportControls/>
-            </MediaElement.TransportControls>
-        </MediaElement>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <Storyboard x:Name="FadeOut">
+                <DoubleAnimation Storyboard.TargetName="transportControls" EnableDependentAnimation="True"  Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.2"/>
+            </Storyboard>
+            <Storyboard x:Name="FadeIn">
+                <DoubleAnimation Storyboard.TargetName="transportControls" EnableDependentAnimation="True" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2"/>
+            </Storyboard>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/MediaControlSliderStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid x:Name="MediaViewerParent">
+        <MediaPlayerElement x:Name="viewer" Tapped="viewer_Tapped" DoubleTapped="viewer_DoubleTapped" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited"/>
+        <StackPanel x:Name="transportControls" x:FieldModifier="public" VerticalAlignment="Bottom" Background="#88000000" PointerEntered="transportControls_PointerEntered">
+            <Slider x:Name="viewerProgress" Style="{StaticResource MediaControlSliderStyle}" IsThumbToolTipEnabled="False" PointerCaptureLost="viewerProgress_SliderOnComplete"/>
+            <Grid>
+                <CommandBar Background="Transparent" HorizontalAlignment="Left" OverflowButtonVisibility="Collapsed">
+                    <AppBarButton x:Name="ButtonPlay" Icon="Pause" Click="ButtonPlay_Click"/>
+                    <AppBarButton x:Name="ButtonVolume" Icon="Volume" Click="ButtonVolume_Click" Width="180">
+                        <AppBarButton.Template>
+                            <ControlTemplate>
+                                <StackPanel Orientation="Horizontal" Padding="10,0">
+                                    <SymbolIcon Symbol="Volume" MinHeight="{ThemeResource AppBarThemeCompactHeight}" Margin="0,0,10,0"/>
+                                    <Grid>
+                                        <Slider x:Name="VolumeSlider" Value="1000" Maximum="1000" Width="120" VerticalAlignment="Center" Style="{StaticResource VolumeSliderStyle}" ValueChanged="VolumeSlider_ValueChanged" IsThumbToolTipEnabled="False">
+                                            <Slider.RenderTransform>
+                                                <TranslateTransform Y="3"/>
+                                            </Slider.RenderTransform>
+                                        </Slider>
+                                    </Grid>
+                                </StackPanel>
+                            </ControlTemplate>
+                        </AppBarButton.Template>
+                    </AppBarButton>
+                    <AppBarButton x:Name="ButtonDownload" Icon="Download" Tapped="DownloadVideo_Tapped"/>
+                    <AppBarButton x:Name="ButtonCopy" Icon="Copy"/>
+                </CommandBar>
+                <CommandBar Background="Transparent" HorizontalAlignment="Right" OverflowButtonVisibility="Collapsed">
+                    <AppBarButton x:Name="ButtonPiP" Icon="DockBottom" Click="ButtonPiP_Click"/>
+                    <AppBarButton x:Name="ButtonSettings" Icon="Setting" Click="ButtonSettings_Click">
+                        <AppBarButton.Flyout>
+                            <Flyout>
+                                <ListView x:Name="QualityList" Background="#66000000" ItemClick="QualityList_ItemClick" IsItemClickEnabled="True"></ListView>
+                            </Flyout>
+                        </AppBarButton.Flyout>
+                    </AppBarButton>
+                    <AppBarButton x:Name="ButtonFullscreen" Icon="FullScreen" Click="ButtonFullscreen_Click"/>
+                </CommandBar>
+            </Grid>
+        </StackPanel>
     </Grid>
 </UserControl>

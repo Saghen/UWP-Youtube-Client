@@ -34,11 +34,11 @@
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="56"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Grid Background="#2a2a2a">
+        <Grid x:FieldModifier="public" x:Name="Toolbar" Background="#2a2a2a" Height="56">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button x:Name="HamburgerButton" FontFamily="Segoe MDL2 Assets" Content="&#xE700;" FontSize="18" Margin="20,0" Background="Transparent" Click="HamburgerButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
                 <TextBox x:Name="SearchBox" Width="500px" VerticalAlignment="Center" PlaceholderText="Search" KeyDown="SearchBox_KeyDown" BorderThickness="1" Style="{StaticResource TextBoxCleanStyle}" Background="#151515" BorderBrush="#2a2a2a" x:FieldModifier="public"/>
@@ -69,7 +69,7 @@
                     </FlyoutBase.AttachedFlyout>
                 </Button>
             </StackPanel>
-            <ProgressBar x:Name="DownloadProgress" VerticalAlignment="Bottom" Visibility="Collapsed"/>
+            <ProgressBar x:Name="DownloadProgress" VerticalAlignment="Bottom" Visibility="Collapsed" Maximum="1000"/>
         </Grid>
 
         <SplitView Grid.Row="1" x:Name="SideBarSplitView" DisplayMode="Overlay">

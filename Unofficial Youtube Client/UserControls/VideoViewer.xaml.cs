@@ -9,6 +9,7 @@ using Windows.Foundation.Collections;
 using Windows.Media;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Networking.BackgroundTransfer;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -20,6 +21,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using YoutubeExplode;
 using YoutubeExplode.Models.MediaStreams;
+using YTApp.Classes;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -27,11 +29,21 @@ namespace YTApp.UserControls
 {
     public sealed partial class VideoViewer : UserControl
     {
+        public event EventHandler EnteringFullscreen;
+        public event EventHandler ExitingFullscren;
+
         private static readonly DependencyProperty SourceProperty = DependencyProperty.Register( "Source", typeof(string), typeof(VideoViewer), null );
 
         MediaStreamInfoSet videoStreams;
 
         MediaPlayer audioPlayer = new MediaPlayer();
+        MediaPlayer videoPlayer = new MediaPlayer();
+        public MediaTimelineController timelineController = new MediaTimelineController();
+
+        //Timer that will update our progress slider on our custom controls
+        DispatcherTimer timer = new DispatcherTimer();
+
+        bool OverViewer = false;
 
         public string Source
         {
@@ -43,93 +55,270 @@ namespace YTApp.UserControls
         {
             this.InitializeComponent();
 
-            //Events for background audio playback
-            viewer.CurrentStateChanged += Viewer_CurrentStateChanged;
-            viewer.SeekCompleted += Viewer_SeekCompleted;
-            viewer.VolumeChanged += Viewer_VolumeChanged;
+            ((CustomMediaTransportControls)Constants.MainPageRef.viewer.TransportControls).SwitchedToFullSize += VideoViewer_SwitchedToFullSize;
 
-            //Custom event that fires immediately after seeking
-            var controls = (CustomMediaTransportControls)viewer.TransportControls;
-            controls.SeekCompletedFast += Controls_SeekCompletedFast;
-
-            //Checks to make sure the audio is synced
-            DispatcherTimer checkAudioTimer = new DispatcherTimer();
-            checkAudioTimer.Interval = new TimeSpan(0, 1, 0);
-            checkAudioTimer.Tick += CheckAudioTimer_Tick;
-            checkAudioTimer.Start();
+            //Update progress bar 30 times per second
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 32);
+            timer.Tick += Timer_Tick;
         }
 
-        private void CheckAudioTimer_Tick(object sender, object e)
-        {
-            if (Math.Round(audioPlayer.PlaybackSession.Position.TotalSeconds, 1) != Math.Round(viewer.Position.TotalSeconds, 1))
-                audioPlayer.PlaybackSession.Position = viewer.Position;
-        }
+        #region Transport Control Management
 
-        #region Audio Events
-        private void Controls_SeekCompletedFast(object sender, EventArgs e)
+        private async void Timer_Tick(object sender, object e)
         {
-            audioPlayer.Pause();
-        }
-        
-        private void Viewer_VolumeChanged(object sender, RoutedEventArgs e)
-        {
-            audioPlayer.Volume = viewer.Volume;
-        }
-
-        private void Viewer_SeekCompleted(object sender, RoutedEventArgs e)
-        {
-            audioPlayer.PlaybackSession.Position = viewer.Position;
-            audioPlayer.Play();
-        }
-
-        private async void Viewer_CurrentStateChanged(object sender, RoutedEventArgs e)
-        {
-            switch (viewer.CurrentState)
+            if (Window.Current.CoreWindow.GetKeyState(Windows.System.VirtualKey.LeftButton).HasFlag(CoreVirtualKeyStates.Down))
+                return;
+            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
             {
-                case MediaElementState.Playing:
-                    await Task.Delay(200);
-                    audioPlayer.PlaybackSession.Position = viewer.Position;
-                    audioPlayer.Play();
-                    break;
-                default:
-                    audioPlayer.PlaybackSession.Position = viewer.Position;
-                    audioPlayer.Pause();
-                    break;
+                viewerProgress.Value = videoPlayer.PlaybackSession.Position.TotalSeconds;
+            });
+        }
+
+        private void ButtonPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if(timelineController.State == MediaTimelineControllerState.Running)
+            {
+                timelineController.Pause();
+                ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Play };
+            }
+            else
+            {
+                timelineController.Resume();
+                ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Pause };
             }
         }
+
+        private async void ButtonPiP_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
+            compactOptions.CustomSize = new Size(500, 281);
+            await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions);
+
+            Constants.MainPageRef.viewer.Source = new Uri(videoStreams.Muxed[0].Url);
+            Constants.MainPageRef.viewer.Position = timelineController.Position;
+            Constants.MainPageRef.viewer.Visibility = Visibility.Visible;
+
+            timelineController.Pause();
+
+            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+        }
+
+        private void VideoViewer_SwitchedToFullSize(object sender, EventArgs e)
+        {
+            Constants.MainPageRef.viewer.Visibility = Visibility.Collapsed;
+
+            //Reset title to bar to it's normal state
+            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = false;
+
+            //Set the position of this video page's viewer to the position of the compact view's one
+            timelineController.Position = Constants.MainPageRef.viewer.Position;
+            timelineController.Start();
+        }
+
+        private void ButtonSettings_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonSettings.Flyout.ShowAt(ButtonSettings);
+        }
+
+        private void ButtonFullscreen_Click(object sender, RoutedEventArgs e)
+        {
+            var view = ApplicationView.GetForCurrentView();
+            if (view.IsFullScreenMode)
+            {
+                view.ExitFullScreenMode();
+                ExitingFullscren.Invoke(this, new EventArgs());
+            } 
+            else
+            {
+                view.TryEnterFullScreenMode();
+                EnteringFullscreen.Invoke(this, new EventArgs());
+            }
+        }
+
+        private async void MediaViewerParent_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            FadeIn.Begin();
+        }
+
+        private void MediaViewerParent_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            FadeOut.Begin();
+        }
+
+        private async void viewer_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            OverViewer = true;
+            await Task.Delay(2000);
+            if (transportControls.Opacity == 1 && OverViewer)
+                FadeOut.Begin();
+        }
+
+        private void viewer_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            OverViewer = false;
+        }
+
+        private void transportControls_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            if (transportControls.Opacity == 0)
+                FadeIn.Begin();
+        }
+
+        private void viewerProgress_SliderOnComplete(object sender, PointerRoutedEventArgs e)
+        {
+            //Set new position to the one that was just selected
+            timelineController.Position = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(viewerProgress.Value * 1000));
+        }
+
+        private void QualityList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            videoPlayer.Source = MediaSource.CreateFromUri(new Uri(YoutubeItemMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false)));
+            ButtonSettings.Flyout.Hide();
+        }
+
+        #region Volume Button
+        private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            audioPlayer.Volume = ((Slider)sender).Value/1000;
+        }
+
+
+        private void ButtonVolume_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonVolume.Flyout.ShowAt(ButtonVolume);
+        }
+
+        #endregion
+
+
+        #region Viewer Events
+        private void viewer_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            if (timelineController.State == MediaTimelineControllerState.Running)
+            {
+                timelineController.Pause();
+                ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Play };
+            }
+            else
+            {
+                timelineController.Resume();
+                ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Pause };
+            }
+        }
+
+        private void viewer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        {
+            var view = ApplicationView.GetForCurrentView();
+            if (view.IsFullScreenMode)
+            {
+                view.ExitFullScreenMode();
+                ExitingFullscren.Invoke(this, new EventArgs());
+            }
+            else
+            {
+                view.TryEnterFullScreenMode();
+                EnteringFullscreen.Invoke(this, new EventArgs());
+            }
+        }
+
+        #endregion
+
+        #region Download Video Event
+        private async void DownloadVideo_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var client = new YoutubeClient();
+            var videoUrl = Constants.videoInfo.Muxed[0].Url;
+
+            var savePicker = new Windows.Storage.Pickers.FileSavePicker();
+            savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
+            savePicker.FileTypeChoices.Add("Video File", new List<string>() { ".mp4" });
+
+            Windows.Storage.StorageFile file = await savePicker.PickSaveFileAsync();
+            if (file != null)
+            {
+                // Prevent updates to the remote version of the file until
+                // we finish making changes and call CompleteUpdatesAsync.
+                Windows.Storage.CachedFileManager.DeferUpdates(file);
+                // write to file
+                BackgroundDownloader downloader = new BackgroundDownloader();
+                DownloadOperation download = downloader.CreateDownload(new Uri(videoUrl), file);
+                download.StartAsync();
+            }
+            else
+            {
+                //Log.Info("Download operation was cancelled.");
+            }
+        }
+        #endregion
         #endregion
 
         #region Video Source Management
 
-        private async void UpdateVideo()
+        private async Task<bool> GetVideoData()
         {
-            viewerAudio.SetMediaPlayer(null);
-
             var client = new YoutubeClient();
             string id = Source;
 
             //Convert it to a regular ID if it is a youtube link
             try { id = YoutubeClient.ParseVideoId(Source); }
             catch { }
-            
-            try
+
+            //Get the video
+            try { videoStreams = await client.GetVideoMediaStreamInfosAsync(id); }
+            catch { return false; }
+
+            //Store the video urls and info
+            Constants.videoInfo = videoStreams;
+
+            return true;
+        }
+
+        private async void UpdateVideo()
+        {
+            if (!(await GetVideoData()))
+                return;
+
+
+            //We use this method so that we can synchronize the audio and video streams
+            audioPlayer.Source = MediaSource.CreateFromUri(new Uri(Constants.videoInfo.Audio[0].Url));
+            videoPlayer.Source = MediaSource.CreateFromUri(new Uri(Constants.videoInfo.Video[0].Url));
+
+            audioPlayer.CommandManager.IsEnabled = false;
+            videoPlayer.CommandManager.IsEnabled = false;
+
+            audioPlayer.TimelineController = timelineController;
+            videoPlayer.TimelineController = timelineController;
+
+            viewer.SetMediaPlayer(videoPlayer);
+
+            timelineController.Start();
+
+            //Event that allows us to set the maximum progress bar value and start updating
+            videoPlayer.MediaOpened += VideoPlayer_MediaOpened;
+
+            //Update video qualities
+            QualityList.ItemsSource = YoutubeItemMethodsStatic.GetVideoQualityList();
+        }
+
+        private async void VideoPlayer_MediaOpened(MediaPlayer sender, object args)
+        {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
             {
-                videoStreams = await client.GetVideoMediaStreamInfosAsync(id);
-            }
-            catch { return; }
-
-            audioPlayer.Source = MediaSource.CreateFromUri(new Uri(videoStreams.Audio[0].Url));
-            audioPlayer.PlaybackSession.PlaybackRate = 0.9983; // <-- Compensate for it being slightly too fast and causing desync
-            viewerAudio.SetMediaPlayer(audioPlayer);
-            
-
-            viewer.Source = new Uri(videoStreams.Video[2].Url);
+                viewerProgress.Maximum = videoPlayer.PlaybackSession.NaturalDuration.TotalSeconds;
+                timer.Start();
+            });
         }
 
         public void StopVideo()
         {
-            audioPlayer.Source = null;
-            viewer.Source = null;
+            //Stop updating the progress bar
+            timer.Stop();
+
+            //Remove the players from memory
+            audioPlayer.Dispose();
+            videoPlayer.Dispose();
         }
         #endregion
     }
