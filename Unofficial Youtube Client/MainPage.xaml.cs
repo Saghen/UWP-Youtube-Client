@@ -40,17 +40,11 @@ namespace YTApp
         public ObservableCollection<SubscriptionDataType> subscriptionsList = new ObservableCollection<SubscriptionDataType>();
         List<SearchListResponse> youtubeVideos = new List<SearchListResponse>();
 
-        public event EventHandler SwitchToFullSize;
-
         public MainPage()
         {
             InitializeComponent();
 
             Constants.MainPageRef = this;
-
-            //Reset Title Bar
-            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = false;
 
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
@@ -84,6 +78,7 @@ namespace YTApp
             LoadSubscriptions();
             contentFrame.Navigate(typeof(HomePage));
             UpdateLoginDetails();
+
             //Plays Youtube link in clipboard
             PlayClipboardYLink();
         }
@@ -299,15 +294,6 @@ namespace YTApp
             videoFrame.Visibility = Visibility.Visible;
             Constants.activeVideoID = Id;
             videoFrame.Navigate(typeof(VideoPage));
-        }
-
-        #endregion
-
-        #region Events
-
-        public void Viewer_SwitchToFullSize(object sender, EventArgs e)
-        {
-            SwitchToFullSize.Invoke(this, new EventArgs());
         }
 
         #endregion

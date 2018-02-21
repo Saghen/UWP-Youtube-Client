@@ -68,7 +68,6 @@ namespace YTApp.UserControls
             pointerCheckTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             pointerCheckTimer.Tick += PointerCheckTimer_Tick;
 
-
             videoPlayer.CurrentStateChanged += VideoPlayer_CurrentStateChanged;
             //timelineController.StateChanged += TimelineController_StateChanged;
         }
@@ -87,39 +86,7 @@ namespace YTApp.UserControls
         }
         #endregion
 
-        private void PointerCheckTimer_Tick(object sender, object e)
-        {
-            try
-            {
-                if (previousMouseLocation != Window.Current.CoreWindow.PointerPosition)
-                {
-                    mouseHasntMoved = 0;
-                    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
-                    if (transportControls.Opacity == 0)
-                        FadeIn.Begin();
-                }
-                else if (mouseHasntMoved == 20 && transportControls.Opacity == 1)
-                {
-                    FadeOut.Begin();
-                    Window.Current.CoreWindow.PointerCursor = null;
-                }
-                mouseHasntMoved += 1;
-                previousMouseLocation = Window.Current.CoreWindow.PointerPosition;
-            }
-            catch { }
-        }
-
         #region Transport Control Management
-
-        private async void Timer_Tick(object sender, object e)
-        {
-            if (Window.Current.CoreWindow.GetKeyState(Windows.System.VirtualKey.LeftButton).HasFlag(CoreVirtualKeyStates.Down))
-                return;
-            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-            {
-                viewerProgress.Value = videoPlayer.PlaybackSession.Position.TotalSeconds;
-            });
-        }
 
         private void ButtonPlay_Click(object sender, RoutedEventArgs e)
         {
@@ -135,25 +102,46 @@ namespace YTApp.UserControls
             }
         }
 
+        #region Picture in Picture
         private async void ButtonPiP_Click(object sender, RoutedEventArgs e)
         {
             ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
             compactOptions.CustomSize = new Size(500, 281);
             await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions);
 
-            Constants.MainPageRef.viewer.Source = new Uri(videoStreams.Muxed[0].Url);
-            Constants.MainPageRef.viewer.Position = timelineController.Position;
-            Constants.MainPageRef.viewer.Visibility = Visibility.Visible;
-
+            //Pause the video
             timelineController.Pause();
 
+            //Set the source of the title bar and then wait until the media has opened to set the position
+            Constants.MainPageRef.viewer.Source = new Uri(videoStreams.Muxed[0].Url);
+            Constants.MainPageRef.viewer.MediaOpened += Viewer_MediaOpened;
+
+            //Make the title bar smaller
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = true;
+
+            //Pause the slider updating timer
+            timer.Stop();
+            pointerCheckTimer.Stop();
         }
 
-        private void VideoViewer_SwitchedToFullSize(object sender, EventArgs e)
+        private void Viewer_MediaOpened(object sender, RoutedEventArgs e)
         {
+            //Set the PiP window to have the correct position and volume and make it visible. For some reason, if the seconds played is below 15, it just breaks.
+            Constants.MainPageRef.viewer.Volume = audioPlayer.Volume;
+            Constants.MainPageRef.viewer.Visibility = Visibility.Visible;
+        }
+
+        private async void VideoViewer_SwitchedToFullSize(object sender, EventArgs e)
+        {
+            //Stop the PiP media element
             Constants.MainPageRef.viewer.Visibility = Visibility.Collapsed;
+            Constants.MainPageRef.viewer.Source = null;
+
+            //Set the window to be full sized
+            ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.Default);
+            compactOptions.CustomSize = new Size(500, 281);
+            await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default, compactOptions);
 
             //Reset title to bar to it's normal state
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
@@ -162,7 +150,11 @@ namespace YTApp.UserControls
             //Set the position of this video page's viewer to the position of the compact view's one
             timelineController.Position = Constants.MainPageRef.viewer.Position;
             timelineController.Start();
+
+            //Start the slider updating timer again
+            timer.Start();
         }
+        #endregion
 
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
@@ -193,6 +185,28 @@ namespace YTApp.UserControls
 
         #region Manage Transport Control Fading
 
+        private void PointerCheckTimer_Tick(object sender, object e)
+        {
+            try
+            {
+                if (previousMouseLocation != Window.Current.CoreWindow.PointerPosition)
+                {
+                    mouseHasntMoved = 0;
+                    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
+                    if (transportControls.Opacity == 0)
+                        FadeIn.Begin();
+                }
+                else if (mouseHasntMoved == 20 && transportControls.Opacity == 1)
+                {
+                    FadeOut.Begin();
+                    Window.Current.CoreWindow.PointerCursor = null;
+                }
+                mouseHasntMoved += 1;
+                previousMouseLocation = Window.Current.CoreWindow.PointerPosition;
+            }
+            catch { }
+        }
+
         private void MediaViewerParent_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             FadeIn.Begin();
@@ -215,17 +229,31 @@ namespace YTApp.UserControls
 
         #endregion
 
+        #region Slider
+        private async void Timer_Tick(object sender, object e)
+        {
+            if (Window.Current.CoreWindow.GetKeyState(Windows.System.VirtualKey.LeftButton).HasFlag(CoreVirtualKeyStates.Down))
+                return;
+            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+            {
+                viewerProgress.Value = videoPlayer.PlaybackSession.Position.TotalSeconds;
+            });
+        }
+
         private void viewerProgress_SliderOnComplete(object sender, PointerRoutedEventArgs e)
         {
             //Set new position to the one that was just selected
             timelineController.Position = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(viewerProgress.Value * 1000));
         }
+        #endregion
 
+        #region Quality Button
         private void QualityList_ItemClick(object sender, ItemClickEventArgs e)
         {
             videoPlayer.Source = MediaSource.CreateFromUri(new Uri(YoutubeItemMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false)));
             ButtonSettings.Flyout.Hide();
         }
+        #endregion
 
         #region Volume Button
         private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
@@ -236,7 +264,6 @@ namespace YTApp.UserControls
             }
             catch { }
         }
-
 
         private void ButtonVolume_Click(object sender, RoutedEventArgs e)
         {

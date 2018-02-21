@@ -54,6 +54,10 @@ namespace YTApp
         {
             Frame rootFrame = Window.Current.Content as Frame;
 
+            //Reset Title Bar
+            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = false;
+
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
             if (rootFrame == null)
