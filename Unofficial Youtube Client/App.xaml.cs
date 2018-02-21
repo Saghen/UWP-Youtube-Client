@@ -84,7 +84,7 @@ namespace YTApp
                     // configuring the new page by passing required information as a navigation
                     // parameter
 
-                    if (await Classes.YoutubeItemMethodsStatic.IsUserAuthenticated())
+                    if (await Classes.YoutubeMethodsStatic.IsUserAuthenticated())
                         rootFrame.Navigate(typeof(MainPage), e.Arguments);
                     else
                         rootFrame.Navigate(typeof(Pages.WelcomePage), e.Arguments);

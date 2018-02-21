@@ -1,22 +1,7 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
-using Google.Apis.YouTube.v3;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
+﻿using Google.Apis.YouTube.v3;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
-using YTApp.Classes.DataTypes;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -41,9 +26,9 @@ namespace YTApp.Pages
 
         public async void UpdateVideos()
         {
-            YoutubeItemMethods methods = new YoutubeItemMethods();
+            YoutubeMethods methods = new YoutubeMethods();
 
-            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var service = await YoutubeMethodsStatic.GetServiceAsync();
 
             var recommendations = service.Videos.List("snippet, contentDetails");
             recommendations.Chart = VideosResource.ListRequest.ChartEnum.MostPopular;

@@ -25,7 +25,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
 using YTApp.Classes.DataTypes;
-using YTApp.Classes.EventsArgs;
+using YTApp.Classes.EventArgs;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -67,7 +67,7 @@ namespace YTApp.Pages
         #region Home
         public async void UpdateChannel()
         {
-            var GetChannelInfo = (await YoutubeItemMethodsStatic.GetServiceAsync()).Channels.List("snippet, brandingSettings, statistics");
+            var GetChannelInfo = (await YoutubeMethodsStatic.GetServiceAsync()).Channels.List("snippet, brandingSettings, statistics");
             GetChannelInfo.Id = Constants.activeChannelID;
             var ChannelInfoResults = GetChannelInfo.Execute();
             channel = ChannelInfoResults.Items[0];
@@ -83,19 +83,19 @@ namespace YTApp.Pages
             ChannelName.Text = channel.Snippet.Title;
 
             //Subscribe Button
-            var CheckIfSubscribed = (await YoutubeItemMethodsStatic.GetServiceAsync()).Subscriptions.List("snippet");
+            var CheckIfSubscribed = (await YoutubeMethodsStatic.GetServiceAsync()).Subscriptions.List("snippet");
             CheckIfSubscribed.Mine = true;
             CheckIfSubscribed.ForChannelId = Constants.activeChannelID;
             var IsSubscribed = CheckIfSubscribed.Execute();
 
             if (IsSubscribed.Items.Count == 0)
             {
-                SubscribeButton.Content = "Subscribe " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
+                SubscribeButton.Content = "Subscribe " + YoutubeMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
                 isSubscribed = false;
             }
             else
             {
-                SubscribeButton.Content = "Subscribed " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
+                SubscribeButton.Content = "Subscribed " + YoutubeMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
                 isSubscribed = true;
             }
 
@@ -135,9 +135,9 @@ namespace YTApp.Pages
 
         public async void UpdatePopularUploads()
         {
-            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var service = await YoutubeMethodsStatic.GetServiceAsync();
 
-            var methods = new YoutubeItemMethods();
+            var methods = new YoutubeMethods();
             ObservableCollection<YoutubeItemDataType> YoutubeItemsTemp = new ObservableCollection<YoutubeItemDataType>();
 
             var GetChannelVideosPopular = service.Search.List("snippet");
@@ -157,9 +157,9 @@ namespace YTApp.Pages
 
         public async void UpdateChannelSections()
         {
-            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var service = await YoutubeMethodsStatic.GetServiceAsync();
 
-            var methods = new YoutubeItemMethods();
+            var methods = new YoutubeMethods();
 
             //Get the playlists for the channel
             var GetChannelPlaylists = service.ChannelSections.List("snippet,contentDetails");
@@ -219,11 +219,11 @@ namespace YTApp.Pages
 
         public async void UpdateFeaturedChannels()
         {
-            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var service = await YoutubeMethodsStatic.GetServiceAsync();
 
             try
             {
-                var methods = new YoutubeItemMethods();
+                var methods = new YoutubeMethods();
 
                 string FeaturedChannelIds = "";
                 foreach (var Id in channel.BrandingSettings.Channel.FeaturedChannelsUrls)
@@ -266,7 +266,7 @@ namespace YTApp.Pages
 
             if (isSubscribed == true)
             {
-                SubscribeButton.Content = "Subscribe " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
+                SubscribeButton.Content = "Subscribe " + YoutubeMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
 
                 var getSubscription = service.Subscriptions.List("snippet");
                 getSubscription.Mine = true;
@@ -287,13 +287,13 @@ namespace YTApp.Pages
                     catch
                     {
                         //Fires if subscription could not be removed for whatever reason.
-                        SubscribeButton.Content = "Subscribed " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount + 1);
+                        SubscribeButton.Content = "Subscribed " + YoutubeMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount + 1);
                     }
                 }
                 catch
                 {
                     //Fires if subscription doesn't exist.
-                    SubscribeButton.Content = "Subscribe " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
+                    SubscribeButton.Content = "Subscribe " + YoutubeMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount);
                     isSubscribed = false;
                 }
             }
@@ -309,7 +309,7 @@ namespace YTApp.Pages
                 var subscribe = service.Subscriptions.Insert(subscription, "snippet");
                 subscribe.Execute();
 
-                SubscribeButton.Content = "Subscribed " + YoutubeItemMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount + 1);
+                SubscribeButton.Content = "Subscribed " + YoutubeMethodsStatic.ViewCountShortner(channel.Statistics.SubscriberCount + 1);
 
                 isSubscribed = true;
             }
@@ -329,7 +329,7 @@ namespace YTApp.Pages
                 else { return; }
                 List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
 
-                YoutubeItemMethods methods = new YoutubeItemMethods();
+                YoutubeMethods methods = new YoutubeMethods();
 
                 var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                 {
@@ -379,7 +379,7 @@ namespace YTApp.Pages
 
                 List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
 
-                YoutubeItemMethods methods = new YoutubeItemMethods();
+                YoutubeMethods methods = new YoutubeMethods();
 
                 var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                 {

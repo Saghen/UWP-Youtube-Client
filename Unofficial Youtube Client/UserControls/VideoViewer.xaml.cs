@@ -70,7 +70,6 @@ namespace YTApp.UserControls
             videoPlayer.CurrentStateChanged += VideoPlayer_CurrentStateChanged;
         }
 
-
         #region Loading Ring
         private async void VideoPlayer_CurrentStateChanged(MediaPlayer sender, object args)
         {
@@ -207,7 +206,7 @@ namespace YTApp.UserControls
         #region Quality Button
         private void QualityList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            videoPlayer.Source = MediaSource.CreateFromUri(new Uri(YoutubeItemMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false)));
+            videoPlayer.Source = MediaSource.CreateFromUri(new Uri(YoutubeMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false)));
             ButtonSettings.Flyout.Hide();
         }
         #endregion
@@ -319,7 +318,7 @@ namespace YTApp.UserControls
             videoPlayer.MediaOpened += VideoPlayer_MediaOpened;
 
             //Update video qualities
-            QualityList.ItemsSource = YoutubeItemMethodsStatic.GetVideoQualityList();
+            QualityList.ItemsSource = YoutubeMethodsStatic.GetVideoQualityList();
         }
 
         private async void VideoPlayer_MediaOpened(MediaPlayer sender, object args)
@@ -340,6 +339,16 @@ namespace YTApp.UserControls
             videoPlayer.Dispose();
             audioPlayer.Dispose();
             timelineController.Pause();
+        }
+
+        public void ResumeVideo(TimeSpan position)
+        {
+            ButtonPlay.Icon = new SymbolIcon(Symbol.Pause);
+
+            if (position != null)
+                timelineController.Position = position;
+
+            timelineController.Resume();
         }
         #endregion
     }

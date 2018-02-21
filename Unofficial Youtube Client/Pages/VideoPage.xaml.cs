@@ -93,7 +93,7 @@ namespace YTApp.Pages
             //Set the ID of our viewer to the new ID
             viewer.Source = ID;
 
-            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var service = await YoutubeMethodsStatic.GetServiceAsync();
 
             var getVideoInfo = service.Videos.List("snippet, statistics, contentDetails");
             getVideoInfo.Id = ID;
@@ -122,7 +122,7 @@ namespace YTApp.Pages
 
         public void UpdatePageInfo(YouTubeService service)
         {
-            var methods = new YoutubeItemMethods();
+            var methods = new YoutubeMethods();
 
             Title.Text = Constants.activeVideo.Snippet.Title;
             Views.Text = string.Format("{0:#,###0.#}", Constants.activeVideo.Statistics.ViewCount) + " Views";
@@ -147,7 +147,7 @@ namespace YTApp.Pages
                 getRelatedVideos.Type = "video";
                 var relatedVideosResponse = getRelatedVideos.Execute();
 
-                var methods = new YoutubeItemMethods();
+                var methods = new YoutubeMethods();
                 foreach (SearchResult video in relatedVideosResponse.Items)
                 {
                     relatedVideosList.Add(methods.VideoToYoutubeItem(video));
@@ -338,9 +338,8 @@ namespace YTApp.Pages
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = false;
 
-            //Set the position of this video page's viewer to the position of the compact view's one
-            viewer.timelineController.Position = pipViewer.Position;
-            viewer.timelineController.Resume();
+            //Set the position of this video page's viewer to the position of the compact view's one and the volume
+            viewer.ResumeVideo(pipViewer.Position);
         }
 
         private async void viewer_EnteringPiP(object sender, EventArgs e)

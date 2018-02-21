@@ -107,10 +107,10 @@
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\DataTypes\ChannelListDataType.cs" />
     <Compile Include="Classes\DataTypes\PlaylistDataType.cs" />
-    <Compile Include="Classes\EventsArgs\RoutedEventArgsWithID.cs" />
+    <Compile Include="Classes\EventArgs\RoutedEventArgsWithID.cs" />
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\DataTypes\YoutubeChannelDataType.cs" />
-    <Compile Include="Classes\YoutubeItemMethodsStatic.cs" />
+    <Compile Include="Classes\YoutubeMethodsStatic.cs" />
     <Compile Include="Controls\ExtendedSlider.cs" />
     <Compile Include="Controls\GridViewWithXProperty.cs" />
     <Compile Include="Pages\WelcomePage.xaml.cs">
@@ -130,7 +130,7 @@
     </Compile>
     <Compile Include="Classes\DataTypes\SplitViewItemDataType.cs" />
     <Compile Include="Classes\DataTypes\SubscriptionDataType.cs" />
-    <Compile Include="Classes\YoutubeItemMethods.cs" />
+    <Compile Include="Classes\YoutubeMethods.cs" />
     <Compile Include="Controls\CustomMediaTransportControls.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>

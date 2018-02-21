@@ -14,7 +14,7 @@ using YoutubeExplode.Models.MediaStreams;
 
 namespace YTApp.Classes
 {
-    static class YoutubeItemMethodsStatic
+    static class YoutubeMethodsStatic
     {
         static async public Task<YouTubeService> GetServiceAsync()
         {

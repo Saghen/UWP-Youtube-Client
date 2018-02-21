@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace YTApp.Classes
 {
-    class YoutubeItemMethods
+    class YoutubeMethods
     {
         public YoutubeItemDataType VideoToYoutubeItem(SearchResult video)
         {
@@ -129,7 +129,7 @@ namespace YTApp.Classes
 
             for (int i = 0; i < collection.Count; i++)
             {
-                collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                collection[i].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
             }
             return null;
         }
@@ -158,7 +158,7 @@ namespace YTApp.Classes
             {
                 try
                 {
-                    collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                    collection[i].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
                 }
                 catch { collection[i].ViewsAndDate = "Unknown" + collection[i].ViewsAndDate; }
             }
@@ -188,7 +188,7 @@ namespace YTApp.Classes
 
             for (int i = 0; i < collection.Count; i++)
             {
-                collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                collection[i].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
             }
         }
 
@@ -216,7 +216,7 @@ namespace YTApp.Classes
             {
                 try
                 {
-                    collection[i].ViewsAndDate = YoutubeItemMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                    collection[i].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
                 }
                 catch { collection[i].ViewsAndDate = "Unknown" + collection[i].ViewsAndDate; }
             }

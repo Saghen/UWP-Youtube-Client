@@ -19,7 +19,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using YTApp.Classes;
 using YTApp.Classes.DataTypes;
-using YTApp.Classes.EventsArgs;
+using YTApp.Classes.EventArgs;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -44,7 +44,7 @@ namespace YTApp.Pages
         {
             List<YoutubeItemDataType> tempList = new List<YoutubeItemDataType>();
 
-            YoutubeItemMethods methods = new YoutubeItemMethods();
+            YoutubeMethods methods = new YoutubeMethods();
 
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {

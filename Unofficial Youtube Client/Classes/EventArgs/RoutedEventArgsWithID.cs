@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 
-namespace YTApp.Classes.EventsArgs
+namespace YTApp.Classes.EventArgs
 {
     public class RoutedEventArgsWithID : RoutedEventArgs
     {

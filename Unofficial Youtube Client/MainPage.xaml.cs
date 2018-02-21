@@ -33,12 +33,9 @@ namespace YTApp
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        public string VideoID = "";
-
         private ILogger Log = LogManagerFactory.DefaultLogManager.GetLogger<MainPage>();
 
         public ObservableCollection<SubscriptionDataType> subscriptionsList = new ObservableCollection<SubscriptionDataType>();
-        List<SearchListResponse> youtubeVideos = new List<SearchListResponse>();
 
         public MainPage()
         {
@@ -102,7 +99,7 @@ namespace YTApp
         public async void LoadSubscriptions()
         {
             //Get the service
-            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var service = await YoutubeMethodsStatic.GetServiceAsync();
 
             string nextPageToken;
 
@@ -262,8 +259,6 @@ namespace YTApp
 
         #region Search
 
-        #region Events
-
         private void Search_Click(object sender, RoutedEventArgs e)
         {
             contentFrame.Navigate(typeof(SearchPage));
@@ -283,11 +278,7 @@ namespace YTApp
 
         #endregion
 
-        #endregion
-
-        #region Media Viewer
-
-        #region Methods
+        #region Play Video
 
         public void StartVideo(string Id)
         {
@@ -298,9 +289,7 @@ namespace YTApp
 
         #endregion
 
-        #endregion
-
-        #region Login Region
+        #region User Info Region
         private async void BtnSignOut_Tapped(object sender, TappedRoutedEventArgs e)
         {
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
@@ -328,7 +317,7 @@ namespace YTApp
 
         private async void BtnMyChannel_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var service = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var service = await YoutubeMethodsStatic.GetServiceAsync();
 
             var getMyChannel = service.Channels.List("snippet");
             getMyChannel.Mine = true;
@@ -339,7 +328,7 @@ namespace YTApp
         }
         #endregion
 
-        #region Video Functions
+        #region Download
         public async void DownloadVideo()
         {
             var client = new YoutubeClient();
@@ -378,6 +367,7 @@ namespace YTApp
             if (e.Progress.BytesReceived == e.Progress.TotalBytesToReceive && e.Progress.TotalBytesToReceive != 0)
             {
                 DownloadProgress.Visibility = Visibility.Collapsed;
+                ShowNotifcation("Download complete.", 3000);
             }
         }
 
@@ -385,10 +375,10 @@ namespace YTApp
 
         #region Notifications
 
-        public void ShowNotifcation(string Text)
+        public void ShowNotifcation(string Text, int Length = 3000)
         {
             InAppNotif.Content = Text;
-            InAppNotif.Show();
+            InAppNotif.Show(Length);
         }
 
         #endregion

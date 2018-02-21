@@ -16,15 +16,12 @@ namespace YTApp.Pages
     public sealed partial class SearchPage : Page
     {
         private string nextPageToken = "";
-        private string searchQuery = "";
         private bool addingVideos = false;
 
         ObservableCollection<object> SearchResultsList = new ObservableCollection<object>();
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            searchQuery = Constants.MainPageRef.SearchBox.Text;
-
             Search();
         }
 
@@ -50,12 +47,11 @@ namespace YTApp.Pages
             }
         }
 
-        #region Search
         private async void Search()
         {
             SearchResultsList.Clear();
 
-            var youtubeService = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var youtubeService = await YoutubeMethodsStatic.GetServiceAsync();
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = Constants.MainPageRef.SearchBox.Text;
@@ -70,7 +66,7 @@ namespace YTApp.Pages
 
             ObservableCollection<YoutubeItemDataType> tempList = new ObservableCollection<YoutubeItemDataType>();
 
-            var methods = new YoutubeItemMethods();
+            var methods = new YoutubeMethods();
 
             foreach (var searchResult in searchListResponse.Items)
             {
@@ -94,7 +90,7 @@ namespace YTApp.Pages
 
         private async void SearchAddMore()
         {
-            var youtubeService = await YoutubeItemMethodsStatic.GetServiceAsync();
+            var youtubeService = await YoutubeMethodsStatic.GetServiceAsync();
 
             if (addingVideos == true)
                 return;
@@ -113,7 +109,7 @@ namespace YTApp.Pages
 
             ObservableCollection<YoutubeItemDataType> tempList = new ObservableCollection<YoutubeItemDataType>();
 
-            var methods = new YoutubeItemMethods();
+            var methods = new YoutubeMethods();
 
             foreach (var searchResult in searchListResponse.Items)
             {
@@ -137,44 +133,6 @@ namespace YTApp.Pages
 
             addingVideos = false;
         }
-
-        private string ViewCountShortner(ulong? viewCount)
-        {
-            if (viewCount > 1000000)
-            {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000000), 1)) + "M";
-            }
-            else if (viewCount > 1000)
-            {
-                return Convert.ToString(Math.Round(Convert.ToDouble(viewCount / 1000), 1)) + "K";
-            }
-            else
-            {
-                return Convert.ToString(viewCount);
-            }
-        }
-
-        private string TimeSinceDate(DateTime? date)
-        {
-            try
-            {
-                TimeSpan ts = DateTime.Now.Subtract(Convert.ToDateTime(date));
-                if (ts.TotalDays > 365)
-                    return String.Format("{0} years ago", (int)ts.TotalDays / 365);
-                else if (ts.TotalDays > 30)
-                    return String.Format("{0} months ago", (int)ts.TotalDays / 30);
-                else if (ts.TotalDays > 1)
-                    return String.Format("{0} days ago", (int)ts.TotalDays);
-                else if (ts.TotalHours > 1)
-                    return String.Format("{0} hours ago", (int)ts.TotalHours);
-                else if (ts.TotalMinutes > 1)
-                    return String.Format("{0} minutes ago", (int)ts.TotalMinutes);
-                else
-                    return String.Format("{0} seconds ago", (int)ts.TotalSeconds);
-            }
-            catch { return "unkown date"; }
-        }
-        #endregion
 
         private void ScrollView_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
