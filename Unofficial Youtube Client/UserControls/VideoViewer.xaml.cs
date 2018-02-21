@@ -89,18 +89,24 @@ namespace YTApp.UserControls
 
         private void PointerCheckTimer_Tick(object sender, object e)
         {
-            if (previousMouseLocation != Window.Current.CoreWindow.PointerPosition)
+            try
             {
-                mouseHasntMoved = 0;
-                if (transportControls.Opacity == 0)
-                    FadeIn.Begin();
+                if (previousMouseLocation != Window.Current.CoreWindow.PointerPosition)
+                {
+                    mouseHasntMoved = 0;
+                    Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 1);
+                    if (transportControls.Opacity == 0)
+                        FadeIn.Begin();
+                }
+                else if (mouseHasntMoved == 20 && transportControls.Opacity == 1)
+                {
+                    FadeOut.Begin();
+                    Window.Current.CoreWindow.PointerCursor = null;
+                }
+                mouseHasntMoved += 1;
+                previousMouseLocation = Window.Current.CoreWindow.PointerPosition;
             }
-            else if (mouseHasntMoved == 20 && transportControls.Opacity == 1)
-            {
-                FadeOut.Begin();
-            }
-            mouseHasntMoved += 1;
-            previousMouseLocation = Window.Current.CoreWindow.PointerPosition;
+            catch { }
         }
 
         #region Transport Control Management
@@ -224,7 +230,11 @@ namespace YTApp.UserControls
         #region Volume Button
         private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
-            audioPlayer.Volume = ((Slider)sender).Value / 1000;
+            try
+            {
+                audioPlayer.Volume = ((Slider)sender).Value / 1000;
+            }
+            catch { }
         }
 
 
@@ -234,7 +244,6 @@ namespace YTApp.UserControls
         }
 
         #endregion
-
 
         #region Viewer Events
         private void viewer_Tapped(object sender, TappedRoutedEventArgs e)
@@ -300,8 +309,13 @@ namespace YTApp.UserControls
 
         private async void UpdateVideo()
         {
+            StopVideo();
+
             if (!(await GetVideoData()))
                 return;
+
+            audioPlayer = new MediaPlayer();
+            videoPlayer = new MediaPlayer();
 
             //We use this method so that we can synchronize the audio and video streams
             audioPlayer.Source = MediaSource.CreateFromUri(new Uri(Constants.videoInfo.Audio[0].Url));
@@ -339,6 +353,8 @@ namespace YTApp.UserControls
             timer.Stop();
 
             //Pause the player (It's a good idea to figure out a way to clear it from memory)
+            videoPlayer.Dispose();
+            audioPlayer.Dispose();
             timelineController.Pause();
         }
         #endregion

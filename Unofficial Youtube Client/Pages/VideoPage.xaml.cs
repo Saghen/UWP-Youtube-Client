@@ -113,10 +113,10 @@ namespace YTApp.Pages
             UpdateRelatedVideos(service);
 
             //Store the video id
-            if (localSettings.Values["History"] != null)
+            /*if (localSettings.Values["History"] != null)
                 ((List<string>)localSettings.Values["History"]).Add(Constants.activeVideoID);
             else
-                localSettings.Values["History"] = new List<string>() { Constants.activeVideoID };
+                localSettings.Values["History"] = new List<string>() { Constants.activeVideoID };*/
         }
 
         public void UpdatePageInfo(YouTubeService service)
