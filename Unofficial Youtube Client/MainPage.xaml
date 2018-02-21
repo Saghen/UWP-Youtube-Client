@@ -135,20 +135,5 @@
                 </Grid>
             </SplitView.Content>
         </SplitView>
-
-        <Grid Grid.RowSpan="2" x:Name="MediaElementContainer" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-            <MediaElement x:Name="viewer" x:FieldModifier="public" Source="" AreTransportControlsEnabled="True" Visibility="Collapsed">
-                <MediaElement.TransportControls>
-                    <local:CustomMediaTransportControls IsCompact="True" Background="#AA000000">
-                        <FlyoutBase.AttachedFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="Copy link" Click="Flyout_CopyLink"/>
-                                <MenuFlyoutItem Text="Copy link at current time" Click="Flyout_CopyLinkAtTime"/>
-                            </MenuFlyout>
-                        </FlyoutBase.AttachedFlyout>
-                    </local:CustomMediaTransportControls>
-                </MediaElement.TransportControls>
-            </MediaElement>
-        </Grid>
     </Grid>
 </Page>

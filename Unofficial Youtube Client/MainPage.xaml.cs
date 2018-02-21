@@ -300,25 +300,6 @@ namespace YTApp
 
         #endregion
 
-        #region Flyout
-
-        private void Flyout_CopyLink(object sender, RoutedEventArgs e)
-        {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText("https://youtu.be/" + VideoID);
-            Clipboard.SetContent(dataPackage);
-        }
-
-        private void Flyout_CopyLinkAtTime(object sender, RoutedEventArgs e)
-        {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText("https://youtu.be/" + VideoID + "?t=" + Convert.ToInt32(viewer.Position.TotalSeconds) + "s");
-            Clipboard.SetContent(dataPackage);
-        }
-
-
-        #endregion
-
         #region Login Region
         private async void BtnSignOut_Tapped(object sender, TappedRoutedEventArgs e)
         {

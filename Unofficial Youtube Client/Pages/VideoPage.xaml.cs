@@ -11,6 +11,7 @@ using Windows.Media.Editing;
 using Windows.Media.Playback;
 using Windows.Networking.BackgroundTransfer;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -254,12 +255,12 @@ namespace YTApp.Pages
         {
             if ((string)DescriptionShowMore.Content == "Show less")
             {
-                Description.MaxLines = 6;
+                Description.MaxHeight = 200;
                 DescriptionShowMore.Content = "Show more";
             }
             else
             {
-                Description.MaxLines = 400;
+                Description.MaxHeight = 10000;
                 DescriptionShowMore.Content = "Show less";
             }
         }
@@ -320,5 +321,54 @@ namespace YTApp.Pages
             catch { }
         }
         #endregion
+
+        private async void CustomMediaTransportControls_SwitchedToFullSize(object sender, EventArgs e)
+        {
+            //Make the toolbar visible
+            Constants.MainPageRef.Toolbar.Visibility = Visibility.Visible;
+
+            //Stop the PiP media element
+            pipViewer.Visibility = Visibility.Collapsed;
+            pipViewer.Source = null;
+
+            //Set the window to be full sized
+            await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default);
+
+            //Reset title to bar to it's normal state
+            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = false;
+
+            //Set the position of this video page's viewer to the position of the compact view's one
+            viewer.timelineController.Position = pipViewer.Position;
+            viewer.timelineController.Resume();
+        }
+
+        private async void viewer_EnteringPiP(object sender, EventArgs e)
+        {
+            //Enter compact mode
+            ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
+            compactOptions.CustomSize = new Windows.Foundation.Size(500, 281);
+            await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions);
+
+            //Pause the video
+            viewer.timelineController.Pause();
+
+            //Make the title bar smaller
+            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
+            coreTitleBar.ExtendViewIntoTitleBar = true;
+
+            //Make the toolbar collapsed
+            Constants.MainPageRef.Toolbar.Visibility = Visibility.Collapsed;
+
+            pipViewer.Visibility = Visibility.Visible;
+            pipViewer.Source = new Uri(Constants.videoInfo.Muxed[0].Url);
+            pipViewer.MediaOpened += PipViewer_MediaOpened;
+        }
+
+        private void PipViewer_MediaOpened(object sender, RoutedEventArgs e)
+        {
+            //Sets position to the viewer's position once it loads
+            pipViewer.Position = viewer.timelineController.Position;
+        }
     }
 }

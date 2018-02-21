@@ -31,6 +31,7 @@ namespace YTApp.UserControls
     {
         public event EventHandler EnteringFullscreen;
         public event EventHandler ExitingFullscren;
+        public event EventHandler EnteringPiP;
 
         private static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(string), typeof(VideoViewer), null);
 
@@ -41,7 +42,7 @@ namespace YTApp.UserControls
         public MediaTimelineController timelineController = new MediaTimelineController();
 
         //Timer that will update our progress slider on our custom controls
-        DispatcherTimer timer = new DispatcherTimer();
+        public DispatcherTimer timer = new DispatcherTimer();
 
         //Data used for control fading
         Point previousMouseLocation;
@@ -58,8 +59,6 @@ namespace YTApp.UserControls
         {
             this.InitializeComponent();
 
-            ((CustomMediaTransportControls)Constants.MainPageRef.viewer.TransportControls).SwitchedToFullSize += VideoViewer_SwitchedToFullSize;
-
             //Update progress bar 30 times per second
             timer.Interval = new TimeSpan(0, 0, 0, 0, 32);
             timer.Tick += Timer_Tick;
@@ -69,7 +68,6 @@ namespace YTApp.UserControls
             pointerCheckTimer.Tick += PointerCheckTimer_Tick;
 
             videoPlayer.CurrentStateChanged += VideoPlayer_CurrentStateChanged;
-            //timelineController.StateChanged += TimelineController_StateChanged;
         }
 
 
@@ -103,56 +101,10 @@ namespace YTApp.UserControls
         }
 
         #region Picture in Picture
-        private async void ButtonPiP_Click(object sender, RoutedEventArgs e)
+        private void ButtonPiP_Click(object sender, RoutedEventArgs e)
         {
-            ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
-            compactOptions.CustomSize = new Size(500, 281);
-            await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions);
-
-            //Pause the video
-            timelineController.Pause();
-
-            //Set the source of the title bar and then wait until the media has opened to set the position
-            Constants.MainPageRef.viewer.Source = new Uri(videoStreams.Muxed[0].Url);
-            Constants.MainPageRef.viewer.MediaOpened += Viewer_MediaOpened;
-
-            //Make the title bar smaller
-            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = true;
-
-            //Pause the slider updating timer
-            timer.Stop();
-            pointerCheckTimer.Stop();
-        }
-
-        private void Viewer_MediaOpened(object sender, RoutedEventArgs e)
-        {
-            //Set the PiP window to have the correct position and volume and make it visible. For some reason, if the seconds played is below 15, it just breaks.
-            Constants.MainPageRef.viewer.Volume = audioPlayer.Volume;
-            Constants.MainPageRef.viewer.Visibility = Visibility.Visible;
-        }
-
-        private async void VideoViewer_SwitchedToFullSize(object sender, EventArgs e)
-        {
-            //Stop the PiP media element
-            Constants.MainPageRef.viewer.Visibility = Visibility.Collapsed;
-            Constants.MainPageRef.viewer.Source = null;
-
-            //Set the window to be full sized
-            ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.Default);
-            compactOptions.CustomSize = new Size(500, 281);
-            await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.Default, compactOptions);
-
-            //Reset title to bar to it's normal state
-            var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
-            coreTitleBar.ExtendViewIntoTitleBar = false;
-
-            //Set the position of this video page's viewer to the position of the compact view's one
-            timelineController.Position = Constants.MainPageRef.viewer.Position;
-            timelineController.Start();
-
-            //Start the slider updating timer again
-            timer.Start();
+            //Call event that the parent page has captured
+            EnteringPiP.Invoke(this, new EventArgs());
         }
         #endregion
 

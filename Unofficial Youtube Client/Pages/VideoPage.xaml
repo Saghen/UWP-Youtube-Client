@@ -38,7 +38,7 @@
                 </Grid.RowDefinitions>
                 
                 <Grid x:Name="MediaElementContainer" PointerEntered="Viewer_PointerEntered" PointerExited="Viewer_PointerExited" Background="#1a1a1a">
-                    <userctrls:VideoViewer x:Name="viewer" Source="" EnteringFullscreen="viewer_EnteringFullscreen" ExitingFullscren="viewer_ExitingFullscren"/>
+                    <userctrls:VideoViewer x:Name="viewer" Source="" EnteringFullscreen="viewer_EnteringFullscreen" ExitingFullscren="viewer_ExitingFullscren" EnteringPiP="viewer_EnteringPiP"/>
                     <Button x:Name='MinimizeMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="MinimizeMediaElement_Click"/>
                     <Button x:Name='CloseMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Click="CloseMediaElement_Click"/>
                 </Grid>
@@ -77,7 +77,7 @@
                                 <StackPanel Grid.Column="1" Margin="0,20">
                                     <TextBlock x:Name="ChannelTitle" Tapped="OpenChannel" PointerEntered="ChannelProfileIcon_PointerEntered" PointerExited="ChannelProfileIcon_PointerExited" IsTextSelectionEnabled="False" HorizontalAlignment="Left"/>
                                     <TextBlock x:Name="DatePosted" Foreground="#aaa" Margin="0,5,0,20"/>
-                                    <TextBlock x:Name="Description" MaxLines="6" TextTrimming="CharacterEllipsis" TextWrapping="WrapWholeWords"/>
+                                    <toolkit:MarkdownTextBlock x:Name="Description" MaxHeight="200" TextWrapping="WrapWholeWords" ParagraphMargin="18"/>
                                     <HyperlinkButton x:Name="DescriptionShowMore" Content="Show more" Click="DescriptionShowMore_Click" Visibility="Collapsed">
                                         <HyperlinkButton.ContentTemplate>
                                             <DataTemplate>
@@ -89,6 +89,7 @@
                             </Grid>
                         </Grid>
                     </StackPanel>
+
                     <Grid Grid.Column="1" Margin="0,10">
                         <ToggleSwitch x:Name="SwitchAutoplay" HorizontalAlignment="Right" VerticalAlignment="Top" OffContent="Autoplay Off" OnContent="Autoplay On" Toggled="SwitchAutoplay_Toggled"/>
                         <ListView x:Name="RelatedVideosGridView" Header="Related" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" Margin="0,30" ItemsSource="{x:Bind relatedVideos.Items, Mode=OneWay}">
@@ -110,10 +111,13 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </Grid>
-                    
                 </Grid>
             </Grid>
         </ScrollViewer>
-        
+        <MediaElement x:Name="pipViewer" Visibility="Collapsed" AreTransportControlsEnabled="True">
+            <MediaElement.TransportControls>
+                <local:CustomMediaTransportControls IsCompact="True" SwitchedToFullSize="CustomMediaTransportControls_SwitchedToFullSize" Background="#99000000" IsZoomButtonVisible="False" />
+            </MediaElement.TransportControls>
+        </MediaElement>
     </Grid>
 </Page>

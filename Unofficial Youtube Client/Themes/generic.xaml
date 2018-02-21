@@ -66,6 +66,15 @@
                                                             </Setter.Value>
                                                         </Setter>
                                                     </Style>
+                                                    <Style TargetType='ProgressBar' x:Key='MediaSliderProgressBarStyle'>
+                                                        <Setter Property='Height' Value='{ThemeResource SliderTrackThemeHeight}' />
+                                                        <Setter Property='Minimum' Value='0' />
+                                                        <Setter Property='Maximum' Value='100' />
+                                                        <Setter Property='Foreground' Value='{ThemeResource SystemControlHighlightChromeAltLowBrush}' />
+                                                        <Setter Property='Background' Value='Transparent' />
+                                                        <Setter Property='BorderBrush' Value='Transparent' />
+                                                        <Setter Property='BorderThickness' Value='1' />
+                                                    </Style>
                                                 </Grid.Resources>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto" />
@@ -189,6 +198,12 @@
                                 Height="{ThemeResource SliderTrackThemeHeight}"
                                 Grid.Row="1"
                                 Grid.ColumnSpan="3" />
+                                                        <ProgressBar x:Name='DownloadProgressIndicator'
+                                  Style='{StaticResource MediaSliderProgressBarStyle}'
+                                  Grid.Row='1'
+                                  Grid.ColumnSpan='3'
+                                  HorizontalAlignment='Stretch'
+                                  VerticalAlignment='Center'/>
                                                         <Rectangle x:Name="HorizontalDecreaseRect"
                                 Fill="{TemplateBinding Foreground}"
                                 Grid.Row="1" />
@@ -222,6 +237,59 @@
                                 Grid.Row="0"
                                 Grid.RowSpan="3"
                                 Grid.Column="1"
+                                AutomationProperties.AccessibilityView="Raw" />
+                                                    </Grid>
+
+                                                    <Grid x:Name="VerticalTemplate" MinWidth="44" Visibility="Collapsed">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="*" />
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="18" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Rectangle x:Name="VerticalTrackRect"
+                                Fill="{TemplateBinding Background}"
+                                Width="{ThemeResource SliderTrackThemeHeight}"
+                                Grid.Column="1"
+                                Grid.RowSpan="3" />
+                                                        <Rectangle x:Name="VerticalDecreaseRect"
+                                Fill="{TemplateBinding Foreground}"
+                                Grid.Column="1"
+                                Grid.Row="2" />
+                                                        <TickBar x:Name="LeftTickBar"
+                                Visibility="Collapsed"
+                                Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                Width="{ThemeResource SliderOutsideTickBarThemeHeight}"
+                                HorizontalAlignment="Right"
+                                Margin="0,0,4,0"
+                                Grid.RowSpan="3" />
+                                                        <TickBar x:Name="VerticalInlineTickBar"
+                                Visibility="Collapsed"
+                                Fill="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                                Width="{ThemeResource SliderTrackThemeHeight}"
+                                Grid.Column="1"
+                                Grid.RowSpan="3" />
+                                                        <TickBar x:Name="RightTickBar"
+                                Visibility="Collapsed"
+                                Fill="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                Width="{ThemeResource SliderOutsideTickBarThemeHeight}"
+                                HorizontalAlignment="Left"
+                                Margin="4,0,0,0"
+                                Grid.Column="2"
+                                Grid.RowSpan="3" />
+                                                        <Thumb x:Name="VerticalThumb"
+                                Background="{ThemeResource SystemControlForegroundAccentBrush}"
+                                Style="{StaticResource SliderThumbStyle}"
+                                DataContext="{TemplateBinding Value}"
+                                Width="8"
+                                Height="24"
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="3"
                                 AutomationProperties.AccessibilityView="Raw"/>
                                                     </Grid>
                                                 </Grid>
@@ -539,13 +607,6 @@
                                                     <FontIcon Glyph="&#xEB9E;"/>
                                                 </AppBarButton.Icon>
                                             </AppBarButton>
-                                            <AppBarButton x:Name='CastButton'
-                                  Style='{StaticResource AppBarButtonStyle}'
-                                  MediaTransportControlsHelper.DropoutOrder='7'>
-                                                <AppBarButton.Icon>
-                                                    <FontIcon Glyph="&#xEC15;"/>
-                                                </AppBarButton.Icon>
-                                            </AppBarButton>
                                             <AppBarButton x:Name='ZoomButton'
                                   Style='{StaticResource AppBarButtonStyle}'
                                   MediaTransportControlsHelper.DropoutOrder='6'>
@@ -557,7 +618,7 @@
                                   Style='{StaticResource AppBarButtonStyle}'
                                   MediaTransportControlsHelper.DropoutOrder='6'>
                                                 <AppBarButton.Icon>
-                                                    <FontIcon Glyph="&#xE173;"/>
+                                                    <SymbolIcon Symbol="DockBottom"/>
                                                 </AppBarButton.Icon>
                                             </AppBarButton>
                                             <AppBarButton x:Name='AudioTracksSelectionButton'
