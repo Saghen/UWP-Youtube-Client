@@ -179,7 +179,8 @@ namespace YTApp.UserControls
         private void ButtonCopy_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var link = new Windows.ApplicationModel.DataTransfer.DataPackage();
-            link.SetText("https://youtu.be/" + Constants.activeVideoID);
+            link.SetText("https://youtu.be/" + Constants.activeVideoID + "?t=" + Convert.ToInt32(timelineController.Position.TotalSeconds) + "s");
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(link);
             Constants.MainPageRef.ShowNotifcation("Link copied to clipboard.");
         }
 
@@ -232,12 +233,16 @@ namespace YTApp.UserControls
         #region Slider
         private async void Timer_Tick(object sender, object e)
         {
-            if (Window.Current.CoreWindow.GetKeyState(Windows.System.VirtualKey.LeftButton).HasFlag(CoreVirtualKeyStates.Down))
-                return;
-            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+            try
             {
-                viewerProgress.Value = videoPlayer.PlaybackSession.Position.TotalSeconds;
-            });
+                if (Window.Current.CoreWindow.GetKeyState(Windows.System.VirtualKey.LeftButton).HasFlag(CoreVirtualKeyStates.Down))
+                    return;
+                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                {
+                    viewerProgress.Value = videoPlayer.PlaybackSession.Position.TotalSeconds;
+                });
+            }
+            catch { }
         }
 
         private void viewerProgress_SliderOnComplete(object sender, PointerRoutedEventArgs e)
