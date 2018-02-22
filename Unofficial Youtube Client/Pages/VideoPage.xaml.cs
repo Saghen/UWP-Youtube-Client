@@ -184,6 +184,9 @@ namespace YTApp.Pages
                 localSettings.Values["MediaViewerHeight"] = MediaRow.Height.Value;
 
                 MediaRow.Height = new GridLength(360);
+
+                //Disable the taps on the viewer
+                viewer.IsHitTestVisible = false;
             }
             else
             {
@@ -203,6 +206,9 @@ namespace YTApp.Pages
                     MediaRow.Height = new GridLength(Convert.ToDouble(localSettings.Values["MediaViewerHeight"]));
                 else
                     MediaRow.Height = new GridLength(600);
+
+                //Enable the taps on the viewer
+                viewer.IsHitTestVisible = true;
             }
         }
 

@@ -98,6 +98,9 @@ namespace YTApp
 
         public async void LoadSubscriptions()
         {
+            //Reset the subscriptions
+            subscriptionsList.Clear();
+
             //Get the service
             var service = await YoutubeMethodsStatic.GetServiceAsync();
 
