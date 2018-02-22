@@ -256,6 +256,19 @@ namespace YTApp.UserControls
                 view.TryEnterFullScreenMode();
                 EnteringFullscreen.Invoke(this, new EventArgs());
             }
+
+            //The first tap will pause the player
+            timelineController.Resume();
+        }
+
+        private void MediaViewerParent_KeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            var view = ApplicationView.GetForCurrentView();
+            if (e.Key == Windows.System.VirtualKey.Escape && view.IsFullScreenMode)
+            {
+                view.ExitFullScreenMode();
+                ExitingFullscren.Invoke(this, new EventArgs());
+            }
         }
 
         #endregion

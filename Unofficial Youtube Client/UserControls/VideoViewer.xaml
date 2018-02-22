@@ -23,7 +23,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="MediaViewerParent">
+    <Grid x:Name="MediaViewerParent" KeyDown="MediaViewerParent_KeyDown">
         <MediaPlayerElement x:Name="viewer" Tapped="viewer_Tapped" DoubleTapped="viewer_DoubleTapped" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited"/>
         <ProgressRing x:Name="LoadingRing" IsActive="False" Width="50" Height="50"/>
         <StackPanel x:Name="transportControls" x:FieldModifier="public" VerticalAlignment="Bottom" Background="#88000000">
