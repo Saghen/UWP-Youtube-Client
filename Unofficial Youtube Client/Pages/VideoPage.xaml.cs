@@ -280,6 +280,10 @@ namespace YTApp.Pages
             Scrollviewer.ChangeView(0, 0, 1, true);
             Scrollviewer.VerticalScrollMode = ScrollMode.Disabled;
             Scrollviewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+
+            //Hide the close and minimize controls
+            MinimizeMediaElement.Visibility = Visibility.Collapsed;
+            CloseMediaElement.Visibility = Visibility.Collapsed;
         }
 
         private void viewer_ExitingFullscren(object sender, EventArgs e)
@@ -294,6 +298,10 @@ namespace YTApp.Pages
                 MediaRow.Height = new GridLength(Convert.ToDouble(localSettings.Values["MediaViewerHeight"]));
             else
                 MediaRow.Height = new GridLength(600);
+
+            //Show the close and minimize controls
+            MinimizeMediaElement.Visibility = Visibility.Visible;
+            CloseMediaElement.Visibility = Visibility.Visible;
         }
 
         #endregion

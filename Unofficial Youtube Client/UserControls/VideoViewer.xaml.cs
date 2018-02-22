@@ -307,6 +307,9 @@ namespace YTApp.UserControls
         {
             StopVideo();
 
+            var _displayRequest = new Windows.System.Display.DisplayRequest();
+            _displayRequest.RequestActive();
+
             if (!(await GetVideoData()))
                 return;
 
@@ -352,6 +355,10 @@ namespace YTApp.UserControls
             videoPlayer.Dispose();
             audioPlayer.Dispose();
             timelineController.Pause();
+
+            //Stop keeping the screen active
+            var _displayRequest = new Windows.System.Display.DisplayRequest();
+            _displayRequest.RequestRelease();
         }
 
         public void ResumeVideo(TimeSpan position)
