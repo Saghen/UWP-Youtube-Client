@@ -76,7 +76,7 @@ namespace YTApp.Pages
             VideoCount.Text = channel.Statistics.VideoCount + " videos";
 
             //Profile Image
-            var ProfileImageBrush = new ImageBrush{ ImageSource = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url)) };
+            var ProfileImageBrush = new ImageBrush { ImageSource = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url)) };
             ProfileImage.Fill = ProfileImageBrush;
 
             //Channel Name
@@ -99,14 +99,18 @@ namespace YTApp.Pages
                 isSubscribed = true;
             }
 
-            //Banner Image
-            SplashImage.Source = new BitmapImage(new Uri(channel.BrandingSettings.Image.BannerImageUrl));
 
-            //About Page
-            if (channel.BrandingSettings.Channel.Description != null)
-                ChannelAboutText.Text = channel.BrandingSettings.Channel.Description;
-            else
-                ChannelAboutText.Text = "This channel does not have a description.";
+            if (channel.BrandingSettings != null)
+            {
+                //Banner Image
+                SplashImage.Source = new BitmapImage(new Uri(channel.BrandingSettings.Image.BannerImageUrl));
+
+                //About Page
+                if (channel.BrandingSettings.Channel.Description != null)
+                    ChannelAboutText.Text = channel.BrandingSettings.Channel.Description;
+                else
+                    ChannelAboutText.Text = "This channel does not have a description.";
+            }
         }
 
         public async void UpdateChannelHome()
@@ -131,6 +135,13 @@ namespace YTApp.Pages
                     continue;
                 playlists.Add(playlist);
             }
+
+            if (playlists.Count == 0 && featuredChannelsCtrl.Items.Count == 0)
+            {
+                featuredChannelsCtrlContainer.Visibility = Visibility.Collapsed;
+                HomePivotStackPanel.Children.Add(new TextBlock() { Text = "This channel is completely empty :thinking:" });
+            }
+                
         }
 
         public async void UpdatePopularUploads()
@@ -146,6 +157,10 @@ namespace YTApp.Pages
             GetChannelVideosPopular.Type = "video";
             GetChannelVideosPopular.MaxResults = 10;
             var ChannelVideosResultPopular = GetChannelVideosPopular.Execute();
+
+            if (ChannelVideosResultPopular.Items.Count == 0)
+                return;
+
             foreach (var video in ChannelVideosResultPopular.Items)
             {
                 if (video.Id.Kind == "youtube#video" && video.Id.VideoId != null && video.Snippet.LiveBroadcastContent != "live")
@@ -161,13 +176,20 @@ namespace YTApp.Pages
 
             var methods = new YoutubeMethods();
 
-            //Get the playlists for the channel
-            var GetChannelPlaylists = service.ChannelSections.List("snippet,contentDetails");
-            GetChannelPlaylists.ChannelId = Constants.activeChannelID;
-            var ChannelPlaylistsResult = GetChannelPlaylists.Execute();
+            ChannelSectionListResponse ChannelPlaylistsResult = new ChannelSectionListResponse();
+
+            try
+            {
+                //Get the playlists for the channel
+                var GetChannelPlaylists = service.ChannelSections.List("snippet,contentDetails");
+                GetChannelPlaylists.ChannelId = Constants.activeChannelID;
+                ChannelPlaylistsResult = GetChannelPlaylists.Execute();
+            }
+            catch { }
+            
 
             //Check if there are no playlists to process
-            if (ChannelPlaylistsResult.Items.Count == 0)
+            if (ChannelPlaylistsResult.Items == null || ChannelPlaylistsResult.Items.Count == 0)
                 return;
 
             List<ObservableCollection<YoutubeItemDataType>> tempGridViews = new List<ObservableCollection<YoutubeItemDataType>>();
@@ -220,6 +242,7 @@ namespace YTApp.Pages
         public async void UpdateFeaturedChannels()
         {
             var service = await YoutubeMethodsStatic.GetServiceAsync();
+                
 
             try
             {

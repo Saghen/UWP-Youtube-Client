@@ -12,6 +12,7 @@ using Windows.Data.Json;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -19,6 +20,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using YTApp.Classes;
 
 namespace YTApp
 {
@@ -27,7 +29,7 @@ namespace YTApp
     /// </summary>
     sealed partial class App : Application
     {
-        public static string OAuthCode;
+
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -35,6 +37,13 @@ namespace YTApp
         /// </summary>
         public App()
         {
+            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+
+            if (localSettings.Values["Theme"] == null || (string)localSettings.Values["Theme"] == "Dark")
+                RequestedTheme = ApplicationTheme.Dark;
+            else
+                RequestedTheme = ApplicationTheme.Light;
+
             this.InitializeComponent();
             this.Suspending += OnSuspending;
 
@@ -52,6 +61,29 @@ namespace YTApp
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            if (RequestedTheme == ApplicationTheme.Dark)
+            {
+                ((SolidColorBrush)Resources["AppBackgroundDark"]).Color = Color.FromArgb(255, 34, 34, 34);
+                ((SolidColorBrush)Resources["AppBackground"]).Color = Color.FromArgb(255, 37, 37, 37);
+                ((SolidColorBrush)Resources["AppBackgroundLighter"]).Color = Color.FromArgb(255, 42, 42, 42);
+                ((SolidColorBrush)Resources["AppBackgroundLightest"]).Color = Color.FromArgb(255, 51, 51, 51);
+                ((SolidColorBrush)Resources["AppText"]).Color = Color.FromArgb(255, 255, 255, 255);
+                ((SolidColorBrush)Resources["AppTextSecondary"]).Color = Color.FromArgb(255, 170, 170, 170);
+                ((SolidColorBrush)Resources["ButtonBackground"]).Color = Color.FromArgb(255, 102, 102, 102);
+            }
+            else
+            {
+                ((SolidColorBrush)Resources["AppBackgroundDark"]).Color = Color.FromArgb(255, 240, 240, 240);
+                ((SolidColorBrush)Resources["AppBackground"]).Color = Color.FromArgb(255, 245, 245, 245);
+                ((SolidColorBrush)Resources["AppBackgroundLighter"]).Color = Color.FromArgb(255, 250, 250, 250);
+                ((SolidColorBrush)Resources["AppBackgroundLightest"]).Color = Color.FromArgb(255, 255, 255, 255);
+                ((SolidColorBrush)Resources["AppText"]).Color = Color.FromArgb(255, 0, 0, 0);
+                ((SolidColorBrush)Resources["AppTextSecondary"]).Color = Color.FromArgb(255, 60, 60, 60);
+                ((SolidColorBrush)Resources["ButtonBackground"]).Color = Color.FromArgb(255, 200, 200, 200);
+                ((SolidColorBrush)Resources["TextBoxBackground"]).Color = Color.FromArgb(255, 240, 240, 240);
+                ((SolidColorBrush)Resources["BorderColor"]).Color = Color.FromArgb(255, 220, 220, 220);
+            }
+
             Frame rootFrame = Window.Current.Content as Frame;
 
             //Reset Title Bar
@@ -88,7 +120,7 @@ namespace YTApp
                         rootFrame.Navigate(typeof(MainPage), e.Arguments);
                     else
                         rootFrame.Navigate(typeof(Pages.WelcomePage), e.Arguments);
-                    
+
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();

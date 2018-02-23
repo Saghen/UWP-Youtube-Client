@@ -9,22 +9,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
-    extensions:TitleBar.BackgroundColor="#2a2a2a"
-    extensions:TitleBar.InactiveBackgroundColor="#333"
-    extensions:TitleBar.ButtonBackgroundColor="#2a2a2a"
-    extensions:TitleBar.ButtonInactiveBackgroundColor="#333"
     mc:Ignorable="d" Loaded="Page_Loaded" x:Name="MainWindowPage">
 
     <Page.Resources>
         <ResourceDictionary>
-            <Storyboard x:Name="FadeOut">
-                <DoubleAnimation Storyboard.TargetName="CloseMediaElement" EnableDependentAnimation="True"  Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.2"/>
-                <DoubleAnimation Storyboard.TargetName="MinimizeMediaElement" EnableDependentAnimation="True"  Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.2"/>
-            </Storyboard>
-            <Storyboard x:Name="FadeIn">
-                <DoubleAnimation Storyboard.TargetName="CloseMediaElement" EnableDependentAnimation="True" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2"/>
-                <DoubleAnimation Storyboard.TargetName="MinimizeMediaElement" EnableDependentAnimation="True" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2"/>
-            </Storyboard>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/TransparentButton.xaml"/>
                 <ResourceDictionary Source="Styles/TextBoxCleanStyle.xaml"/>
@@ -40,8 +28,8 @@
         <Grid x:FieldModifier="public" x:Name="Toolbar" Background="{StaticResource AppBackgroundLighter}" Height="56">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <Button x:Name="HamburgerButton" FontFamily="Segoe MDL2 Assets" Content="&#xE700;" FontSize="18" Margin="20,0" Background="Transparent" Click="HamburgerButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
-                <TextBox x:Name="SearchBox" Width="500px" VerticalAlignment="Center" PlaceholderText="Search" KeyDown="SearchBox_KeyDown" BorderThickness="1" Style="{StaticResource TextBoxCleanStyle}" Background="#151515" BorderBrush="#2a2a2a" x:FieldModifier="public"/>
-                <Button x:Name="SearchButton" Background="#444" Padding="20,0" Height="32" FontFamily="Segoe MDL2 Assets" Content="&#xE094;" Click="Search_Click" Style="{StaticResource TransparentButtonStyle}"/>
+                <TextBox x:Name="SearchBox" Width="500px" VerticalAlignment="Center" PlaceholderText="Search" KeyDown="SearchBox_KeyDown" BorderThickness="1" Style="{StaticResource TextBoxCleanStyle}" Background="{StaticResource TextBoxBackground}" BorderBrush="{StaticResource BorderColor}" x:FieldModifier="public"/>
+                <Button x:Name="SearchButton" Background="{StaticResource ButtonBackground}" Padding="20,0" Height="32" FontFamily="Segoe MDL2 Assets" Content="&#xE094;" Click="Search_Click" Style="{StaticResource TransparentButtonStyle}"/>
             </StackPanel>
             <StackPanel x:Name="stkpnlLoginInfo" Orientation="Horizontal" HorizontalAlignment="Right" Padding="10,0">
                 <TextBlock x:Name="txtLoginName" VerticalAlignment="Center" Padding="10,0"/>
@@ -54,7 +42,7 @@
                                     <FontIcon Glyph="&#xE716;"/>
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Name="btnSettings" Text="Settings" Height="50">
+                            <MenuFlyoutItem x:Name="btnSettings" Text="Settings" Height="50" Click="btnSettings_Click">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon Glyph="&#xE713;"/>
                                 </MenuFlyoutItem.Icon>

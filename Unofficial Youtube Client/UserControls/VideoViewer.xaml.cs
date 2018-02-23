@@ -262,7 +262,7 @@ namespace YTApp.UserControls
             }
 
             //The first tap will pause the player
-            timelineController.Resume();
+            ResumeVideo();
         }
 
         private void MediaViewerParent_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -272,6 +272,13 @@ namespace YTApp.UserControls
             {
                 view.ExitFullScreenMode();
                 ExitingFullscren.Invoke(this, new EventArgs());
+            }
+            else if (e.Key == Windows.System.VirtualKey.Space)
+            {
+                if (timelineController.State == MediaTimelineControllerState.Running || timelineController.State == MediaTimelineControllerState.Stalled)
+                    PauseVideo();
+                else if (timelineController.State == MediaTimelineControllerState.Paused)
+                    ResumeVideo();
             }
         }
 
@@ -311,7 +318,13 @@ namespace YTApp.UserControls
 
         private async void UpdateVideo()
         {
-            StopVideo();
+            //Stop updating the progress bar
+            timer.Stop();
+
+            //Pause the player (It's a good idea to figure out a way to clear it from memory)
+            videoPlayer.Dispose();
+            audioPlayer.Dispose();
+            timelineController.Pause();
 
             var _displayRequest = new Windows.System.Display.DisplayRequest();
             _displayRequest.RequestActive();
@@ -377,6 +390,23 @@ namespace YTApp.UserControls
             timelineController.Resume();
         }
 
+<<<<<<< HEAD
         #endregion Video Source Management
+=======
+        public void ResumeVideo()
+        {
+            ButtonPlay.Icon = new SymbolIcon(Symbol.Pause);
+
+            timelineController.Resume();
+        }
+
+        public void PauseVideo()
+        {
+            ButtonPlay.Icon = new SymbolIcon(Symbol.Play);
+
+            timelineController.Pause();
+        }
+        #endregion
+>>>>>>> a824848f0ab9cbd2203bb0c99f3099fe905489e8
     }
 }

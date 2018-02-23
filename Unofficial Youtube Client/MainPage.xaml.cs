@@ -20,6 +20,20 @@ using Windows.UI.Xaml.Media.Imaging;
 using YoutubeExplode;
 using YTApp.Classes;
 using YTApp.Pages;
+<<<<<<< HEAD
+=======
+using YTApp.Classes.DataTypes;
+using System.Collections.ObjectModel;
+using MetroLog;
+using Newtonsoft.Json;
+using YoutubeExplode;
+using System.Threading.Tasks;
+using Windows.UI.Xaml.Media.Animation;
+using Windows.Web.Http;
+using Windows.Networking.BackgroundTransfer;
+using System.IO;
+using Windows.UI.ViewManagement;
+>>>>>>> a824848f0ab9cbd2203bb0c99f3099fe905489e8
 
 namespace YTApp
 {
@@ -36,8 +50,17 @@ namespace YTApp
         {
             InitializeComponent();
 
+            //Set titlebar colour
+            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.BackgroundColor = ((Windows.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AppBackgroundLighter"]).Color;
+            titleBar.ButtonBackgroundColor = ((Windows.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AppBackgroundLighter"]).Color;
+            titleBar.InactiveBackgroundColor = ((Windows.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AppBackgroundLightest"]).Color;
+            titleBar.ButtonInactiveBackgroundColor = ((Windows.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AppBackgroundLightest"]).Color;
+
+            //Set a reference to this page for all other pages to use it's functions
             Constants.MainPageRef = this;
 
+            //Enable going backwards
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
 
@@ -327,7 +350,15 @@ namespace YTApp
             contentFrame.Navigate(typeof(ChannelPage));
         }
 
+<<<<<<< HEAD
         #endregion User Info Region
+=======
+        private void btnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            contentFrame.Navigate(typeof(SettingsPage));
+        }
+        #endregion
+>>>>>>> a824848f0ab9cbd2203bb0c99f3099fe905489e8
 
         #region Download
 

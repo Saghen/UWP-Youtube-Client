@@ -2,8 +2,7 @@
     x:Class="YTApp.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:YTApp"
-    RequestedTheme="Dark">
+    xmlns:local="using:YTApp">
 
     <Application.Resources>
         <Style TargetType="ListView">
@@ -48,7 +47,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <!-- Brushes -->
         <SolidColorBrush x:Key="AppBackgroundDark" Color="#222"/>
         <SolidColorBrush x:Key="AppBackground" Color="#252525"/>
@@ -57,7 +56,7 @@
         <SolidColorBrush x:Key="AppText" Color="#fff"/>
         <SolidColorBrush x:Key="AppTextSecondary" Color="#aaa"/>
         <SolidColorBrush x:Key="ButtonBackground" Color="#666"/>
+        <SolidColorBrush x:Key="TextBoxBackground" Color="#151515"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#2a2a2a"/>
     </Application.Resources>
-    
-
 </Application>
