@@ -1,30 +1,25 @@
-﻿using System;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Oauth2.v2;
+using Google.Apis.Services;
+using Google.Apis.YouTube.v3;
+using Google.Apis.YouTube.v3.Data;
+using MetroLog;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Networking.BackgroundTransfer;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.ApplicationModel.DataTransfer;
-using Google.Apis.YouTube.v3;
-using Google.Apis.Services;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.YouTube.v3.Data;
-using Google.Apis.Oauth2.v2;
+using YoutubeExplode;
 using YTApp.Classes;
 using YTApp.Pages;
-using YTApp.Classes.DataTypes;
-using System.Collections.ObjectModel;
-using MetroLog;
-using Newtonsoft.Json;
-using YoutubeExplode;
-using System.Threading.Tasks;
-using Windows.UI.Xaml.Media.Animation;
-using Windows.Web.Http;
-using Windows.Networking.BackgroundTransfer;
-using System.IO;
 
 namespace YTApp
 {
@@ -66,9 +61,10 @@ namespace YTApp
             SearchBox.Focus(FocusState.Keyboard);
         }
 
-        #endregion
+        #endregion Main Events
 
         #region Startup
+
         private void Startup()
         {
             Log.Info("Loading subscriptions");
@@ -90,7 +86,8 @@ namespace YTApp
             }
             catch { Log.Error("Exception thrown while loading video from clipboard"); }
         }
-        #endregion
+
+        #endregion Startup
 
         #region Menu
 
@@ -195,7 +192,7 @@ namespace YTApp
             contentFrame.Navigate(typeof(ChannelPage));
         }
 
-        #endregion
+        #endregion Subscriptions
 
         public async void UpdateLoginDetails()
         {
@@ -204,7 +201,6 @@ namespace YTApp
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
                 ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
             }, new[] { Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
-
 
             // Create the service.
             var service = new Oauth2Service(new BaseClientService.Initializer()
@@ -258,7 +254,7 @@ namespace YTApp
             SideBarSplitView.IsPaneOpen = !SideBarSplitView.IsPaneOpen;
         }
 
-        #endregion
+        #endregion Menu
 
         #region Search
 
@@ -279,7 +275,7 @@ namespace YTApp
             }
         }
 
-        #endregion
+        #endregion Search
 
         #region Play Video
 
@@ -290,9 +286,10 @@ namespace YTApp
             videoFrame.Navigate(typeof(VideoPage));
         }
 
-        #endregion
+        #endregion Play Video
 
         #region User Info Region
+
         private async void BtnSignOut_Tapped(object sender, TappedRoutedEventArgs e)
         {
             UserCredential credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
@@ -329,9 +326,11 @@ namespace YTApp
             Constants.activeChannelID = result.Items[0].Id;
             contentFrame.Navigate(typeof(ChannelPage));
         }
-        #endregion
+
+        #endregion User Info Region
 
         #region Download
+
         public async void DownloadVideo()
         {
             var client = new YoutubeClient();
@@ -374,7 +373,7 @@ namespace YTApp
             }
         }
 
-        #endregion
+        #endregion Download
 
         #region Notifications
 
@@ -384,6 +383,6 @@ namespace YTApp
             InAppNotif.Show(Length);
         }
 
-        #endregion
+        #endregion Notifications
     }
 }
