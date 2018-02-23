@@ -67,6 +67,9 @@ namespace YTApp.Pages
             Constants.MainPageRef.contentFrame.Navigated += ContentFrame_Navigated;
             SystemNavigationManager.GetForCurrentView().BackRequested += VideoPage_BackRequested;
 
+            //Set the focus to the video viewer
+            viewer.Focus(FocusState.Programmatic);
+
             //Get the video data and play it
             StartVideo(Constants.activeVideoID);
 
