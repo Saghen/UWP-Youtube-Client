@@ -119,7 +119,7 @@
                 <Grid>
                     <Frame x:Name="contentFrame" Background="{StaticResource AppBackgroundDark}" x:FieldModifier="public"/>
                     <Frame x:Name="videoFrame" Background="{StaticResource AppBackgroundDark}" Visibility="Collapsed"/>
-                    <controls:InAppNotification Name="InAppNotif"/>
+                    <controls:InAppNotification x:Name="InAppNotif"/>
                 </Grid>
             </SplitView.Content>
         </SplitView>

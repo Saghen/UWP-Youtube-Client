@@ -98,13 +98,13 @@ namespace YTApp.Pages
             var getVideoInfo = service.Videos.List("snippet, statistics, contentDetails");
             getVideoInfo.Id = ID;
             var videoList = await getVideoInfo.ExecuteAsync();
-            Constants.activeVideo = videoList.Items[0];
+            Constants.ActiveVideo = videoList.Items[0];
 
             //Channel Info
             await Task.Run(() =>
             {
                 var getChannelInfo = service.Channels.List("snippet");
-                getChannelInfo.Id = Constants.activeVideo.Snippet.ChannelId;
+                getChannelInfo.Id = Constants.ActiveVideo.Snippet.ChannelId;
                 var channelInfo = getChannelInfo.Execute();
                 channel = channelInfo.Items[0];
             });
@@ -124,12 +124,12 @@ namespace YTApp.Pages
         {
             var methods = new YoutubeMethods();
 
-            Title.Text = Constants.activeVideo.Snippet.Title;
-            Views.Text = string.Format("{0:#,###0.#}", Constants.activeVideo.Statistics.ViewCount) + " Views";
+            Title.Text = Constants.ActiveVideo.Snippet.Title;
+            Views.Text = string.Format("{0:#,###0.#}", Constants.ActiveVideo.Statistics.ViewCount) + " Views";
 
             ChannelTitle.Text = channel.Snippet.Title;
-            DatePosted.Text = Constants.activeVideo.Snippet.PublishedAt.Value.ToString("MMMM d, yyyy");
-            Description.Text = Constants.activeVideo.Snippet.Description;
+            DatePosted.Text = Constants.ActiveVideo.Snippet.PublishedAt.Value.ToString("MMMM d, yyyy");
+            Description.Text = Constants.ActiveVideo.Snippet.Description;
             DescriptionShowMore.Visibility = Visibility.Visible;
             var image = new BitmapImage(new Uri(channel.Snippet.Thumbnails.High.Url));
             var imageBrush = new ImageBrush { ImageSource = image };

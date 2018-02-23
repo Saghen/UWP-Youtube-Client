@@ -390,9 +390,8 @@ namespace YTApp.UserControls
             timelineController.Resume();
         }
 
-<<<<<<< HEAD
         #endregion Video Source Management
-=======
+
         public void ResumeVideo()
         {
             ButtonPlay.Icon = new SymbolIcon(Symbol.Pause);
@@ -406,7 +405,5 @@ namespace YTApp.UserControls
 
             timelineController.Pause();
         }
-        #endregion
->>>>>>> a824848f0ab9cbd2203bb0c99f3099fe905489e8
     }
 }

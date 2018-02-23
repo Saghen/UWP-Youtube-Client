@@ -22,13 +22,13 @@ namespace YTApp.Classes
             {
                 ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
                 ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube, Google.Apis.Oauth2.v2.Oauth2Service.Scope.UserinfoProfile }, "user", CancellationToken.None);
+            }, new[] { YouTubeService.Scope.Youtube, Google.Apis.Oauth2.v2.Oauth2Service.Scope.UserinfoProfile, Google.Apis.Drive.v2.DriveService.Scope.DriveAppdata }, "user", CancellationToken.None);
 
             // Create the service.
             return new YouTubeService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
-                ApplicationName = "Youtube Viewer",
+                ApplicationName = "Unofficial Youtube Client",
             });
         }
 
@@ -107,5 +107,7 @@ namespace YTApp.Classes
             qualitiesString.Sort();
             return qualitiesString;
         }
+
+
     }
 }
