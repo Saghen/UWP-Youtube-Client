@@ -44,7 +44,7 @@
     </Page.Resources>
     
     <ScrollViewer x:Name="ScrollView" ViewChanged="ScrollView_ViewChanged">
-        <Grid x:Name="MainGrid" Background="#1a1a1a">
+        <Grid x:Name="MainGrid">
             <ListView x:Name="YoutubeItemsGridView" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" ItemsSource="{x:Bind SearchResultsList, Mode=OneWay}" ItemTemplateSelector="{StaticResource SearchTemplateSelector}"/>
         </Grid>
     </ScrollViewer>

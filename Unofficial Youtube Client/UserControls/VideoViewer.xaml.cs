@@ -358,7 +358,7 @@ namespace YTApp.UserControls
 
             //Stop keeping the screen active
             var _displayRequest = new Windows.System.Display.DisplayRequest();
-            _displayRequest.RequestRelease();
+            //_displayRequest.RequestRelease();
         }
 
         public void ResumeVideo(TimeSpan position)

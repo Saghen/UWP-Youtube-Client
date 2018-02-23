@@ -19,10 +19,10 @@ namespace YTApp.Classes
         static public MainPage MainPageRef;
 
         static public Video activeVideo = new Video();
-        static public string activeVideoID = "";
+        static public string activeVideoID;
 
         static public Channel activeChannel = new Channel();
-        static public string activeChannelID = "";
+        static public string activeChannelID;
 
         static public MediaStreamInfoSet videoInfo;
     }

@@ -25,6 +25,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.Web.Http;
 using Windows.Networking.BackgroundTransfer;
 using System.IO;
+using Windows.UI.ViewManagement;
 
 namespace YTApp
 {
@@ -41,8 +42,17 @@ namespace YTApp
         {
             InitializeComponent();
 
+            //Set titlebar colour
+            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.BackgroundColor = ((Windows.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AppBackgroundLighter"]).Color;
+            titleBar.ButtonBackgroundColor = ((Windows.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AppBackgroundLighter"]).Color;
+            titleBar.InactiveBackgroundColor = ((Windows.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AppBackgroundLightest"]).Color;
+            titleBar.ButtonInactiveBackgroundColor = ((Windows.UI.Xaml.Media.SolidColorBrush)Application.Current.Resources["AppBackgroundLightest"]).Color;
+
+            //Set a reference to this page for all other pages to use it's functions
             Constants.MainPageRef = this;
 
+            //Enable going backwards
             SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             SystemNavigationManager.GetForCurrentView().BackRequested += MainPage_BackRequested;
 
@@ -328,6 +338,11 @@ namespace YTApp
 
             Constants.activeChannelID = result.Items[0].Id;
             contentFrame.Navigate(typeof(ChannelPage));
+        }
+
+        private void btnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            contentFrame.Navigate(typeof(SettingsPage));
         }
         #endregion
 

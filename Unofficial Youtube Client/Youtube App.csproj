@@ -107,12 +107,16 @@
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\DataTypes\ChannelListDataType.cs" />
     <Compile Include="Classes\DataTypes\PlaylistDataType.cs" />
+    <Compile Include="Classes\DataTypes\ThemeDataType.cs" />
     <Compile Include="Classes\EventArgs\RoutedEventArgsWithID.cs" />
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\DataTypes\YoutubeChannelDataType.cs" />
     <Compile Include="Classes\YoutubeMethodsStatic.cs" />
     <Compile Include="Controls\ExtendedSlider.cs" />
     <Compile Include="Controls\GridViewWithXProperty.cs" />
+    <Compile Include="Pages\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
@@ -235,6 +239,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Pages\SettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\WelcomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -318,6 +326,9 @@
     </PackageReference>
     <PackageReference Include="Google.Apis.Core">
       <Version>1.30.0-beta02</Version>
+    </PackageReference>
+    <PackageReference Include="Google.Apis.Drive.v2">
+      <Version>1.30.0.1044</Version>
     </PackageReference>
     <PackageReference Include="Google.Apis.Oauth2.v2">
       <Version>1.29.2.994</Version>

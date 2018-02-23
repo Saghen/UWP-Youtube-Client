@@ -42,8 +42,8 @@
                     <Button x:Name='MinimizeMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="MinimizeMediaElement_Click"/>
                     <Button x:Name='CloseMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Click="CloseMediaElement_Click"/>
                 </Grid>
-                
-                <toolkit:GridSplitter Foreground="#aaa" Grid.Row="1" ResizeBehavior="BasedOnAlignment" ResizeDirection="Auto" Background="#333" HorizontalAlignment="Stretch"  FontSize="13" Height="10"/>
+
+                <toolkit:GridSplitter Foreground="{StaticResource AppTextSecondary}" Grid.Row="1" ResizeBehavior="BasedOnAlignment" ResizeDirection="Auto" Background="#333" HorizontalAlignment="Stretch"  FontSize="13" Height="10"/>
 
                 <Grid Grid.Row="2" Margin="10,0" MaxWidth="1400">
                     <Grid.ColumnDefinitions>
@@ -63,7 +63,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel MaxWidth="500" HorizontalAlignment="Left">
                                     <TextBlock x:Name="Title" Text="Title" FontSize="20" TextWrapping="WrapWholeWords" MaxLines="2" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock x:Name="Views" Text="Views" MaxHeight="200" FontSize="14" Foreground="#aaa"/>
+                                    <TextBlock x:Name="Views" Text="Views" MaxHeight="200" FontSize="14" Foreground="{StaticResource AppTextSecondary}"/>
                                 </StackPanel>
                                 <userctrls:LikeDislikeUserControl x:Name="LikeDislikeControl" Grid.Column="1"/>
                             </Grid>
@@ -76,7 +76,7 @@
                                 <Ellipse x:Name="ChannelProfileIcon" Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20" Tapped="OpenChannel" PointerEntered="ChannelProfileIcon_PointerEntered" PointerExited="ChannelProfileIcon_PointerExited"/>
                                 <StackPanel Grid.Column="1" Margin="0,20">
                                     <TextBlock x:Name="ChannelTitle" Tapped="OpenChannel" PointerEntered="ChannelProfileIcon_PointerEntered" PointerExited="ChannelProfileIcon_PointerExited" IsTextSelectionEnabled="False" HorizontalAlignment="Left"/>
-                                    <TextBlock x:Name="DatePosted" Foreground="#aaa" Margin="0,5,0,20"/>
+                                    <TextBlock x:Name="DatePosted" Foreground="{StaticResource AppTextSecondary}" Margin="0,5,0,20"/>
                                     <toolkit:MarkdownTextBlock x:Name="Description" MaxHeight="200" TextWrapping="WrapWholeWords" ParagraphMargin="18"/>
                                     <HyperlinkButton x:Name="DescriptionShowMore" Content="Show more" Click="DescriptionShowMore_Click" Visibility="Collapsed">
                                         <HyperlinkButton.ContentTemplate>

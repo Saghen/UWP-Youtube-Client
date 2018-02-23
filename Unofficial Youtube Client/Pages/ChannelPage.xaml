@@ -30,19 +30,19 @@
             </Grid.RowDefinitions>
             <Image x:Name="SplashImage" Stretch="UniformToFill"/>
             <StackPanel Orientation="Vertical" Grid.Row="1">
-                <Grid Padding="70,40" Background="#222">
+                <Grid Padding="70,40" Background="{StaticResource AppBackgroundDark}">
                     <StackPanel Orientation="Horizontal">
                         <Ellipse x:Name="ProfileImage" Width="80" Height="80"/>
                         <StackPanel VerticalAlignment="Center" Margin="10,0">
                             <TextBlock x:Name="ChannelName" FontSize="24"/>
-                            <TextBlock x:Name="VideoCount" Foreground="#aaa"/>
+                            <TextBlock x:Name="VideoCount" Foreground="{StaticResource AppTextSecondary}"/>
                         </StackPanel>
                     </StackPanel>
                     <Button x:Name="SubscribeButton" Background="#f22" BorderThickness="0" Content="Subscribe" Width="150" Height="50" HorizontalAlignment="Right" Style="{StaticResource RoundButtonStyle}" Click="SubscribeButton_Click"/>
                 </Grid>
                 <Pivot x:Name="rootPivot" Margin="70,10,30,10">
                     <PivotItem x:Name="HomePivot" Header="Home">
-                        <StackPanel Margin="0,10">
+                        <StackPanel x:Name="HomePivotStackPanel" Margin="0,10">
                             <ItemsControl ItemsSource="{x:Bind playlists, Mode=OneWay}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="datatypes:PlaylistDataType">
@@ -68,22 +68,22 @@
                                                                     </Image.Source>
                                                                 </Image>
                                                                 <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
-                                                                <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
-                                                                <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                                                                <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>
+                                                                <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>
                                                             </StackPanel>
                                                         </DataTemplate>
                                                     </lclctrls:GridViewWithXProperty.ItemTemplate>
                                                 </lclctrls:GridViewWithXProperty>
                                             </controls:HeaderedContentControl>
 
-                                            <Button x:Name="btnMoveLeft" Background="#222" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="PlaylistMoveLeft_Click"></Button>
-                                            <Button x:Name="btnMoveRight" Background="#222" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="PlaylistMoveRight_Click"></Button>
+                                            <Button x:Name="btnMoveLeft" Background="{StaticResource ButtonBackground}" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="PlaylistMoveLeft_Click"></Button>
+                                            <Button x:Name="btnMoveRight" Background="{StaticResource ButtonBackground}" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="PlaylistMoveRight_Click"></Button>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <Grid>
-                                <controls:HeaderedContentControl Header="Featured Channels" SizeChanged="FeaturedChannels_SizeChanged">
+                            <Grid x:Name="featuredChannelsCtrlContainer">
+                                <controls:HeaderedContentControl  Header="Featured Channels" SizeChanged="FeaturedChannels_SizeChanged">
                                     <lclctrls:GridViewWithXProperty x:Name="featuredChannelsCtrl" ItemsSource="{x:Bind featuredChannels, Mode=OneWay}" ItemClick="FeaturedChannels_ItemClick" XValue="0" SelectionMode="None" IsItemClickEnabled="True" >
                                         <lclctrls:GridViewWithXProperty.ItemsPanel>
                                             <ItemsPanelTemplate>
@@ -107,16 +107,16 @@
                                                         </Ellipse.Fill>
                                                     </Ellipse>
                                                     <TextBlock Text="{x:Bind Title}" FontSize="14" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
-                                                    <TextBlock Text="{x:Bind Subscribers}" HorizontalAlignment="Center" Foreground="#aaa"/>
-                                                    <TextBlock Text="{x:Bind Videos}" HorizontalAlignment="Center" Foreground="#aaa"/>
+                                                    <TextBlock Text="{x:Bind Subscribers}" HorizontalAlignment="Center" Foreground="{StaticResource AppTextSecondary}"/>
+                                                    <TextBlock Text="{x:Bind Videos}" HorizontalAlignment="Center" Foreground="{StaticResource AppTextSecondary}"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </lclctrls:GridViewWithXProperty.ItemTemplate>
                                     </lclctrls:GridViewWithXProperty>
                                 </controls:HeaderedContentControl>
 
-                                <Button x:Name="btnMoveLeft" Background="#222" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="FeaturedChannelsMoveLeft_Click"></Button>
-                                <Button x:Name="btnMoveRight" Background="#222" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="FeaturedChannelsMoveRight_Click"></Button>
+                                <Button x:Name="btnMoveLeft" Background="{StaticResource ButtonBackground}" Content="&#xE76B;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Left" Margin="10,0" Click="FeaturedChannelsMoveLeft_Click"></Button>
+                                <Button x:Name="btnMoveRight" Background="{StaticResource ButtonBackground}" Content="&#xE76C;" Style="{StaticResource CircularButtonStyle}" FontFamily="Segoe MDL2 Assets" Width="50" Height="50" HorizontalAlignment="Right" Margin="10,0" Click="FeaturedChannelsMoveRight_Click"></Button>
                             </Grid>
                         </StackPanel>
                     </PivotItem>
@@ -131,8 +131,8 @@
                                             </Image.Source>
                                         </Image>
                                         <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
-                                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" FontSize="12" HorizontalAlignment="Center"/>
-                                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" FontSize="12" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridView.ItemTemplate>
