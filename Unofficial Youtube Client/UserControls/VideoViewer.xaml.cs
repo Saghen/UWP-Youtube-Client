@@ -1,24 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Media;
 using Windows.Media.Core;
 using Windows.Media.Playback;
-using Windows.Networking.BackgroundTransfer;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using YoutubeExplode;
 using YoutubeExplode.Models.MediaStreams;
 using YTApp.Classes;
@@ -30,12 +21,14 @@ namespace YTApp.UserControls
     public sealed partial class VideoViewer : UserControl
     {
         public event EventHandler EnteringFullscreen;
+
         public event EventHandler ExitingFullscren;
+
         public event EventHandler EnteringPiP;
 
         private static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(string), typeof(VideoViewer), null);
 
-        MediaStreamInfoSet videoStreams;
+        private MediaStreamInfoSet videoStreams;
 
         public MediaPlayer audioPlayer = new MediaPlayer();
         public MediaPlayer videoPlayer = new MediaPlayer();
@@ -45,9 +38,10 @@ namespace YTApp.UserControls
         public DispatcherTimer timer = new DispatcherTimer();
 
         //Data used for control fading
-        Point previousMouseLocation;
-        int mouseHasntMoved = 0;
-        DispatcherTimer pointerCheckTimer = new DispatcherTimer();
+        private Point previousMouseLocation;
+
+        private int mouseHasntMoved = 0;
+        private DispatcherTimer pointerCheckTimer = new DispatcherTimer();
 
         public string Source
         {
@@ -71,6 +65,7 @@ namespace YTApp.UserControls
         }
 
         #region Loading Ring
+
         private async void VideoPlayer_CurrentStateChanged(MediaPlayer sender, object args)
         {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -81,7 +76,8 @@ namespace YTApp.UserControls
                     LoadingRing.IsActive = false;
             });
         }
-        #endregion
+
+        #endregion Loading Ring
 
         #region Transport Control Management
 
@@ -100,12 +96,14 @@ namespace YTApp.UserControls
         }
 
         #region Picture in Picture
+
         private void ButtonPiP_Click(object sender, RoutedEventArgs e)
         {
             //Call event that the parent page has captured
             EnteringPiP.Invoke(this, new EventArgs());
         }
-        #endregion
+
+        #endregion Picture in Picture
 
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
@@ -179,9 +177,10 @@ namespace YTApp.UserControls
             pointerCheckTimer.Stop();
         }
 
-        #endregion
+        #endregion Manage Transport Control Fading
 
         #region Slider
+
         private async void Timer_Tick(object sender, object e)
         {
             try
@@ -201,17 +200,21 @@ namespace YTApp.UserControls
             //Set new position to the one that was just selected
             timelineController.Position = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(viewerProgress.Value * 1000));
         }
-        #endregion
+
+        #endregion Slider
 
         #region Quality Button
+
         private void QualityList_ItemClick(object sender, ItemClickEventArgs e)
         {
             videoPlayer.Source = MediaSource.CreateFromUri(new Uri(YoutubeMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false)));
             ButtonSettings.Flyout.Hide();
         }
-        #endregion
+
+        #endregion Quality Button
 
         #region Volume Button
+
         private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
             try
@@ -226,9 +229,10 @@ namespace YTApp.UserControls
             ButtonVolume.Flyout.ShowAt(ButtonVolume);
         }
 
-        #endregion
+        #endregion Volume Button
 
         #region Viewer Events
+
         private void viewer_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if (timelineController.State == MediaTimelineControllerState.Running)
@@ -278,16 +282,18 @@ namespace YTApp.UserControls
             }
         }
 
-        #endregion
+        #endregion Viewer Events
 
         #region Download Video Event
+
         private void DownloadVideo_Tapped(object sender, TappedRoutedEventArgs e)
         {
             Constants.MainPageRef.DownloadVideo();
         }
-        #endregion
 
-        #endregion
+        #endregion Download Video Event
+
+        #endregion Transport Control Management
 
         #region Video Source Management
 
@@ -384,6 +390,8 @@ namespace YTApp.UserControls
             timelineController.Resume();
         }
 
+        #endregion Video Source Management
+
         public void ResumeVideo()
         {
             ButtonPlay.Icon = new SymbolIcon(Symbol.Pause);
@@ -397,6 +405,5 @@ namespace YTApp.UserControls
 
             timelineController.Pause();
         }
-        #endregion
     }
 }

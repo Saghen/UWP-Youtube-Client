@@ -22,6 +22,7 @@ namespace YTApp.Classes
         private string _channeId;
         private DateTime _dateSubmitted;
         private bool failed = false;
+        private double watchTime;
 
         public string Thumbnail { get => _thumbnail; set => _thumbnail = value; }
         public string Title { get => _title; set => _title = value; }
@@ -34,6 +35,7 @@ namespace YTApp.Classes
         public string Id { get => _id; set => _id = value; }
         public bool Failed { get => failed; set => failed = value; }
         public string ChanneId { get => _channeId; set => _channeId = value; }
+        public double WatchTime { get => watchTime; set => watchTime = value; }
 
         private void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {

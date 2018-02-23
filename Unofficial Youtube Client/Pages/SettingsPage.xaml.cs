@@ -26,30 +26,11 @@ namespace YTApp.Pages
         {
             InitializeComponent();
 
-            if ((string)Windows.Storage.ApplicationData.Current.LocalSettings.Values["Theme"] == "Dark")
+            if ((string)Windows.Storage.ApplicationData.Current.LocalSettings.Values["Theme"] == "Dark" || Windows.Storage.ApplicationData.Current.LocalSettings.Values["Theme"] == null)
                 ThemeToggleSwitch.IsOn = true;
 
             //We set it here so that it doesn't fire when we set the initial value
             ThemeToggleSwitch.Toggled += ToggleSwitch_Toggled;
-        }
-
-        private void AppBackgroundDarkTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (((TextBox)sender).Text.Length == 7 && ((TextBox)sender).Text[0] == '#')
-                Classes.DataTypes.ThemeDataType.AppBackgroundDark = GenerateColorFromHex(((TextBox)sender).Text.Remove(0,1));
-        }
-
-        private void AppBackgroundTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            Classes.DataTypes.ThemeDataType.AppBackground = GenerateColorFromHex(((TextBox)sender).Text);
-        }
-
-        public Windows.UI.Color GenerateColorFromHex(string hexColor)
-        {
-            byte r = byte.Parse(hexColor.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
-            byte g = byte.Parse(hexColor.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
-            byte b = byte.Parse(hexColor.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
-            return Windows.UI.Color.FromArgb(255,r,g,b);
         }
 
         private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
