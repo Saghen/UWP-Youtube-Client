@@ -16,13 +16,14 @@
                     <DataTemplate x:DataType="datatypes:PlaylistDataType">
                         <GridView x:Name="VideoItemGridView" Header="{x:Bind Title}" ItemsSource="{x:Bind Items, Mode=OneWay}" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick">
                             <GridView.ItemTemplate>
-                                <DataTemplate x:DataType="classes:YoutubeItemDataType">
+                                <DataTemplate x:DataType="datatypes:YoutubeItemDataType">
                                     <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
-                                        <Image x:Name="ImageControl" Margin="5" HorizontalAlignment="Center">
+                                        <Image x:Name="ImageControl" HorizontalAlignment="Center" Margin="5">
                                             <Image.Source>
                                                 <BitmapImage DecodePixelWidth="230" DecodePixelHeight="130" UriSource="{x:Bind Thumbnail}"/>
                                             </Image.Source>
                                         </Image>
+                                        <ProgressBar Value="{x:Bind WatchTime}" Background="Transparent"/>
                                         <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
                                         <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>
                                         <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate, Mode=OneWay}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>

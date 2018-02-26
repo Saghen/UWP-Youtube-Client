@@ -2,6 +2,7 @@
 using Google.Apis.YouTube.v3.Data;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -40,6 +41,8 @@ namespace YTApp.Pages
 
         PlaylistDataType relatedVideos = new PlaylistDataType();
 
+        ObservableCollection<CommentContainerDataType> commentCollection = new ObservableCollection<CommentContainerDataType>();
+
         public VideoPage()
         {
             this.InitializeComponent();
@@ -48,7 +51,7 @@ namespace YTApp.Pages
             NavigationCacheMode = NavigationCacheMode.Enabled;
 
             //Link to the video complete event
-            viewer.videoPlayer.MediaEnded += VideoPlayer_MediaEnded;
+            viewer.controller.videoPlayer.MediaEnded += VideoPlayer_MediaEnded;
 
             //Set autoplay value
             try { SwitchAutoplay.IsOn = (bool)localSettings.Values["Autoplay"]; } catch { }
@@ -66,6 +69,7 @@ namespace YTApp.Pages
 
             Constants.MainPageRef.contentFrame.Navigated += ContentFrame_Navigated;
             SystemNavigationManager.GetForCurrentView().BackRequested += VideoPage_BackRequested;
+            Constants.MainPageRef.Frame.Navigated += Frame_Navigated;
 
             //Set the focus to the video viewer
             viewer.Focus(FocusState.Programmatic);
@@ -75,6 +79,18 @@ namespace YTApp.Pages
 
             //Update likes/dislikes
             LikeDislikeControl.UpdateData();
+
+            //Update comments
+            if (CommentsOptionComboBox.SelectedIndex == 0)
+                UpdateComments(CommentThreadsResource.ListRequest.OrderEnum.Relevance);
+            else
+                UpdateComments(CommentThreadsResource.ListRequest.OrderEnum.Time);
+        }
+
+        private void Frame_Navigated(object sender, NavigationEventArgs e)
+        {
+            //If the user logs out, we need to stop the video
+            viewer.StopVideo();
         }
 
         private void VideoPage_BackRequested(object sender, BackRequestedEventArgs e)
@@ -244,6 +260,8 @@ namespace YTApp.Pages
         }
         #endregion
 
+        #region Channel Clicked
+
         private void OpenChannel(object sender, TappedRoutedEventArgs e)
         {
             Constants.activeChannelID = channel.Id;
@@ -252,14 +270,17 @@ namespace YTApp.Pages
 
         private void ChannelProfileIcon_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Hand, 1);
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Hand, 1);
         }
 
         private void ChannelProfileIcon_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            Window.Current.CoreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(Windows.UI.Core.CoreCursorType.Arrow, 2);
+            Window.Current.CoreWindow.PointerCursor = new CoreCursor(CoreCursorType.Arrow, 2);
         }
 
+        #endregion
+
+        #region Description
         private void DescriptionShowMore_Click(object sender, RoutedEventArgs e)
         {
             if ((string)DescriptionShowMore.Content == "Show less")
@@ -273,6 +294,12 @@ namespace YTApp.Pages
                 DescriptionShowMore.Content = "Show less";
             }
         }
+
+        private async void Description_LinkClicked(object sender, Microsoft.Toolkit.Uwp.UI.Controls.LinkClickedEventArgs e)
+        {
+            await Windows.System.Launcher.LaunchUriAsync(new Uri(e.Link));
+        }
+        #endregion Description
 
         #region Fullscreen
 
@@ -356,8 +383,10 @@ namespace YTApp.Pages
             coreTitleBar.ExtendViewIntoTitleBar = false;
 
             //Set the position of this video page's viewer to the position of the compact view's one and the volume
-            viewer.ResumeVideo(pipViewer.Position);
+            viewer.controller.Start(pipViewer.Position);
         }
+
+        #region PiP
 
         private async void viewer_EnteringPiP(object sender, EventArgs e)
         {
@@ -367,7 +396,7 @@ namespace YTApp.Pages
             await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions);
 
             //Pause the video
-            viewer.timelineController.Pause();
+            viewer.controller.Pause();
 
             //Make the title bar smaller
             var coreTitleBar = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView().TitleBar;
@@ -384,7 +413,99 @@ namespace YTApp.Pages
         private void PipViewer_MediaOpened(object sender, RoutedEventArgs e)
         {
             //Sets position to the viewer's position once it loads
-            pipViewer.Position = viewer.timelineController.Position;
+            pipViewer.Position = viewer.controller.audioPlayer.PlaybackSession.Position;
         }
+
+        #endregion
+
+        #region Comments
+        string commentNextPageToken;
+        bool isAdding = false;
+
+        private async void UpdateComments(CommentThreadsResource.ListRequest.OrderEnum option)
+        {
+            //Clear the current comments
+            commentCollection.Clear();
+
+            var methods = new YoutubeMethods();
+
+            //Get the comments
+            var service = YoutubeMethodsStatic.GetServiceNoAuth();
+            var getComments = service.CommentThreads.List("snippet,replies");
+            getComments.VideoId = Constants.activeVideoID;
+            getComments.Order = option;
+            getComments.TextFormat = CommentThreadsResource.ListRequest.TextFormatEnum.PlainText;
+            getComments.MaxResults = 10;
+            var response = await getComments.ExecuteAsync();
+
+            //Save the next page token
+            commentNextPageToken = response.NextPageToken;
+
+            //Add them to our collection so that they will be updated on the UI
+            foreach (var commentThread in response.Items)
+            {
+                commentCollection.Add(new CommentContainerDataType(methods.CommentToDataType(commentThread)));
+            }
+        }
+
+        private async void AddComments(CommentThreadsResource.ListRequest.OrderEnum option)
+        {
+            if (isAdding)
+                return;
+
+            isAdding = true;
+
+            //Check if there are more comments
+            if (commentNextPageToken == null || commentNextPageToken == "")
+                return;
+
+            var methods = new YoutubeMethods();
+
+            //Get the comments
+            var service = YoutubeMethodsStatic.GetServiceNoAuth();
+            var getComments = service.CommentThreads.List("snippet,replies");
+            getComments.VideoId = Constants.activeVideoID;
+            getComments.Order = option;
+            getComments.TextFormat = CommentThreadsResource.ListRequest.TextFormatEnum.PlainText;
+            getComments.PageToken = commentNextPageToken;
+            getComments.MaxResults = 15;
+            var response = await getComments.ExecuteAsync();
+
+            //Save the next page token
+            commentNextPageToken = response.NextPageToken;
+
+            //Add them to our collection so that they will be updated on the UI
+            foreach (var commentThread in response.Items)
+            {
+                commentCollection.Add(new CommentContainerDataType(methods.CommentToDataType(commentThread)));
+            }
+
+            isAdding = false;
+        }
+
+        private void CommentsOptionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CommentsOptionComboBox.SelectedIndex == 0)
+                UpdateComments(CommentThreadsResource.ListRequest.OrderEnum.Relevance);
+            else
+                UpdateComments(CommentThreadsResource.ListRequest.OrderEnum.Time);
+        }
+
+        /// <summary>
+        /// Checks if we need to add more comments to the end of the page if the user has scrolled that far
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Scrollviewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            if (Scrollviewer.VerticalOffset > Scrollviewer.ScrollableHeight - 700)
+            {
+                if (CommentsOptionComboBox.SelectedIndex == 0)
+                    AddComments(CommentThreadsResource.ListRequest.OrderEnum.Relevance);
+                else
+                    AddComments(CommentThreadsResource.ListRequest.OrderEnum.Time);
+            }
+        }
+        #endregion
     }
 }

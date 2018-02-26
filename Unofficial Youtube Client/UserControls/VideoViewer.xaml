@@ -27,7 +27,7 @@
         <MediaPlayerElement x:Name="viewer" Tapped="viewer_Tapped" DoubleTapped="viewer_DoubleTapped" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited"/>
         <ProgressRing x:Name="LoadingRing" IsActive="False" Width="50" Height="50"/>
         <StackPanel x:Name="transportControls" x:FieldModifier="public" VerticalAlignment="Bottom" Background="#88000000">
-            <Slider x:Name="viewerProgress" Style="{StaticResource MediaControlSliderStyle}" IsThumbToolTipEnabled="False" PointerCaptureLost="viewerProgress_SliderOnComplete" Margin="10,0"/>
+            <Slider x:Name="viewerProgress" Style="{StaticResource MediaControlSliderStyle}" IsThumbToolTipEnabled="False" PointerCaptureLost="viewerProgress_SliderOnComplete" Margin="10,0" Maximum="10000"/>
             <Grid>
                 <CommandBar Background="Transparent" HorizontalAlignment="Left" OverflowButtonVisibility="Collapsed">
                     <AppBarButton x:Name="ButtonPlay" Icon="Pause" Click="ButtonPlay_Click"/>

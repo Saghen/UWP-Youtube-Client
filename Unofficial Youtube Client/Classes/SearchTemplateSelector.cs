@@ -17,7 +17,7 @@ namespace YTApp.Classes
         {
             if (item != null)
             {
-                if (item is YoutubeItemDataType)
+                if (item is DataTypes.YoutubeItemDataType)
                 {
                     return VideoTemplate;
                 }

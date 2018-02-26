@@ -3,7 +3,7 @@ using Google.Apis.Oauth2.v2;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
-using Google.Apis.Drive.v2;
+using Google.Apis.Drive.v3;
 using MetroLog;
 using Newtonsoft.Json;
 using System;
@@ -23,6 +23,8 @@ using YTApp.Classes;
 using YTApp.Pages;
 using Windows.UI.ViewManagement;
 using YTApp.Classes.DataTypes;
+using Windows.Storage;
+using System.Threading.Tasks;
 
 namespace YTApp
 {
@@ -77,7 +79,7 @@ namespace YTApp
 
         #region Startup
 
-        private void Startup()
+        private async void Startup()
         {
             Log.Info("Loading subscriptions");
             LoadSubscriptions();
@@ -87,7 +89,7 @@ namespace YTApp
             //Plays Youtube link in clipboard
             PlayClipboardYLink();
 
-            UpdateAppSyncData();
+            UpdateSyncData();
         }
 
         private async void PlayClipboardYLink()
@@ -101,47 +103,22 @@ namespace YTApp
             catch { Log.Error("Exception thrown while loading video from clipboard"); }
         }
 
-        private async void UpdateAppSyncData()
+        private async void UpdateSyncData()
         {
-            /*var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
+            //Update sync data
+            try
             {
-                ClientId = Constants.ClientID,
-                ClientSecret = Constants.ClientSecret
-            }, new[] { DriveService.Scope.DriveAppdata }, "user", CancellationToken.None);
+                StorageFolder roamingFolder = ApplicationData.Current.RoamingFolder;
+                var wow = await roamingFolder.GetItemsAsync();
 
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Unofficial Youtube Client",
-            });
+                var text = await FileIO.ReadTextAsync(await roamingFolder.GetFileAsync("data.json"));
 
-            var request = service.Files.List();
-            request.Spaces = "appDataFolder";
-            request.Fields = "";
-            request.MaxResults = 10;
-            var result = request.Execute();
+                if (text == "")
+                    return;
 
-            string id;
-            foreach (var file in result.Items)
-            {
-                if(file.Title == "config.json")
-                {
-                    //Download the file if found and store it
-                    var getFile = service.Files.Get(file.Id);
-                    var response = await getFile.ExecuteAsync();
-                    var client = new Windows.Web.Http.HttpClient();
-                    var configDataSerialized = await client.GetStringAsync(new Uri(file.DownloadUrl));
-                    var configData = JsonConvert.DeserializeObject<SyncedApplicationDataType>(configDataSerialized);
-                    Constants.syncedData = configData;
-
-                    //Set the theme
-                    Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-                    if (configData.DarkTheme)
-                        localSettings.Values["Theme"] = "Dark";
-                    else
-                        localSettings.Values["Theme"] = "Light";
-                }
-            }*/
+                Constants.syncedData = JsonConvert.DeserializeObject<SyncedApplicationDataType>(text);
+            }
+            catch { }
         }
 
         #endregion Startup
@@ -236,7 +213,7 @@ namespace YTApp
             }
             catch (Exception ex)
             {
-                Log.Fatal(String.Format("GetSubscriptions failed to load with the service {0}", JsonConvert.SerializeObject(subscriptions)));
+                Log.Fatal(String.Format("GetSubscriptions failed to load"));
                 Log.Fatal(ex.Message);
                 return null;
             }
@@ -397,8 +374,7 @@ namespace YTApp
             var client = new YoutubeClient();
             var videoUrl = Constants.videoInfo.Muxed[0].Url;
 
-            var savePicker = new Windows.Storage.Pickers.FileSavePicker();
-            savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads;
+            var savePicker = new Windows.Storage.Pickers.FileSavePicker { SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Downloads };
             savePicker.FileTypeChoices.Add("Video File", new List<string>() { ".mp4" });
 
             Windows.Storage.StorageFile file = await savePicker.PickSaveFileAsync();

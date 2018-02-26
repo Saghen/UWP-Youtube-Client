@@ -1,0 +1,89 @@
+﻿<UserControl
+    x:Class="YTApp.UserControls.CommentThread"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YTApp.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:classes="using:YTApp.Classes.DataTypes"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Styles/TransparentButton.xaml"/>
+                <ResourceDictionary Source="../Styles/TextBoxCleanStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal" Margin="0,15" >
+        <Ellipse Margin="20,0" Width="50" Height="50" VerticalAlignment="Top">
+            <Ellipse.Fill>
+                <ImageBrush>
+                    <ImageBrush.ImageSource>
+                        <BitmapImage UriSource="{x:Bind Source.AuthorThumbnail}" DecodePixelHeight="50" DecodePixelWidth="50"/>
+                    </ImageBrush.ImageSource>
+                </ImageBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{x:Bind Source.Author}" Margin="0,0,10,0" IsTextSelectionEnabled="True"/>
+                <TextBlock Text="{x:Bind Source.DatePosted}" Foreground="{StaticResource AppTextSecondary}" IsTextSelectionEnabled="True"/>
+            </StackPanel>
+            <TextBlock Text="{x:Bind Source.Content}" Margin="0,10" IsTextSelectionEnabled="True" MaxLines="20" TextWrapping="WrapWholeWords"/>
+            <StackPanel Orientation="Horizontal">
+                <HyperlinkButton Foreground="{StaticResource AppTextSecondary}" Content="REPLY" VerticalAlignment="Center" Margin="0,0,10,0" Tapped="ReplyButton_Tapped">
+                    <HyperlinkButton.ContentTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" />
+                        </DataTemplate>
+                    </HyperlinkButton.ContentTemplate>
+                </HyperlinkButton>
+                <TextBlock Margin="10,0" VerticalAlignment="Center" IsTextSelectionEnabled="True">
+                    <Run Text="{x:Bind Source.LikeCount}"/>
+                    <Run Text="Likes"/>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel x:Name="ReplyContainer" Margin="0,10" Orientation="Horizontal" Visibility="Collapsed">
+                <TextBox x:Name="ReplyBox" PlaceholderText="Enter your reply..." Style="{StaticResource TextBoxCleanStyle}" BorderThickness="1" Background="{StaticResource TextBoxBackground}" BorderBrush="{StaticResource BorderColor}" Width="400"/>
+                <TextBlock Margin="10,0" VerticalAlignment="Center">
+                    <Hyperlink x:Name="ReplyBoxSend" Foreground="{StaticResource AppText}" FontFamily="Segoe MDL2 Assets" TextDecorations="None" FontSize="24" Click="ReplyBoxSend_Click">&#xE724;</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel x:Name="Replies">
+                <TextBlock >
+                    <Hyperlink x:Name="ViewMoreButton" Foreground="{StaticResource AppTextSecondary}" TextDecorations="None" Click="ViewMoreButton_Click">View more comments</Hyperlink>
+                </TextBlock>
+                <ItemsControl x:Name="RepliesItems" ItemsSource="{x:Bind commentReplies}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="classes:CommentDataType">
+                            <StackPanel Orientation="Horizontal" Margin="0,15">
+                                <TextBlock Foreground="{StaticResource AppTextSecondary}" Margin="20,14,0,0" VerticalAlignment="Top" IsTextSelectionEnabled="True"><Run Text="{x:Bind LikeCount}"/></TextBlock>
+                                <Ellipse Margin="20,0" Width="50" Height="50" VerticalAlignment="Top">
+                                    <Ellipse.Fill>
+                                        <ImageBrush>
+                                            <ImageBrush.ImageSource>
+                                                <BitmapImage UriSource="{x:Bind AuthorThumbnail}" DecodePixelHeight="50" DecodePixelWidth="50"/>
+                                            </ImageBrush.ImageSource>
+                                        </ImageBrush>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{x:Bind Author}" Margin="0,0,10,0" IsTextSelectionEnabled="True"/>
+                                        <TextBlock Text="{x:Bind DatePosted}" Foreground="{StaticResource AppTextSecondary}" IsTextSelectionEnabled="True"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{x:Bind Content}" Margin="0,10" IsTextSelectionEnabled="True" MaxLines="20" TextWrapping="WrapWholeWords"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

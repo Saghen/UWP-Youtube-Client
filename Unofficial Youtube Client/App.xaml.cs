@@ -1,4 +1,5 @@
 ﻿using MetroLog;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,12 +38,10 @@ namespace YTApp
         /// </summary>
         public App()
         {
-            Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-
-            if (localSettings.Values["Theme"] == null || (string)localSettings.Values["Theme"] == "Dark")
-                RequestedTheme = ApplicationTheme.Dark;
-            else
+            if ((string)ApplicationData.Current.LocalSettings.Values["Theme"] == "Light")
                 RequestedTheme = ApplicationTheme.Light;
+            else
+                RequestedTheme = ApplicationTheme.Dark;
 
             this.InitializeComponent();
             this.Suspending += OnSuspending;
@@ -146,6 +145,8 @@ namespace YTApp
         /// <param name="e">Details about the suspend request.</param>
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
+            Constants.StoreAppData();
+
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();

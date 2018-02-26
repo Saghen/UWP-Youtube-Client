@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:YTApp"
-    xmlns:classes="using:YTApp.Classes"
+    xmlns:classes="using:YTApp.Classes.DataTypes"
     xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:userctrls="using:YTApp.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -29,14 +29,14 @@
     </Page.Resources>
 
     <Grid>
-        <ScrollViewer x:Name="Scrollviewer">
+        <ScrollViewer x:Name="Scrollviewer" ViewChanged="Scrollviewer_ViewChanged">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition x:Name="MediaRow" Height="600"/>
                     <RowDefinition Height="11"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                
+
                 <Grid x:Name="MediaElementContainer" PointerEntered="Viewer_PointerEntered" PointerExited="Viewer_PointerExited" Background="#1a1a1a">
                     <userctrls:VideoViewer x:Name="viewer" Source="" EnteringFullscreen="viewer_EnteringFullscreen" ExitingFullscren="viewer_ExitingFullscren" EnteringPiP="viewer_EnteringPiP"/>
                     <Button x:Name='MinimizeMediaElement' Style="{StaticResource TransparentButtonStyle}" BorderThickness="0" Opacity="0" Background="Transparent" Content="&#xE011;" FontFamily="Segoe MDL2 Assets" VerticalAlignment="Top" Margin="12" Click="MinimizeMediaElement_Click"/>
@@ -77,7 +77,7 @@
                                 <StackPanel Grid.Column="1" Margin="0,20">
                                     <TextBlock x:Name="ChannelTitle" Tapped="OpenChannel" PointerEntered="ChannelProfileIcon_PointerEntered" PointerExited="ChannelProfileIcon_PointerExited" IsTextSelectionEnabled="False" HorizontalAlignment="Left"/>
                                     <TextBlock x:Name="DatePosted" Foreground="{StaticResource AppTextSecondary}" Margin="0,5,0,20"/>
-                                    <toolkit:MarkdownTextBlock x:Name="Description" MaxHeight="200" TextWrapping="WrapWholeWords" ParagraphMargin="18"/>
+                                    <toolkit:MarkdownTextBlock x:Name="Description" MaxHeight="200" TextWrapping="WrapWholeWords" ParagraphMargin="18" LinkClicked="Description_LinkClicked" />
                                     <HyperlinkButton x:Name="DescriptionShowMore" Content="Show more" Click="DescriptionShowMore_Click" Visibility="Collapsed">
                                         <HyperlinkButton.ContentTemplate>
                                             <DataTemplate>
@@ -88,6 +88,18 @@
                                 </StackPanel>
                             </Grid>
                         </Grid>
+                        <MenuFlyoutSeparator VerticalAlignment="Bottom"/>
+                        <ComboBox x:Name="CommentsOptionComboBox" Header="Order by" SelectedIndex="0" SelectionChanged="CommentsOptionComboBox_SelectionChanged" Margin="0,10">
+                            <ComboBoxItem Content="Relevance"/>
+                            <ComboBoxItem Content="Newest"/>
+                        </ComboBox>
+                        <ItemsControl ItemsSource="{x:Bind commentCollection, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="classes:CommentContainerDataType">
+                                    <userctrls:CommentThread Source="{x:Bind commentData}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
 
                     <Grid Grid.Column="1" Margin="0,10">

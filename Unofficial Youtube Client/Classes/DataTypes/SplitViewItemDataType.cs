@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YTApp.Classes
+namespace YTApp.Classes.DataTypes
 {
     class SplitViewItemDataType
     {

@@ -5,7 +5,7 @@
     xmlns:local="using:YTApp.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:classes="using:YTApp.Classes"
+    xmlns:classes="using:YTApp.Classes.DataTypes"
     mc:Ignorable="d">
 
     <ScrollViewer>

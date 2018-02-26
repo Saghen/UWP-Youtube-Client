@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using YTApp.Classes.DataTypes;
 
 namespace YTApp.Classes
 {
     class YoutubeMethods
     {
+        #region Video To Youtube Item
         public YoutubeItemDataType VideoToYoutubeItem(SearchResult video)
         {
             var VideoToAdd = new YoutubeItemDataType();
@@ -23,6 +25,7 @@ namespace YTApp.Classes
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
             VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
             VideoToAdd.ChanneId = video.Snippet.ChannelId;
+            VideoToAdd.WatchTime = GetWatchedTime(video.Id.VideoId);
             return VideoToAdd;
         }
 
@@ -40,6 +43,7 @@ namespace YTApp.Classes
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
             VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
             VideoToAdd.ChanneId = video.Snippet.ChannelId;
+            VideoToAdd.WatchTime = GetWatchedTime(video.Id);
             return VideoToAdd;
         }
 
@@ -57,6 +61,7 @@ namespace YTApp.Classes
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
             VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
             VideoToAdd.ChanneId = video.Snippet.ChannelId;
+            VideoToAdd.WatchTime = GetWatchedTime(video.Id);
             return VideoToAdd;
         }
 
@@ -74,39 +79,87 @@ namespace YTApp.Classes
             VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
             VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
             VideoToAdd.ChanneId = video.Snippet.ChannelId;
+            VideoToAdd.WatchTime = GetWatchedTime(video.Id);
             return VideoToAdd;
         }
+        #endregion
 
-
+        #region Channel To Channel Item
         public YoutubeChannelDataType ChannelToYoutubeChannel(SearchResult video, YouTubeService service)
         {
             var getChannelInfo = service.Channels.List("snippet, statistics");
             getChannelInfo.Id = video.Snippet.ChannelId;
             var channelInfo = getChannelInfo.Execute();
-            
 
-            var VideoToAdd = new YoutubeChannelDataType();
-            VideoToAdd.Description = video.Snippet.Description;
-            VideoToAdd.Thumbnail = channelInfo.Items[0].Snippet.Thumbnails.Medium.Url;
-            VideoToAdd.Title = video.Snippet.Title;
-            VideoToAdd.Id = video.Id.ChannelId;
-            VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId;
-            VideoToAdd.SubscribersAndVideos = string.Format("{0:#,###0.#}", channelInfo.Items[0].Statistics.SubscriberCount) + " Subscribers • Videos " + Convert.ToString(channelInfo.Items[0].Statistics.VideoCount);
+            var VideoToAdd = new YoutubeChannelDataType
+            {
+                Description = video.Snippet.Description,
+                Thumbnail = channelInfo.Items[0].Snippet.Thumbnails.Medium.Url,
+                Title = video.Snippet.Title,
+                Id = video.Id.ChannelId,
+                Ylink = "https://www.youtube.com/watch?v=" + video.Id.VideoId,
+                SubscribersAndVideos = string.Format("{0:#,###0.#}", channelInfo.Items[0].Statistics.SubscriberCount) + " Subscribers • Videos " + Convert.ToString(channelInfo.Items[0].Statistics.VideoCount)
+            };
             return VideoToAdd;
         }
 
         public YoutubeChannelDataType ChannelToYoutubeChannel(Channel channel)
         {
-            var ChannelToAdd = new YoutubeChannelDataType();
-            ChannelToAdd.Description = channel.Snippet.Description;
-            ChannelToAdd.Thumbnail = channel.Snippet.Thumbnails.Medium.Url;
-            ChannelToAdd.Title = channel.Snippet.Title;
-            ChannelToAdd.Id = channel.Id;
-            ChannelToAdd.Subscribers = string.Format("{0:#,###0.#}", channel.Statistics.SubscriberCount) + " Subscribers";
-            ChannelToAdd.Videos = Convert.ToString(channel.Statistics.VideoCount) + " Videos";
+            var ChannelToAdd = new YoutubeChannelDataType
+            {
+                Description = channel.Snippet.Description,
+                Thumbnail = channel.Snippet.Thumbnails.Medium.Url,
+                Title = channel.Snippet.Title,
+                Id = channel.Id,
+                Subscribers = string.Format("{0:#,###0.#}", channel.Statistics.SubscriberCount) + " Subscribers",
+                Videos = Convert.ToString(channel.Statistics.VideoCount) + " Videos"
+            };
             return ChannelToAdd;
         }
+        #endregion
 
+        #region Comment to Comment Datatype
+
+        public CommentDataType CommentToDataType(CommentThread commentData)
+        {
+            var comment = new CommentDataType();
+            comment.Author = commentData.Snippet.TopLevelComment.Snippet.AuthorDisplayName;
+            comment.AuthorThumbnail = commentData.Snippet.TopLevelComment.Snippet.AuthorProfileImageUrl;
+            comment.Content = commentData.Snippet.TopLevelComment.Snippet.TextDisplay;
+            comment.DatePosted = TimeSinceDate(commentData.Snippet.TopLevelComment.Snippet.PublishedAt);
+            comment.Id = commentData.Snippet.TopLevelComment.Id;
+            comment.IsReplies = commentData.Replies != null;
+            comment.LikeCount = commentData.Snippet.TopLevelComment.Snippet.LikeCount;
+
+            if (commentData.Replies != null)
+                comment.ReplyCount = commentData.Replies.Comments.Count;
+            else
+                comment.ReplyCount = 0;
+
+            if (commentData.Replies != null)
+                foreach (var item in commentData.Replies.Comments)
+                    comment.Replies.Add(CommentToDataType(item));
+
+            return comment;
+        }
+
+        public CommentDataType CommentToDataType(Comment commentData)
+        {
+            var comment = new CommentDataType();
+            comment.Author = commentData.Snippet.AuthorDisplayName;
+            comment.AuthorThumbnail = commentData.Snippet.AuthorProfileImageUrl;
+            comment.Content = commentData.Snippet.TextDisplay;
+            comment.DatePosted = TimeSinceDate(commentData.Snippet.PublishedAt);
+            comment.Id = commentData.Id;
+            comment.IsReplies = false;
+            comment.LikeCount = commentData.Snippet.LikeCount;
+
+            return comment;
+        }
+
+        #endregion
+
+        #region Fill in Views
         public Task FillInViewsAsync(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return null;
@@ -222,6 +275,8 @@ namespace YTApp.Classes
             }
         }
 
+        #endregion
+
         public string TimeSinceDate(DateTime? date)
         {
             try
@@ -241,6 +296,22 @@ namespace YTApp.Classes
                     return String.Format("{0} seconds ago", (int)ts.TotalSeconds);
             }
             catch { return "unkown date"; }
+        }
+
+        public double GetWatchedTime(string VideoID)
+        {
+            List<YoutubeItemDataType> list;
+            if (Constants.syncedData.history.Count > 200)
+                list = Constants.syncedData.history.GetRange(0, 200);
+            else
+                list = Constants.syncedData.history;
+
+            var value = list.Find(x => x.Id == VideoID);
+            if (value != null)
+            {
+                return value.WatchTime;
+            }
+            return 0;
         }
     }
 }

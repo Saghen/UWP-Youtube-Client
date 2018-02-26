@@ -106,9 +106,12 @@
     </Compile>
     <Compile Include="Classes\Constants.cs" />
     <Compile Include="Classes\DataTypes\ChannelListDataType.cs" />
+    <Compile Include="Classes\DataTypes\CommentContainerDataType.cs" />
+    <Compile Include="Classes\DataTypes\CommentDataType.cs" />
     <Compile Include="Classes\DataTypes\PlaylistDataType.cs" />
     <Compile Include="Classes\DataTypes\SyncedApplicationDataType.cs" />
     <Compile Include="Classes\EventArgs\RoutedEventArgsWithID.cs" />
+    <Compile Include="Classes\MediaPlayerController.cs" />
     <Compile Include="Classes\SearchTemplateSelector.cs" />
     <Compile Include="Classes\DataTypes\YoutubeChannelDataType.cs" />
     <Compile Include="Classes\YoutubeMethodsStatic.cs" />
@@ -150,6 +153,9 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classes\DataTypes\YoutubeItemDataType.cs" />
+    <Compile Include="UserControls\CommentThread.xaml.cs">
+      <DependentUpon>CommentThread.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\LikeDislikeUserControl.xaml.cs">
       <DependentUpon>LikeDislikeUserControl.xaml</DependentUpon>
     </Compile>
@@ -308,6 +314,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UserControls\CommentThread.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\LikeDislikeUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -327,7 +337,7 @@
     <PackageReference Include="Google.Apis.Core">
       <Version>1.30.0-beta02</Version>
     </PackageReference>
-    <PackageReference Include="Google.Apis.Drive.v2">
+    <PackageReference Include="Google.Apis.Drive.v3">
       <Version>1.30.0.1044</Version>
     </PackageReference>
     <PackageReference Include="Google.Apis.Oauth2.v2">

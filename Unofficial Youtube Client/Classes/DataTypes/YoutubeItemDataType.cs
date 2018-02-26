@@ -4,8 +4,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml;
 
-namespace YTApp.Classes
+namespace YTApp.Classes.DataTypes
 {
     public class YoutubeItemDataType : INotifyPropertyChanged
     {
@@ -23,6 +24,7 @@ namespace YTApp.Classes
         private DateTime _dateSubmitted;
         private bool failed = false;
         private double watchTime;
+        private Windows.UI.Xaml.Visibility isNewVideo = Windows.UI.Xaml.Visibility.Visible;
 
         public string Thumbnail { get => _thumbnail; set => _thumbnail = value; }
         public string Title { get => _title; set => _title = value; }
@@ -36,6 +38,7 @@ namespace YTApp.Classes
         public bool Failed { get => failed; set => failed = value; }
         public string ChanneId { get => _channeId; set => _channeId = value; }
         public double WatchTime { get => watchTime; set => watchTime = value; }
+        public Visibility IsNewVideo { get => isNewVideo; set => isNewVideo = value; }
 
         private void NotifyPropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {

@@ -20,15 +20,24 @@ namespace YTApp.Classes
         {
             var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(new ClientSecrets
             {
-                ClientId = "957928808020-pa0lopl3crh565k6jd4djaj36rm1d9i5.apps.googleusercontent.com",
-                ClientSecret = "oB9U6yWFndnBqLKIRSA0nYGm"
-            }, new[] { YouTubeService.Scope.Youtube, Google.Apis.Oauth2.v2.Oauth2Service.Scope.UserinfoProfile, Google.Apis.Drive.v2.DriveService.Scope.DriveAppdata }, "user", CancellationToken.None);
-
+                ClientId = Constants.ClientID,
+                ClientSecret = Constants.ClientSecret
+            }, new[] { Google.Apis.Oauth2.v2.Oauth2Service.Scope.UserinfoProfile, YouTubeService.Scope.YoutubeForceSsl }, "user", CancellationToken.None);
+        
             // Create the service.
             return new YouTubeService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
                 ApplicationName = "Unofficial Youtube Client",
+            });
+        }
+
+        static public YouTubeService GetServiceNoAuth()
+        {
+            return new YouTubeService(new BaseClientService.Initializer()
+            {
+                ApiKey = Constants.ApiKey,
+                ApplicationName = "Unofficial Youtube Client"
             });
         }
 

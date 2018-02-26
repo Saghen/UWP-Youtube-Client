@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace YTApp.Classes
+namespace YTApp.Classes.DataTypes
 {
     public class SubscriptionDataType
     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Media;
@@ -30,9 +31,7 @@ namespace YTApp.UserControls
 
         private MediaStreamInfoSet videoStreams;
 
-        public MediaPlayer audioPlayer = new MediaPlayer();
-        public MediaPlayer videoPlayer = new MediaPlayer();
-        public MediaTimelineController timelineController = new MediaTimelineController();
+        public MediaPlayerController controller = new MediaPlayerController();
 
         //Timer that will update our progress slider on our custom controls
         public DispatcherTimer timer = new DispatcherTimer();
@@ -43,10 +42,13 @@ namespace YTApp.UserControls
         private int mouseHasntMoved = 0;
         private DispatcherTimer pointerCheckTimer = new DispatcherTimer();
 
+        //Timer for storing the current position of the video in the cloud storage
+        DispatcherTimer storePositionTimer = new DispatcherTimer();
+
         public string Source
         {
             get { return (string)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); UpdateVideo(); }
+            set { SetValue(SourceProperty, value); LoadVideo(); }
         }
 
         public VideoViewer()
@@ -61,38 +63,38 @@ namespace YTApp.UserControls
             pointerCheckTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             pointerCheckTimer.Tick += PointerCheckTimer_Tick;
 
-            videoPlayer.CurrentStateChanged += VideoPlayer_CurrentStateChanged;
+            controller.videoPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
+
+            //Update the position of the video in the cloud data store
+            
+            storePositionTimer.Interval = new TimeSpan(0, 0, 0, 10);
+            storePositionTimer.Tick += StorePositionTimer_Tick;
         }
 
-        #region Loading Ring
-
-        private async void VideoPlayer_CurrentStateChanged(MediaPlayer sender, object args)
+        private async void PlaybackSession_PlaybackStateChanged(MediaPlaybackSession sender, object args)
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            if(controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Playing)
             {
-                if (videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Buffering)
-                    LoadingRing.IsActive = true;
-                else
-                    LoadingRing.IsActive = false;
-            });
+                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () => { ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Pause }; LoadingRing.IsActive = false; });
+            }
+            else if (controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Buffering)
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () => { LoadingRing.IsActive = true; });
+            }
+            else if (controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Paused)
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () => { ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Play }; LoadingRing.IsActive = false; });
+            }
         }
-
-        #endregion Loading Ring
 
         #region Transport Control Management
 
         private void ButtonPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (timelineController.State == MediaTimelineControllerState.Running || timelineController.State == MediaTimelineControllerState.Stalled)
-            {
-                timelineController.Pause();
-                ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Play };
-            }
+            if (controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Playing || controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Buffering)
+                controller.Pause();
             else
-            {
-                timelineController.Resume();
-                ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Pause };
-            }
+                controller.Start();
         }
 
         #region Picture in Picture
@@ -128,7 +130,7 @@ namespace YTApp.UserControls
         private void ButtonCopy_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var link = new Windows.ApplicationModel.DataTransfer.DataPackage();
-            link.SetText("https://youtu.be/" + Constants.activeVideoID + "?t=" + Convert.ToInt32(timelineController.Position.TotalSeconds) + "s");
+            link.SetText("https://youtu.be/" + Constants.activeVideoID + "?t=" + Convert.ToInt32(controller.audioPlayer.PlaybackSession.Position.TotalSeconds) + "s");
             Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(link);
             Constants.MainPageRef.ShowNotifcation("Link copied to clipboard.");
         }
@@ -189,7 +191,8 @@ namespace YTApp.UserControls
                     return;
                 await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
                 {
-                    viewerProgress.Value = videoPlayer.PlaybackSession.Position.TotalSeconds;
+                    if(controller.audioPlayer.PlaybackSession.NaturalDuration.TotalSeconds > 0)
+                        viewerProgress.Value = (controller.audioPlayer.PlaybackSession.Position.TotalSeconds / controller.audioPlayer.PlaybackSession.NaturalDuration.TotalSeconds) * 10000;
                 });
             }
             catch { }
@@ -198,7 +201,7 @@ namespace YTApp.UserControls
         private void viewerProgress_SliderOnComplete(object sender, PointerRoutedEventArgs e)
         {
             //Set new position to the one that was just selected
-            timelineController.Position = new TimeSpan(0, 0, 0, 0, Convert.ToInt32(viewerProgress.Value * 1000));
+            controller.SetPosition(new TimeSpan(0, 0, 0, Convert.ToInt32((viewerProgress.Value / 10000) * controller.audioPlayer.PlaybackSession.NaturalDuration.TotalSeconds)));
         }
 
         #endregion Slider
@@ -207,7 +210,7 @@ namespace YTApp.UserControls
 
         private void QualityList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            videoPlayer.Source = MediaSource.CreateFromUri(new Uri(YoutubeMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false)));
+            controller.videoPlayer.Source = MediaSource.CreateFromUri(new Uri(YoutubeMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false)));
             ButtonSettings.Flyout.Hide();
         }
 
@@ -219,7 +222,7 @@ namespace YTApp.UserControls
         {
             try
             {
-                audioPlayer.Volume = ((Slider)sender).Value / 1000;
+                controller.audioPlayer.Volume = ((Slider)sender).Value / 1000;
             }
             catch { }
         }
@@ -235,16 +238,10 @@ namespace YTApp.UserControls
 
         private void viewer_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            if (timelineController.State == MediaTimelineControllerState.Running)
-            {
-                timelineController.Pause();
-                ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Play };
-            }
+            if (controller.audioPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Playing)
+                controller.Pause();
             else
-            {
-                timelineController.Resume();
-                ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Pause };
-            }
+                controller.Start();
         }
 
         private void viewer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -262,7 +259,7 @@ namespace YTApp.UserControls
             }
 
             //The first tap will pause the player
-            ResumeVideo();
+            controller.Start();
         }
 
         private void MediaViewerParent_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -272,13 +269,6 @@ namespace YTApp.UserControls
             {
                 view.ExitFullScreenMode();
                 ExitingFullscren.Invoke(this, new EventArgs());
-            }
-            else if (e.Key == Windows.System.VirtualKey.Space)
-            {
-                if (timelineController.State == MediaTimelineControllerState.Running || timelineController.State == MediaTimelineControllerState.Stalled)
-                    PauseVideo();
-                else if (timelineController.State == MediaTimelineControllerState.Paused)
-                    ResumeVideo();
             }
         }
 
@@ -316,94 +306,36 @@ namespace YTApp.UserControls
             return true;
         }
 
-        private async void UpdateVideo()
+        private async void LoadVideo()
         {
-            //Stop updating the progress bar
-            timer.Stop();
-
-            //Pause the player (It's a good idea to figure out a way to clear it from memory)
-            videoPlayer.Dispose();
-            audioPlayer.Dispose();
-            timelineController.Pause();
-
-            var _displayRequest = new Windows.System.Display.DisplayRequest();
-            _displayRequest.RequestActive();
-
             if (!(await GetVideoData()))
                 return;
 
-            audioPlayer = new MediaPlayer();
-            videoPlayer = new MediaPlayer();
+            controller.Load(new Uri(Constants.videoInfo.Video[0].Url), new Uri(Constants.videoInfo.Audio[0].Url));
 
-            //We use this method so that we can synchronize the audio and video streams
-            audioPlayer.Source = MediaSource.CreateFromUri(new Uri(Constants.videoInfo.Audio[0].Url));
-            videoPlayer.Source = MediaSource.CreateFromUri(new Uri(Constants.videoInfo.Video[0].Url));
+            viewer.SetMediaPlayer(controller.videoPlayer);
 
-            audioPlayer.CommandManager.IsEnabled = false;
-            videoPlayer.CommandManager.IsEnabled = false;
+            controller.Start();
 
-            audioPlayer.TimelineController = timelineController;
-            videoPlayer.TimelineController = timelineController;
-
-            viewer.SetMediaPlayer(videoPlayer);
-
-            timelineController.Start();
-
-            //Event that allows us to set the maximum progress bar value and start updating
-            videoPlayer.MediaOpened += VideoPlayer_MediaOpened;
-
-            //Update video qualities
-            QualityList.ItemsSource = YoutubeMethodsStatic.GetVideoQualityList();
-        }
-
-        private async void VideoPlayer_MediaOpened(MediaPlayer sender, object args)
-        {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-            {
-                viewerProgress.Maximum = videoPlayer.PlaybackSession.NaturalDuration.TotalSeconds;
-                timer.Start();
-            });
+            timer.Start();
+            storePositionTimer.Start();
         }
 
         public void StopVideo()
         {
-            //Stop updating the progress bar
+            //Stop all timers
             timer.Stop();
+            storePositionTimer.Stop();
 
-            //Pause the player (It's a good idea to figure out a way to clear it from memory)
-            videoPlayer.Dispose();
-            audioPlayer.Dispose();
-            timelineController.Pause();
-
-            //Stop keeping the screen active
-            var _displayRequest = new Windows.System.Display.DisplayRequest();
-            _displayRequest.RequestRelease();
-        }
-
-        public void ResumeVideo(TimeSpan position)
-        {
-            ButtonPlay.Icon = new SymbolIcon(Symbol.Pause);
-
-            if (position != null)
-                timelineController.Position = position;
-
-            timelineController.Resume();
+            controller.Stop();
         }
 
         #endregion Video Source Management
 
-        public void ResumeVideo()
+        private void StorePositionTimer_Tick(object sender, object e)
         {
-            ButtonPlay.Icon = new SymbolIcon(Symbol.Pause);
-
-            timelineController.Resume();
-        }
-
-        public void PauseVideo()
-        {
-            ButtonPlay.Icon = new SymbolIcon(Symbol.Play);
-
-            timelineController.Pause();
+            //Save the percentage of the video watched
+            Constants.syncedData.history[0].WatchTime = (controller.audioPlayer.PlaybackSession.Position.TotalSeconds / controller.audioPlayer.PlaybackSession.NaturalDuration.TotalSeconds) * 100;
         }
     }
 }
