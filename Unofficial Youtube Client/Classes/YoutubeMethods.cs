@@ -163,26 +163,30 @@ namespace YTApp.Classes
         public Task FillInViewsAsync(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return null;
-            int j = 0;
 
-            string VideoIDs = "";
-            foreach (var video in collection)
+            for(int i = 0; i <= (collection.Count - 1)/50; i++)
             {
-                if (video == null)
+                string VideoIDs = "";
+                int j = 0;
+                foreach (var video in collection)
                 {
-                    collection.RemoveAt(j); break;
+                    if (video == null)
+                    {
+                        collection.RemoveAt(j); break;
+                    }
+                    VideoIDs += video.Id + ",";
+                    j++;
                 }
-                VideoIDs += video.Id + ",";
-                j++;
-            }
-            var getViewsRequest = service.Videos.List("statistics");
-            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
+                var getViewsRequest = service.Videos.List("statistics");
+                getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
-            var videoListResponse = getViewsRequest.Execute();
+                var videoListResponse = getViewsRequest.Execute();
 
-            for (int i = 0; i < collection.Count; i++)
-            {
-                collection[i].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                for (int k = 0; k < collection.Count; k++)
+                {
+                    try { collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate; }
+                    catch { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
+                }
             }
             return null;
         }
@@ -191,29 +195,29 @@ namespace YTApp.Classes
         {
             if (collection.Count <= 0) return null;
 
-            string VideoIDs = "";
-            int j = 0;
-            foreach (var video in collection)
+            for (int i = 0; i <= (collection.Count - 1) / 50; i++)
             {
-                if (video == null)
+                string VideoIDs = "";
+                int j = 0;
+                foreach (var video in collection)
                 {
-                    collection.RemoveAt(j); break;
+                    if (video == null)
+                    {
+                        collection.RemoveAt(j); break;
+                    }
+                    VideoIDs += video.Id + ",";
+                    j++;
                 }
-                VideoIDs += video.Id + ",";
-                j++;
-            }
-            var getViewsRequest = service.Videos.List("statistics");
-            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
+                var getViewsRequest = service.Videos.List("statistics");
+                getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
-            var videoListResponse = getViewsRequest.Execute();
+                var videoListResponse = getViewsRequest.Execute();
 
-            for (int i = 0; i < collection.Count; i++)
-            {
-                try
+                for (int k = 0; k < collection.Count; k++)
                 {
-                    collection[i].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                    try { collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate; }
+                    catch { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
                 }
-                catch { collection[i].ViewsAndDate = "Unknown" + collection[i].ViewsAndDate; }
             }
 
             return null;
@@ -222,26 +226,30 @@ namespace YTApp.Classes
         public void FillInViews(ObservableCollection<YoutubeItemDataType> collection, YouTubeService service)
         {
             if (collection.Count <= 0) return;
-            int j = 0;
 
-            string VideoIDs = "";
-            foreach (var video in collection)
+            for (int i = 0; i <= (collection.Count - 1) / 50; i++)
             {
-                if (video == null)
+                string VideoIDs = "";
+                int j = 0;
+                foreach (var video in collection)
                 {
-                    collection.RemoveAt(j); break;
+                    if (video == null)
+                    {
+                        collection.RemoveAt(j); break;
+                    }
+                    VideoIDs += video.Id + ",";
+                    j++;
                 }
-                VideoIDs += video.Id + ",";
-                j++;
-            }
-            var getViewsRequest = service.Videos.List("statistics");
-            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
+                var getViewsRequest = service.Videos.List("statistics");
+                getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
-            var videoListResponse = getViewsRequest.Execute();
+                var videoListResponse = getViewsRequest.Execute();
 
-            for (int i = 0; i < collection.Count; i++)
-            {
-                collection[i].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                for (int k = 0; k < collection.Count; k++)
+                {
+                    try { collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate; }
+                    catch { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
+                }
             }
         }
 
@@ -249,29 +257,29 @@ namespace YTApp.Classes
         {
             if (collection.Count <= 0) return;
 
-            string VideoIDs = "";
-            int j = 0;
-            foreach (var video in collection)
+            for (int i = 0; i <= (collection.Count - 1) / 50; i++)
             {
-                if (video == null)
+                string VideoIDs = "";
+                int j = 0;
+                foreach (var video in collection)
                 {
-                    collection.RemoveAt(j); break;
+                    if (video == null)
+                    {
+                        collection.RemoveAt(j); break;
+                    }
+                    VideoIDs += video.Id + ",";
+                    j++;
                 }
-                VideoIDs += video.Id + ",";
-                j++;
-            }
-            var getViewsRequest = service.Videos.List("statistics");
-            getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
+                var getViewsRequest = service.Videos.List("statistics");
+                getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
-            var videoListResponse = getViewsRequest.Execute();
+                var videoListResponse = getViewsRequest.Execute();
 
-            for (int i = 0; i < collection.Count; i++)
-            {
-                try
+                for (int k = 0; k < collection.Count; k++)
                 {
-                    collection[i].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[i].Statistics.ViewCount) + collection[i].ViewsAndDate;
+                    try { collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate; }
+                    catch { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
                 }
-                catch { collection[i].ViewsAndDate = "Unknown" + collection[i].ViewsAndDate; }
             }
         }
 

@@ -438,6 +438,7 @@ namespace YTApp.Pages
             {
                 Log.Error(String.Format("An error occured while adding more videos to the channel page with the ID {0}", channel.Id));
                 Log.Error(ex.Message);
+                addingVideos = false;
             }
         }
 

@@ -11,7 +11,7 @@
     <AssemblyName>Youtube App</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.15063.0</TargetPlatformVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.15063.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -21,7 +21,7 @@
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
-    <AppxPackageDir>C:\Users\megam\Music\</AppxPackageDir>
+    <AppxPackageDir>C:\Users\liamc\Programming\UWP-Youtube-Client-Builds\</AppxPackageDir>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <PackageCertificateThumbprint>8B17C0337E47C34A98EC5779CC4709C7C94CA7EB</PackageCertificateThumbprint>
     <HockeyAppResourceId>b7521c5cde744a08831b27d83de35f13</HockeyAppResourceId>
