@@ -315,10 +315,8 @@ namespace YTApp.Classes
                 list = Constants.syncedData.history;
 
             var value = list.Find(x => x.Id == VideoID);
-            if (value != null)
-            {
+            if (value != null && !double.IsNaN(value.WatchTime))
                 return value.WatchTime;
-            }
             return 0;
         }
     }

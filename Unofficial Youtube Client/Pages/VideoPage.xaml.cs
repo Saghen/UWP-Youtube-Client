@@ -111,6 +111,7 @@ namespace YTApp.Pages
 
             //Set the ID of our viewer to the new ID
             viewer.Source = ID;
+ 
 
             var service = await YoutubeMethodsStatic.GetServiceAsync();
 
@@ -131,12 +132,6 @@ namespace YTApp.Pages
             UpdatePageInfo(service);
 
             UpdateRelatedVideos(service);
-
-            //Store the video id
-            /*if (localSettings.Values["History"] != null)
-                ((List<string>)localSettings.Values["History"]).Add(Constants.activeVideoID);
-            else
-                localSettings.Values["History"] = new List<string>() { Constants.activeVideoID };*/
         }
 
         public void UpdatePageInfo(YouTubeService service)
@@ -343,7 +338,7 @@ namespace YTApp.Pages
             localSettings.Values["Autoplay"] = SwitchAutoplay.IsOn;
         }
 
-        private async void VideoPlayer_MediaEnded(MediaPlayer sender, object args)
+        private async void VideoPlayer_MediaEnded(object sender, RoutedEventArgs e)
         {
             Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
             try

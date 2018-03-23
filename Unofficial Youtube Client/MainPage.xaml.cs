@@ -79,7 +79,7 @@ namespace YTApp
 
         #region Startup
 
-        private async void Startup()
+        private void Startup()
         {
             Log.Info("Loading subscriptions");
             LoadSubscriptions();

@@ -11,6 +11,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
 using YoutubeExplode;
 using YoutubeExplode.Models.MediaStreams;
 using YTApp.Classes;
@@ -31,7 +32,7 @@ namespace YTApp.UserControls
 
         private MediaStreamInfoSet videoStreams;
 
-        public MediaPlayerController controller = new MediaPlayerController();
+        public MediaPlayerController controller;
 
         //Timer that will update our progress slider on our custom controls
         public DispatcherTimer timer = new DispatcherTimer();
@@ -55,6 +56,8 @@ namespace YTApp.UserControls
         {
             this.InitializeComponent();
 
+            controller = new MediaPlayerController(viewer);
+
             //Update progress bar 30 times per second
             timer.Interval = new TimeSpan(0, 0, 0, 0, 32);
             timer.Tick += Timer_Tick;
@@ -63,7 +66,7 @@ namespace YTApp.UserControls
             pointerCheckTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
             pointerCheckTimer.Tick += PointerCheckTimer_Tick;
 
-            controller.videoPlayer.PlaybackSession.PlaybackStateChanged += PlaybackSession_PlaybackStateChanged;
+            controller.videoPlayer.CurrentStateChanged += VideoPlayer_CurrentStateChanged;
 
             //Update the position of the video in the cloud data store
             
@@ -71,17 +74,17 @@ namespace YTApp.UserControls
             storePositionTimer.Tick += StorePositionTimer_Tick;
         }
 
-        private async void PlaybackSession_PlaybackStateChanged(MediaPlaybackSession sender, object args)
+        private async void VideoPlayer_CurrentStateChanged(object sender, RoutedEventArgs e)
         {
-            if(controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Playing)
+            if (controller.videoPlayer.CurrentState == MediaElementState.Playing)
             {
                 await Dispatcher.RunAsync(CoreDispatcherPriority.High, () => { ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Pause }; LoadingRing.IsActive = false; });
             }
-            else if (controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Buffering)
+            else if (controller.videoPlayer.CurrentState == MediaElementState.Buffering)
             {
                 await Dispatcher.RunAsync(CoreDispatcherPriority.High, () => { LoadingRing.IsActive = true; });
             }
-            else if (controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Paused)
+            else if (controller.videoPlayer.CurrentState == MediaElementState.Paused)
             {
                 await Dispatcher.RunAsync(CoreDispatcherPriority.High, () => { ButtonPlay.Icon = new SymbolIcon() { Symbol = Symbol.Play }; LoadingRing.IsActive = false; });
             }
@@ -91,7 +94,7 @@ namespace YTApp.UserControls
 
         private void ButtonPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Playing || controller.videoPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Buffering)
+            if (controller.videoPlayer.CurrentState == MediaElementState.Playing || controller.videoPlayer.CurrentState == MediaElementState.Buffering)
                 controller.Pause();
             else
                 controller.Start();
@@ -210,7 +213,7 @@ namespace YTApp.UserControls
 
         private void QualityList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            controller.videoPlayer.Source = MediaSource.CreateFromUri(new Uri(YoutubeMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false)));
+            controller.videoPlayer.Source = new Uri(YoutubeMethodsStatic.GetVideoQuality((VideoQuality)e.ClickedItem, false));
             ButtonSettings.Flyout.Hide();
         }
 
@@ -311,9 +314,17 @@ namespace YTApp.UserControls
             if (!(await GetVideoData()))
                 return;
 
-            controller.Load(new Uri(Constants.videoInfo.Video[0].Url), new Uri(Constants.videoInfo.Audio[0].Url));
+            string audioUrl = "";
+            int highestBitrate = 0;
+            foreach(var audioOption in Constants.videoInfo.Audio)
+            {
+                if (audioOption.Container != Container.WebM && audioOption.Bitrate > highestBitrate)
+                {
+                    audioUrl = audioOption.Url;
+                }
+            }
 
-            viewer.SetMediaPlayer(controller.videoPlayer);
+            controller.Load(new Uri(Constants.videoInfo.Video[0].Url), new Uri(audioUrl));
 
             controller.Start();
 

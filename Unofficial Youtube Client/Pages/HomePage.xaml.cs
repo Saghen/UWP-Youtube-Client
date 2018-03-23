@@ -98,7 +98,6 @@ namespace YTApp.Pages
 
             var orderedSearchResponseList = searchResponseList.OrderByDescending(x => x.Snippet.PublishedAt).ToList();
 
-
             Log.Info("Ordering videos by date and placing them in the correct list");
             foreach (var video in orderedSearchResponseList)
             {
