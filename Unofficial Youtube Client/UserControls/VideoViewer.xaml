@@ -24,7 +24,7 @@
     </UserControl.Resources>
 
     <Grid x:Name="MediaViewerParent" KeyDown="MediaViewerParent_KeyDown">
-        <MediaElement x:Name="viewer" Tapped="viewer_Tapped" DoubleTapped="viewer_DoubleTapped" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" AreTransportControlsEnabled="False"/>
+        <MediaElement x:Name="viewer" Tapped="viewer_Tapped" DoubleTapped="viewer_DoubleTapped" PointerEntered="viewer_PointerEntered" PointerExited="viewer_PointerExited" AreTransportControlsEnabled="False" AutoPlay="False"/>
         <ProgressRing x:Name="LoadingRing" IsActive="False" Width="50" Height="50"/>
         <StackPanel x:Name="transportControls" x:FieldModifier="public" VerticalAlignment="Bottom" Background="#88000000">
             <Slider x:Name="viewerProgress" Style="{StaticResource MediaControlSliderStyle}" IsThumbToolTipEnabled="False" PointerCaptureLost="viewerProgress_SliderOnComplete" Margin="10,0" Maximum="10000"/>

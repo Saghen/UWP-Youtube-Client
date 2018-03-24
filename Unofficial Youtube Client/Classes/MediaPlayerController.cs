@@ -25,15 +25,18 @@ namespace YTApp.Classes
 
             videoPlayer.CurrentStateChanged += VideoPlayer_CurrentStateChanged;
 
+            audioPlayer.MediaOpened += AudioPlayer_MediaOpened;
+            videoPlayer.MediaOpened += VideoPlayer_MediaOpened;
+
             SynchronizePlayers();
         }
 
         private void VideoPlayer_CurrentStateChanged(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            if (videoPlayer.CurrentState == MediaElementState.Buffering)
-                audioPlayer.Pause();
-            else if (videoPlayer.CurrentState == MediaElementState.Playing && audioPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Paused)
+            if (videoPlayer.CurrentState == MediaElementState.Playing && audioPlayer.PlaybackSession.PlaybackState == MediaPlaybackState.Paused)
                 audioPlayer.Play();
+            else if (videoPlayer.CurrentState != MediaElementState.Playing)
+                audioPlayer.Pause();
         }
 
         private void AudioPlayer_MediaOpened(MediaPlayer sender, object args)
