@@ -47,24 +47,6 @@ namespace YTApp.Classes
             return VideoToAdd;
         }
 
-        public YoutubeItemDataType VideoToYoutubeItem(Activity video)
-        {
-            var VideoToAdd = new YoutubeItemDataType();
-            if (video == null) { VideoToAdd.Failed = true; return VideoToAdd; }
-            VideoToAdd.Author = video.Snippet.ChannelTitle;
-            VideoToAdd.Description = video.Snippet.Description;
-            try { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.Medium.Url; }
-            catch { VideoToAdd.Thumbnail = video.Snippet.Thumbnails.High.Url; }
-            VideoToAdd.Title = video.Snippet.Title;
-            VideoToAdd.Id = video.ContentDetails.Upload.VideoId;
-            VideoToAdd.Ylink = "https://www.youtube.com/watch?v=" + video.ContentDetails.Upload.VideoId;
-            VideoToAdd.ViewsAndDate = " Views • " + TimeSinceDate(video.Snippet.PublishedAt);
-            VideoToAdd.DateSubmitted = video.Snippet.PublishedAt.Value;
-            VideoToAdd.ChanneId = video.Snippet.ChannelId;
-            VideoToAdd.WatchTime = GetWatchedTime(video.Id);
-            return VideoToAdd;
-        }
-
         public YoutubeItemDataType VideoToYoutubeItem(Video video)
         {
             var VideoToAdd = new YoutubeItemDataType();
@@ -177,14 +159,19 @@ namespace YTApp.Classes
                     VideoIDs += video.Id + ",";
                     j++;
                 }
-                var getViewsRequest = service.Videos.List("statistics");
+                var getViewsRequest = service.Videos.List("statistics, contentDetails");
                 getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
                 var videoListResponse = getViewsRequest.Execute();
 
                 for (int k = 0; k < collection.Count; k++)
                 {
-                    try { collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate; }
+                    try
+                    {
+                        var test = DateTime.Parse(videoListResponse.Items[k].ContentDetails.Duration, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                        collection[k + i * 50].Length = DateTime.Parse(videoListResponse.Items[k].ContentDetails.Duration, null, System.Globalization.DateTimeStyles.RoundtripKind).ToString("HH:mm:ss");
+                        collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate;
+                    }
                     catch { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
                 }
             }
@@ -208,14 +195,19 @@ namespace YTApp.Classes
                     VideoIDs += video.Id + ",";
                     j++;
                 }
-                var getViewsRequest = service.Videos.List("statistics");
+                var getViewsRequest = service.Videos.List("statistics, contentDetails");
                 getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
                 var videoListResponse = getViewsRequest.Execute();
 
                 for (int k = 0; k < collection.Count; k++)
                 {
-                    try { collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate; }
+                    try
+                    {
+                        var test = DateTime.Parse(videoListResponse.Items[k].ContentDetails.Duration, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                        collection[k + i * 50].Length = DateTime.Parse(videoListResponse.Items[k].ContentDetails.Duration, null, System.Globalization.DateTimeStyles.RoundtripKind).ToString("HH:mm:ss");
+                        collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate;
+                    }
                     catch { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
                 }
             }
@@ -240,15 +232,19 @@ namespace YTApp.Classes
                     VideoIDs += video.Id + ",";
                     j++;
                 }
-                var getViewsRequest = service.Videos.List("statistics");
+                var getViewsRequest = service.Videos.List("statistics, contentDetails");
                 getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
                 var videoListResponse = getViewsRequest.Execute();
 
                 for (int k = 0; k < collection.Count; k++)
                 {
-                    try { collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate; }
-                    catch { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
+                   // try
+                   // {
+                        collection[k + i * 50].Length = ISO8601Converter(videoListResponse.Items[k].ContentDetails.Duration);
+                        collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate;
+                   // }
+                    //catch (Exception ex) { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
                 }
             }
         }
@@ -270,14 +266,18 @@ namespace YTApp.Classes
                     VideoIDs += video.Id + ",";
                     j++;
                 }
-                var getViewsRequest = service.Videos.List("statistics");
+                var getViewsRequest = service.Videos.List("statistics, contentDetails");
                 getViewsRequest.Id = VideoIDs.Remove(VideoIDs.Length - 1);
 
                 var videoListResponse = getViewsRequest.Execute();
 
                 for (int k = 0; k < collection.Count; k++)
                 {
-                    try { collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate; }
+                    try
+                    {
+                        collection[k + i * 50].Length = ISO8601Converter(videoListResponse.Items[k].ContentDetails.Duration);
+                        collection[k + i * 50].ViewsAndDate = YoutubeMethodsStatic.ViewCountShortner(videoListResponse.Items[k].Statistics.ViewCount) + collection[k + i * 50].ViewsAndDate;
+                    }
                     catch { collection[k + i * 50].ViewsAndDate = "Unknown" + collection[k + i * 50].ViewsAndDate; }
                 }
             }
@@ -309,8 +309,8 @@ namespace YTApp.Classes
         public double GetWatchedTime(string VideoID)
         {
             List<YoutubeItemDataType> list;
-            if (Constants.syncedData.history.Count > 200)
-                list = Constants.syncedData.history.GetRange(0, 200);
+            if (Constants.syncedData.history.Count > 1000)
+                list = Constants.syncedData.history.GetRange(0, 1000);
             else
                 list = Constants.syncedData.history;
 
@@ -318,6 +318,29 @@ namespace YTApp.Classes
             if (value != null && !double.IsNaN(value.WatchTime))
                 return value.WatchTime;
             return 0;
+        }
+
+        /// <summary>
+        /// Parses ISO 8601 Date into a MM:SS format
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        private string ISO8601Converter(string time)
+        {
+            //Gets the two values for Minutes and Seconds
+            var split = time.Remove(0, 2).Split(new char[] { 'M', 'S' });
+
+            //Ensures that the minutes and seconds use atleast two digits (i.e. 05:04 instead of 5:4)
+            for (int i = 0; i < split.Length; i++)
+            {
+                while (split[i].Length < 2)
+                {
+                    split[i] = "0" + split[i];
+                }
+            }
+
+            //Combines the minutes value and seconds value together and returns them
+            return split[0] + ":" + split[1];
         }
     }
 }

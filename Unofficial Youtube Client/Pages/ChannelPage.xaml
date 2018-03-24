@@ -62,11 +62,17 @@
                                                     <lclctrls:GridViewWithXProperty.ItemTemplate>
                                                         <DataTemplate x:DataType="classes:YoutubeItemDataType">
                                                             <StackPanel Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
-                                                                <Image x:Name="ImageControl" Margin="5" HorizontalAlignment="Center">
-                                                                    <Image.Source>
-                                                                        <BitmapImage DecodePixelWidth="240" DecodePixelHeight="135" UriSource="{x:Bind Thumbnail}"/>
-                                                                    </Image.Source>
-                                                                </Image>
+                                                                <Grid Margin="5">
+                                                                    <Image x:Name="ImageControl" HorizontalAlignment="Center">
+                                                                        <Image.Source>
+                                                                            <BitmapImage DecodePixelWidth="240" DecodePixelHeight="135" UriSource="{x:Bind Thumbnail}"/>
+                                                                        </Image.Source>
+                                                                    </Image>
+                                                                    <Border VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#88000000" Margin="5">
+                                                                        <TextBlock Foreground="#fff" Text="{x:Bind Length}" FontSize="12" Margin="10,3"/>
+                                                                    </Border>
+                                                                </Grid>
+
                                                                 <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
                                                                 <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>
                                                                 <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>
@@ -125,11 +131,16 @@
                             <GridView.ItemTemplate>
                                 <DataTemplate x:DataType="classes:YoutubeItemDataType">
                                     <StackPanel Margin="10" Orientation="Vertical" Width="250" Height="250" HorizontalAlignment="Center">
-                                        <Image x:Name="ImageControl" Margin="5" HorizontalAlignment="Center">
-                                            <Image.Source>
-                                                <BitmapImage DecodePixelWidth="240" DecodePixelHeight="135" UriSource="{x:Bind Thumbnail}"/>
-                                            </Image.Source>
-                                        </Image>
+                                        <Grid Margin="5">
+                                            <Image x:Name="ImageControl" Margin="5" HorizontalAlignment="Center">
+                                                <Image.Source>
+                                                    <BitmapImage DecodePixelWidth="240" DecodePixelHeight="135" UriSource="{x:Bind Thumbnail}"/>
+                                                </Image.Source>
+                                            </Image>
+                                            <Border VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#88000000" Margin="5">
+                                                <TextBlock Foreground="#fff" Text="{x:Bind Length}" FontSize="12" Margin="10,3"/>
+                                            </Border>
+                                        </Grid>
                                         <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="15" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center"/>
                                         <TextBlock x:Name="AuthorControl" Text="{x:Bind Author}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>
                                         <TextBlock x:Name="ViewsAndDateControl" Text="{x:Bind ViewsAndDate}" Foreground="{StaticResource AppTextSecondary}" FontSize="12" HorizontalAlignment="Center"/>

@@ -326,7 +326,8 @@ namespace YTApp.UserControls
 
             controller.Load(new Uri(Constants.videoInfo.Video[0].Url), new Uri(audioUrl));
 
-            controller.Start();
+            //Start the video at the previous time
+            controller.Start(new TimeSpan(0, 0, Convert.ToInt32(new YoutubeMethods().GetWatchedTime(Constants.activeVideoID))));
 
             timer.Start();
             storePositionTimer.Start();

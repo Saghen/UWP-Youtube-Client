@@ -12,11 +12,16 @@
     <Page.Resources>
         <DataTemplate x:Key="VideoDataTemplate" x:DataType="classes:YoutubeItemDataType">
             <StackPanel Margin="10" Height="200" Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <Image x:Name="ImageControl" Margin="10">
-                    <Image.Source>
-                        <BitmapImage UriSource="{Binding Thumbnail}" DecodePixelWidth="200" DecodePixelHeight="113" />
-                    </Image.Source>
-                </Image>
+                <Grid Margin="10">
+                    <Image x:Name="ImageControl">
+                        <Image.Source>
+                            <BitmapImage UriSource="{Binding Thumbnail}" DecodePixelWidth="200" DecodePixelHeight="113" />
+                        </Image.Source>
+                    </Image>
+                    <Border VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="#88000000" Margin="5">
+                        <TextBlock Foreground="#fff" Text="{x:Bind Length}" FontSize="12" Margin="10,3"/>
+                    </Border>
+                </Grid>
                 <StackPanel>
                     <TextBlock x:Name="TitleControl" Text="{x:Bind Title}" FontSize="18" Foreground="{StaticResource AppText}" TextWrapping="WrapWholeWords" TextTrimming="CharacterEllipsis"/>
                     <StackPanel Orientation="Horizontal">
@@ -43,7 +48,7 @@
         </DataTemplate>
         <classes2:SearchTemplateSelector x:Key="SearchTemplateSelector" VideoTemplate="{StaticResource VideoDataTemplate}" ChannelTemplate="{StaticResource ChannelDataTemplate}" />
     </Page.Resources>
-    
+
     <ScrollViewer x:Name="ScrollView" ViewChanged="ScrollView_ViewChanged">
         <Grid x:Name="MainGrid">
             <ListView x:Name="YoutubeItemsGridView" HorizontalAlignment="Center" SelectionMode="None" IsItemClickEnabled="True" ItemClick="YoutubeItemsGridView_ItemClick" ItemsSource="{x:Bind SearchResultsList, Mode=OneWay}" ItemTemplateSelector="{StaticResource SearchTemplateSelector}"/>

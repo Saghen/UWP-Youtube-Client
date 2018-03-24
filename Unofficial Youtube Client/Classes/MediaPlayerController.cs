@@ -68,8 +68,13 @@ namespace YTApp.Classes
             audioPlayer.Play();
         }
 
-        public void Start(TimeSpan time)
+        public async void Start(TimeSpan time)
         {
+            while (!audioPlayerOpened || !videoPlayerOpened)
+            {
+                await Task.Delay(50);
+            }
+
             videoPlayer.Position = time;
             audioPlayer.PlaybackSession.Position = time;
 
