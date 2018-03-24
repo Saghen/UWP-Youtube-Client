@@ -93,10 +93,10 @@
                             <ComboBoxItem Content="Relevance"/>
                             <ComboBoxItem Content="Newest"/>
                         </ComboBox>
-                        <ItemsControl ItemsSource="{x:Bind commentCollection, Mode=OneWay}">
+                        <ItemsControl x:Name="CommentsControl" ItemsSource="{x:Bind commentCollection, Mode=OneWay}" HorizontalContentAlignment="Stretch">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="classes:CommentContainerDataType">
-                                    <userctrls:CommentThread Source="{x:Bind commentData}"/>
+                                    <userctrls:CommentThread Source="{x:Bind commentData}" Width="{Binding ElementName=CommentsControl, Path=ActualWidth, Mode=OneWay}"/>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

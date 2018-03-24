@@ -6,9 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:classes="using:YTApp.Classes.DataTypes"
-    mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="800">
+    mc:Ignorable="d">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -19,7 +17,11 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <StackPanel Orientation="Horizontal" Margin="0,15" >
+    <Grid x:Name="parentPanel" Margin="0,15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <Ellipse Margin="20,0" Width="50" Height="50" VerticalAlignment="Top">
             <Ellipse.Fill>
                 <ImageBrush>
@@ -29,12 +31,12 @@
                 </ImageBrush>
             </Ellipse.Fill>
         </Ellipse>
-        <StackPanel>
+        <StackPanel Grid.Column="1">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{x:Bind Source.Author}" Margin="0,0,10,0" IsTextSelectionEnabled="True"/>
-                <TextBlock Text="{x:Bind Source.DatePosted}" Foreground="{StaticResource AppTextSecondary}" IsTextSelectionEnabled="True"/>
+                <TextBlock Text="{x:Bind Source.Author}" Margin="0,0,10,0"/>
+                <TextBlock Text="{x:Bind Source.DatePosted}" Foreground="{StaticResource AppTextSecondary}"/>
             </StackPanel>
-            <TextBlock Text="{x:Bind Source.Content}" Margin="0,10" IsTextSelectionEnabled="True" MaxLines="20" TextWrapping="WrapWholeWords"/>
+            <TextBlock Text="{x:Bind Source.Content}" Margin="0,10" TextWrapping="WrapWholeWords"/>
             <StackPanel Orientation="Horizontal">
                 <HyperlinkButton Foreground="{StaticResource AppTextSecondary}" Content="REPLY" VerticalAlignment="Center" Margin="0,0,10,0" Tapped="ReplyButton_Tapped">
                     <HyperlinkButton.ContentTemplate>
@@ -56,13 +58,17 @@
             </StackPanel>
             <StackPanel x:Name="Replies">
                 <TextBlock >
-                    <Hyperlink x:Name="ViewMoreButton" Foreground="{StaticResource AppTextSecondary}" TextDecorations="None" Click="ViewMoreButton_Click">View more comments</Hyperlink>
+                    <Hyperlink x:Name="ViewMoreButton" TextDecorations="None" Click="ViewMoreButton_Click">View more comments</Hyperlink>
                 </TextBlock>
                 <ItemsControl x:Name="RepliesItems" ItemsSource="{x:Bind commentReplies}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="classes:CommentDataType">
-                            <StackPanel Orientation="Horizontal" Margin="0,15">
-                                <TextBlock Foreground="{StaticResource AppTextSecondary}" Margin="20,14,0,0" VerticalAlignment="Top" IsTextSelectionEnabled="True"><Run Text="{x:Bind LikeCount}"/></TextBlock>
+                            <Grid Margin="0,15" HorizontalAlignment="Left">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Foreground="{StaticResource AppTextSecondary}" Margin="20,14,0,0" VerticalAlignment="Top" Text="{x:Bind LikeCount}"></TextBlock>
                                 <Ellipse Margin="20,0" Width="50" Height="50" VerticalAlignment="Top">
                                     <Ellipse.Fill>
                                         <ImageBrush>
@@ -72,18 +78,18 @@
                                         </ImageBrush>
                                     </Ellipse.Fill>
                                 </Ellipse>
-                                <StackPanel>
+                                <StackPanel Grid.Column="1">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{x:Bind Author}" Margin="0,0,10,0" IsTextSelectionEnabled="True"/>
-                                        <TextBlock Text="{x:Bind DatePosted}" Foreground="{StaticResource AppTextSecondary}" IsTextSelectionEnabled="True"/>
+                                        <TextBlock Text="{x:Bind Author}" Margin="0,0,10,0"/>
+                                        <TextBlock Text="{x:Bind DatePosted}" Foreground="{StaticResource AppTextSecondary}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{x:Bind Content}" Margin="0,10" IsTextSelectionEnabled="True" MaxLines="20" TextWrapping="WrapWholeWords"/>
+                                    <TextBlock Text="{x:Bind Content}" Margin="0,10" TextWrapping="WrapWholeWords"/>
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </Grid>
 </UserControl>
